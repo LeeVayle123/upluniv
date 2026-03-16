@@ -10,6 +10,18 @@ except ImportError:
     host = user = password = database = None
 
 import os
+
+# Aide pour la compatibilité MySQL/SQLite
+def execute_sql(cursor, query, params=None):
+    if params is None:
+        # On remplace %s par ? même sans paramètres car SQLite est strict
+        query = query.replace('%s', '?')
+        return cursor.execute(query)
+    # Si on utilise SQLite, on remplace %s par ?
+    if 'sqlite' in str(type(cursor)).lower():
+        query = query.replace('%s', '?')
+    return cursor.execute(query, params)
+
 # Initialisation de l'application Flask
 app = Flask(__name__)
 
@@ -51,7 +63,7 @@ def init_sqlite_db():
         ]
         
         for table in student_tables:
-            cursor.execute(f'''
+            execute_sql(cursor, f'''
                 CREATE TABLE IF NOT EXISTS {table} (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     matricule TEXT UNIQUE,
@@ -68,7 +80,7 @@ def init_sqlite_db():
             ''')
             
             # Table de présence pour chaque promotion
-            cursor.execute(f'''
+            execute_sql(cursor, f'''
                 CREATE TABLE IF NOT EXISTS presence_{table} (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     matricule TEXT,
@@ -87,7 +99,7 @@ def init_sqlite_db():
             ''')
             
         # Table centrale des présences
-        cursor.execute('''
+        execute_sql(cursor, '''
             CREATE TABLE IF NOT EXISTS presences (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 matricule TEXT,
@@ -167,7 +179,7 @@ def check_attendance():
         for table in tables:
             # On cherche si le matricule existe dans CETTE promotion spécifique
             query = f"SELECT nom, postnom, prenom, filiere, promotion, sexe, faculte, parcours FROM {table} WHERE matricule = %s"
-            cursor.execute(query, (matricule,))
+            execute_sql(cursor, query, (matricule,))
             result = cursor.fetchone()
             
             # 5. SI ON TROUVE L'ÉTUDIANT :
@@ -181,7 +193,7 @@ def check_attendance():
                     (matricule, nom, postnom, prenom, sexe, parcours, promotion, filiere, faculte, type_presence, device_signature) 
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """
-                cursor.execute(insert_query, (matricule, nom, postnom, prenom, sexe, parcours, promotion, filiere, faculte, type_presence, device_signature))
+                execute_sql(cursor, insert_query, (matricule, nom, postnom, prenom, sexe, parcours, promotion, filiere, faculte, type_presence, device_signature))
                 conn.commit()
                 
                 cursor.close()
@@ -195,7 +207,7 @@ def check_attendance():
         conn.close()
         return "Erreur : Matricule non trouvé. L'étudiant doit d'abord s'inscrire dans sa promotion."
         
-    except mysql.connector.Error as err:
+    except (mysql.connector.Error, sqlite3.Error, Exception) as err:
         return f"Erreur technique de base de données : {err}"
 
 
@@ -223,7 +235,7 @@ def get_student_info(matricule):
         for table in tables:
 
             query = f"SELECT * FROM {table} WHERE matricule = %s"
-            cursor.execute(query, (matricule,))
+            execute_sql(cursor, query, (matricule,))
             result = cursor.fetchone()
             
             if result:
@@ -235,7 +247,7 @@ def get_student_info(matricule):
         conn.close()
         return jsonify({"error": "Étudiant non trouvé"}), 404
         
-    except mysql.connector.Error as err:
+    except (mysql.connector.Error, sqlite3.Error, Exception) as err:
         return jsonify({"error": str(err)}), 500
 
 @app.route('/generate_qr')
@@ -321,14 +333,14 @@ def register():
         
         # Ce code sert à INSÉRER les données récupérées dans la table appropriée
         query = f"INSERT INTO {table} (matricule, nom, postnom, prenom, sexe, parcours, promotion, filiere, faculte) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
-        cursor.execute(query, (matricule, nom, postnom, prenom, sexe, parcours, promotion, filiere, faculte))
+        execute_sql(cursor, query, (matricule, nom, postnom, prenom, sexe, parcours, promotion, filiere, faculte))
         
         conn.commit()
         cursor.close()
         conn.close()
         # Message de succès après enregistrement : redirection vers la liste spécifique
         return redirect(url_for('view_students', promo=table))
-    except mysql.connector.Error as err:
+    except (mysql.connector.Error, sqlite3.Error, Exception) as err:
         return f"Erreur lors de l'inscription : {err}"
     except Exception as e:
         return f"Une erreur est survenue : {e}"
@@ -360,9 +372,9 @@ def view_presences():
         # On lit la table centrale 'presences'
 
         try:
-            cursor.execute("SELECT * FROM presences ORDER BY date_inscription DESC")
+            execute_sql(cursor, "SELECT * FROM presences ORDER BY date_inscription DESC")
             all_presences = cursor.fetchall()
-        except mysql.connector.Error:
+        except (mysql.connector.Error, sqlite3.Error, Exception):
             all_presences = []
 
         cursor.close()
@@ -382,7 +394,7 @@ def view_presences():
         
         # 5. On envoie les données au template HTML pour l'affichage final
         return render_template('presences.html', presences=all_presences)
-    except mysql.connector.Error as err:
+    except (mysql.connector.Error, sqlite3.Error, Exception) as err:
         return f"Erreur lors de la récupération des présences : {err}"
 
 @app.route('/students')
@@ -437,7 +449,7 @@ def api_presences():
             presence_table = f"presence_{table}"
             try:
                 # On récupère toutes les présences de cette table
-                cursor.execute(f"SELECT * FROM {presence_table} ORDER BY date_inscription DESC")
+                execute_sql(cursor, f"SELECT * FROM {presence_table} ORDER BY date_inscription DESC")
                 rows = cursor.fetchall()
                 for row in rows:
                     # Formatage de la date pour l'affichage
@@ -451,7 +463,7 @@ def api_presences():
                         row['formatted_time'] = "N/A"
                         row['date_inscription'] = None
                     all_presences.append(row)
-            except mysql.connector.Error:
+            except (mysql.connector.Error, sqlite3.Error, Exception):
                 # Si une table de présence n'existe pas encore, on passe à la suivante
                 continue
 
@@ -508,7 +520,7 @@ def api_presence_stats():
             presence_table = f"presence_{table}"
             try:
                 # Compte le total et répartit par type_presence
-                cursor.execute(f"SELECT type_presence FROM {presence_table}")
+                execute_sql(cursor, f"SELECT type_presence FROM {presence_table}")
                 rows = cursor.fetchall()
                 for row in rows:
                     total += 1
@@ -516,7 +528,7 @@ def api_presence_stats():
                         entrees += 1
                     elif row['type_presence'] == 'Sortie':
                         sorties += 1
-            except mysql.connector.Error:
+            except (mysql.connector.Error, sqlite3.Error, Exception):
                 continue
 
         cursor.close()
@@ -573,7 +585,7 @@ def api_students():
 
         for table in tables:
             try:
-                cursor.execute(f"SELECT * FROM {table}")
+                execute_sql(cursor, f"SELECT * FROM {table}")
                 rows = cursor.fetchall()
                 for row in rows:
                     if row['date_inscription']:
@@ -581,7 +593,7 @@ def api_students():
                     else:
                         row['formatted_date'] = "N/A"
                     all_students.append(row)
-            except mysql.connector.Error:
+            except (mysql.connector.Error, sqlite3.Error, Exception):
                 continue
 
         cursor.close()
@@ -635,7 +647,7 @@ def api_stats():
 
         for table in tables:
             try:
-                cursor.execute(f"SELECT sexe FROM {table}")
+                execute_sql(cursor, f"SELECT sexe FROM {table}")
                 rows = cursor.fetchall()
                 for row in rows:
                     total_count += 1
@@ -643,7 +655,7 @@ def api_stats():
                         male_count += 1
                     elif row['sexe'] == 'F':
                         female_count += 1
-            except mysql.connector.Error:
+            except (mysql.connector.Error, sqlite3.Error, Exception):
                 continue
 
         cursor.close()
@@ -669,7 +681,7 @@ def admin_dashboard():
         cursor = conn.cursor()
         
         # Compte des étudiants en Bac1 IAGE
-        cursor.execute("SELECT COUNT(*) FROM bac1_IAGE")
+        execute_sql(cursor, "SELECT COUNT(*) FROM bac1_IAGE")
         bac1_count = cursor.fetchone()[0]
         
         # Compte total des présences (somme de toutes les tables)
@@ -684,7 +696,7 @@ def admin_dashboard():
         presence_count = 0
         for table in tables:
             try:
-                cursor.execute(f"SELECT COUNT(*) FROM presence_{table}")
+                execute_sql(cursor, f"SELECT COUNT(*) FROM presence_{table}")
                 presence_count += cursor.fetchone()[0]
             except:
                 continue
@@ -692,7 +704,7 @@ def admin_dashboard():
         cursor.close()
         conn.close()
         return render_template('admin_dashboard.html', bac1_count=bac1_count, presence_count=presence_count)
-    except mysql.connector.Error as err:
+    except (mysql.connector.Error, sqlite3.Error, Exception) as err:
         return f"Erreur : {err}"
 
 @app.route('/admin/bac1_iage')
@@ -709,12 +721,12 @@ def admin_bac1_iage():
         
         # Récupération du total
 
-        cursor.execute("SELECT COUNT(*) as total FROM bac1_IAGE")
+        execute_sql(cursor, "SELECT COUNT(*) as total FROM bac1_IAGE")
         count_res = cursor.fetchone()
         count = count_res['total']
         
         # Récupération de la liste complète
-        cursor.execute("SELECT * FROM bac1_IAGE ORDER BY date_inscription DESC")
+        execute_sql(cursor, "SELECT * FROM bac1_IAGE ORDER BY date_inscription DESC")
         students = cursor.fetchall()
         
         # Pré-formatage des données pour le template
@@ -735,7 +747,7 @@ def admin_bac1_iage():
         cursor.close()
         conn.close()
         return render_template('admin_bac1_iage.html', students=students, count=count)
-    except mysql.connector.Error as err:
+    except (mysql.connector.Error, sqlite3.Error, Exception) as err:
         return f"Erreur : {err}"
 
 @app.route('/admin/attendance')
@@ -762,7 +774,7 @@ def admin_attendance():
 
         for table in tables:
             try:
-                cursor.execute(f"SELECT * FROM presence_{table}")
+                execute_sql(cursor, f"SELECT * FROM presence_{table}")
                 rows = cursor.fetchall()
                 all_presences.extend(rows)
             except:
@@ -785,7 +797,7 @@ def admin_attendance():
         cursor.close()
         conn.close()
         return render_template('admin_attendance.html', presences=all_presences)
-    except mysql.connector.Error as err:
+    except (mysql.connector.Error, sqlite3.Error, Exception) as err:
         return f"Erreur : {err}"
 
 @app.route('/admin/reset_table', methods=['POST'])
@@ -814,10 +826,10 @@ def reset_table():
         cursor = conn.cursor()
         # On vide la table (Action irréversible)
         if isinstance(conn, sqlite3.Connection):
-            cursor.execute(f"DELETE FROM {table_name}")
-            cursor.execute("DELETE FROM sqlite_sequence WHERE name=?", (table_name,))
+            execute_sql(cursor, f"DELETE FROM {table_name}")
+            execute_sql(cursor, "DELETE FROM sqlite_sequence WHERE name=?", (table_name,))
         else:
-            cursor.execute(f"TRUNCATE TABLE {table_name}")
+            execute_sql(cursor, f"TRUNCATE TABLE {table_name}")
         conn.commit()
         cursor.close()
         conn.close()
@@ -828,7 +840,7 @@ def reset_table():
         else:
             return redirect(url_for('view_students', promo=table_name))
             
-    except mysql.connector.Error as err:
+    except (mysql.connector.Error, sqlite3.Error, Exception) as err:
         return f"Erreur lors de la réinitialisation : {err}"
 
 # Lancement du serveur
