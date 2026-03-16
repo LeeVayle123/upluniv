@@ -23,8 +23,9 @@ def execute_sql(cursor, query, params=None):
         query = query.replace('%s', '?')
     return cursor.execute(query, params)
 
-# Initialisation de l'application Flask
-app = Flask(__name__)
+# Configuration pour charger les fichiers directement à la racine (sans dossier templates)
+# Utile si tu as du mal avec les dossiers sur GitHub
+app = Flask(__name__, template_folder='.', static_folder='.')
 
 # --- MODE DE DÉBOGAGE POUR RENDER ---
 @app.errorhandler(Exception)
