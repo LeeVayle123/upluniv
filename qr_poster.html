@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Officiel - UPL</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: #f1f5f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .poster {
+            width: 210mm;
+            /* A4 width */
+            background: white;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            border-radius: 8px;
+            position: relative;
+            text-align: center;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            margin-bottom: 50px;
+            border-bottom: 3px solid navy;
+            padding-bottom: 20px;
+        }
+
+        .logo {
+            width: 120px;
+            height: auto;
+            margin-right: 30px;
+        }
+
+        .title-container {
+            text-align: left;
+        }
+
+        .univ-title {
+            color: navy;
+            font-size: 1.8rem;
+            font-weight: 800;
+            line-height: 1.2;
+            text-transform: uppercase;
+        }
+
+        .univ-subtitle {
+            color: red;
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-top: 5px;
+        }
+
+        .qr-section {
+            margin: 60px 0;
+        }
+
+        .qr-code-img {
+            width: 350px;
+            height: 350px;
+            padding: 15px;
+            border: 5px solid navy;
+            border-radius: 20px;
+        }
+
+        .instructions {
+            font-size: 1.5rem;
+            color: #1e293b;
+            font-weight: 600;
+            margin-top: 30px;
+        }
+
+        .footer {
+            margin-top: 60px;
+            font-size: 0.9rem;
+            color: #64748b;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 20px;
+        }
+
+        .no-print {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+        }
+
+        .btn-print {
+            background: navy;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 999px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        @media print {
+            .no-print {
+                display: none;
+            }
+
+            body {
+                background: white;
+                padding: 0;
+            }
+
+            .poster {
+                box-shadow: none;
+                width: 100%;
+                border: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="no-print">
+        <button class="btn-print" onclick="window.print()">🖨️ Imprimer le QR Code</button>
+    </div>
+
+    <div class="poster">
+        <header class="header">
+            <img src="{{ url_for('static', filename='logo_wh.png') }}" alt="Logo UPL" class="logo">
+            <div class="title-container">
+                <h1 class="univ-title">UNIVERSITE PROTESTANTE <br>DE LUBUMBASHI (UPL)</h1>
+                <p class="univ-subtitle">Vous connetrez la verite, et la verite vous affranchira</p>
+            </div>
+        </header>
+
+        <section class="qr-section">
+            <img src="{{ url_for('generate_qr') }}" alt="QR Code" class="qr-code-img">
+            <p class="instructions">Scannez pour valider votre présence</p>
+            {% if target_url %}
+            <p style="margin-top: 20px; color: #64748b; font-size: 0.8rem; border: 1px dashed #cbd5e1; padding: 10px; border-radius: 5px; background: #f8fafc;">
+                Lien actuel : <strong>{{ target_url }}</strong>
+            </p>
+            {% endif %}
+        </section>
+
+
+        <footer class="footer">
+            <p>© 2026 Université Protestante de Lubumbashi - Système de Gestion des Présences</p>
+        </footer>
+    </div>
+</body>
+
+</html>

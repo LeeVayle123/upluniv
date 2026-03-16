@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscription Étudiant - UPL</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: navy;
+            --primary-dark: navy;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+
+            --radius-lg: 16px;
+            --radius-md: 16px;
+            --transition: all 0.2s ease;
+        }
+
+        .logo-container {
+            display: flex;
+            justify-content: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .university-logo {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            background: white;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: #f8fafc;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px;
+            color: var(--text-main);
+        }
+
+        .vayleP {
+
+            width: 100%;
+            max-width: 720px;
+            display: flex;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            background: white;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+        }
+
+        .side-panel {
+            flex: 0.7;
+            background: linear-gradient(160deg, navy 0%, navy 100%);
+            padding: 32px 24px;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .paneau-titre {
+            font-size: 1.75rem;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 12px;
+        }
+
+        .brand-desc {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            line-height: 1.5;
+            margin-bottom: 24px;
+        }
+
+        /*fais partie de modificatioon du bouton se connecter*/
+        .btn-horsligne {
+            display: inline-flex;
+            padding: 8px 20px;
+            border: 1.5px solid rgba(255, 255, 255, 0.6);
+            border-radius: 999px;
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 13px;
+            transition: var(--transition);
+            width: fit-content;
+        }
+
+        /*modification du bouton se conncter pour le hover, et la couleur en roiuge*/
+        .btn-horsligne:hover {
+            background: red;
+            border-color: white;
+        }
+
+        .vayPform {
+            flex: 1.3;
+            padding: 28px 32px;
+            background: white;
+        }
+
+        .formPrincipale {
+            margin-bottom: 20px;
+        }
+
+        .form-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .form-subtitle {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .vayle {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .form-group {
+            margin-bottom: 4px;
+        }
+
+        .form-group.full {
+            grid-column: span 2;
+        }
+
+        .form-de-label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: var(--text-main);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 8px 12px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: var(--radius-md);
+            font-size: 0.9rem;
+            font-family: inherit;
+            color: var(--text-main);
+            transition: var(--transition);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .btn-submit {
+            grid-column: span 2;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: var(--radius-md);
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: 12px;
+        }
+
+        .btn-submit:hover {
+            background: red;
+            transform: translateY(-1px);
+        }
+
+        .form-footer {
+            margin-top: 16px;
+            text-align: center;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        @media (max-width: 700px) {
+            .vayleP {
+                flex-direction: column;
+                max-width: 400px;
+            }
+
+            .side-panel {
+                padding: 24px;
+                text-align: center;
+                align-items: center;
+            }
+
+            .vayPform {
+                padding: 24px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .vayle {
+                grid-template-columns: 1fr;
+            }
+
+            .form-group.full,
+            .btn-submit {
+                grid-column: span 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="vayleP">
+        <aside class="side-panel">
+            <h1 class="paneau-titre">Hello welcome</h1>
+            <p class="paneau-desc">Don't have Account ?</p>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <a href="/attendance" class="btn-horsligne">Se connecter</a>
+                <a href="/students" class="btn-horsligne" text-align: center;
+                    style="background: rgba(255,255,255,0.1);">Liste des étudiants</a>
+            </div>
+        </aside>
+
+        <main class="vayPform">
+
+            <div class="formPrincipale">
+                <h2 class="form-title">Inscription</h2>
+                <p class="form-subtitle">Remplissez le formulaire pour créer votre compte.</p>
+            </div>
+
+            <form action="/register" method="post" class="vayle">
+                <div class="formGvay">
+                    <label class="form-de-label" for="matricule">Matricule</label>
+                    <input type="text" id="matricule" name="matricule" class="form-input" required
+                        placeholder="Ex: 123/24">
+                </div>
+
+                <div class="formGvay">
+                    <label class="form-de-label" for="sexe">Sexe</label>
+                    <select id="sexe" name="sexe" class="form-input" required>
+                        <option value="">Sélectionner</option>
+                        <option value="M">M</option>
+                        <option value="F">F</option>
+                    </select>
+                </div>
+
+                <div class="formeGvay">
+                    <label class="form-de-label" for="nom">Nom</label>
+                    <input type="text" id="nom" name="nom" class="form-input" required>
+                </div>
+
+                <div class="formeGvay">
+                    <label class="form-de-label" for="postnom">Postnom</label>
+                    <input type="text" id="postnom" name="postnom" class="form-input" required>
+                </div>
+
+                <div class="formeGvay">
+                    <label class="form-de-label" for="prenom">Prénom</label>
+                    <input type="text" id="prenom" name="prenom" class="form-input" required>
+                </div>
+
+                <div class="formeGvay">
+                    <label class="form-de-label" for="parcours">Parcours</label>
+                    <select id="parcours" name="parcours" class="form-input" onchange="updateFields()" required>
+                        <option value="">Sélectionner</option>
+                        <option value="IAGE">IAGE</option>
+                        <option value="TECHNOLOGIE">TECHNOLOGIE</option>
+                    </select>
+                </div>
+
+                <div id="promotionDiv" style="display:none;" class="formeGvay">
+                    <label class="form-de-label" for="promotion">Promotion</label>
+                    <select id="promotion" name="promotion" class="form-input" required></select>
+                </div>
+
+                <div id="filiereDiv" style="display:none;" class="formeGvay">
+                    <label class="form-de-label" for="filiere">Filière</label>
+                    <select id="filiere" name="filiere" class="form-input" required>
+                        <option value="IA">IA</option>
+                        <option value="GL">GL</option>
+                        <option value="SI">SI</option>
+                    </select>
+                </div>
+
+                <div class="formeGvay">
+                    <label class="form-de-label" for="faculte">Faculté</label>
+                    <select id="faculte" name="faculte" class="form-input" required>
+                        <option value="Faculté de sciences informatiques">Informatique</option>
+                        <option value="Polytechnique">Polytechnique</option>
+                    </select>
+                </div>
+
+
+                <button type="submit" class="btn-submit">S'inscrire</button>
+            </form>
+
+            <div class="form-footer">
+                <p>&copy; 2026 Université Protestante de Lubumbashi</p>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function updateFields() {
+            var parcours = document.getElementById('parcours').value;
+            var promotionDiv = document.getElementById('promotionDiv');
+            var filiereDiv = document.getElementById('filiereDiv');
+            var promotionSelect = document.getElementById('promotion');
+
+            if (parcours === 'IAGE') {
+                promotionDiv.style.display = 'block';
+                filiereDiv.style.display = 'none';
+                promotionSelect.innerHTML = `
+                    <option value="Bac1">Bac 1</option>
+                    <option value="Bac2">Bac 2</option>
+                    <option value="Bac3">Bac 3</option>
+                `;
+            } else if (parcours === 'TECHNOLOGIE') {
+                promotionDiv.style.display = 'block';
+                filiereDiv.style.display = 'block';
+                promotionSelect.innerHTML = `
+                    <option value="Bac1">Bac 1</option>
+                    <option value="Bac2">Bac 2</option>
+                    <option value="Bac3">Bac 3</option>
+                    <option value="Bac4">Bac 4</option>
+                `;
+            } else {
+                promotionDiv.style.display = 'none';
+                filiereDiv.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+
+</html>
