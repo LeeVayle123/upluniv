@@ -2,6 +2,7 @@ import mysql.connector
 import sqlite3
 import qrcode
 import io
+import traceback
 from flask import Flask, request, render_template, redirect, url_for, jsonify, send_file
 try:
     from db_config import host, user, password, database
@@ -24,6 +25,13 @@ def execute_sql(cursor, query, params=None):
 
 # Initialisation de l'application Flask
 app = Flask(__name__)
+
+# --- MODE DE DÉBOGAGE POUR RENDER ---
+@app.errorhandler(Exception)
+def handle_exception(e):
+    # Passer le traceback au navigateur
+    tb = traceback.format_exc()
+    return f"<h1>Erreur Interne du Serveur</h1><pre>{tb}</pre>", 500
 
 # --- CONFIGURATION DE L'URL PUBLIQUE (NGROK) ---
 # Si vous utilisez Ngrok, modifiez cette variable avec votre lien https://...
