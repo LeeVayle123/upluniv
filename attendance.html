@@ -303,33 +303,50 @@
                 form.addEventListener('submit', function(e) {
                     e.preventDefault();
                     submitBtn.disabled = true;
-                    submitBtn.innerHTML = "Sablier...";
+                    submitBtn.innerHTML = "⌛ Envoi en cours...";
 
                     const formData = new FormData(form);
                     fetch('/check_attendance', {
                         method: 'POST',
                         body: formData
-                    }).then(res => {
-                        // On simule le ticket de succès
-                        form.style.display = 'none';
-                        badge.style.display = 'none';
-                        ticket.style.display = 'block';
-                        ticketDetails.innerHTML = `<strong>${infoName.textContent}</strong><br>Pointage effectué le ${new Date().toLocaleTimeString()}`;
-                        
-                        // Lancement du cooldown de 30 secondes
-                        let timeLeft = 30;
-                        const interval = setInterval(() => {
-                            timeLeft--;
-                            timerSpan.textContent = timeLeft;
-                            if (timeLeft <= 0) {
-                                clearInterval(interval);
-                                ticket.style.display = 'none';
-                                form.style.display = 'flex';
-                                form.reset();
-                                submitBtn.innerHTML = "Valider ma présence";
-                                timerSpan.textContent = "30";
-                            }
-                        }, 1000);
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            // Succès : Masquage du formulaire et affichage du ticket
+                            form.style.display = 'none';
+                            badge.style.display = 'none';
+                            ticket.style.display = 'block';
+                            ticketDetails.innerHTML = `<strong>${infoName.textContent}</strong><br>Pointage effectué le ${new Date().toLocaleTimeString()}`;
+                            
+                            // Lancement du cooldown de 30 secondes
+                            let timeLeft = 30;
+                            const interval = setInterval(() => {
+                                timeLeft--;
+                                timerSpan.textContent = timeLeft;
+                                if (timeLeft <= 0) {
+                                    clearInterval(interval);
+                                    ticket.style.display = 'none';
+                                    form.style.display = 'flex';
+                                    form.reset();
+                                    submitBtn.innerHTML = "Valider ma présence";
+                                    submitBtn.disabled = true; // Reste désactivé jusqu'au prochain matricule valide
+                                    timerSpan.textContent = "30";
+                                    badge.style.display = 'none';
+                                }
+                            }, 1000);
+                        } else {
+                            // Erreur retournée par le serveur
+                            alert("❌ Erreur : " + data.message);
+                            submitBtn.disabled = false;
+                            submitBtn.innerHTML = "Réessayer";
+                        }
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        alert("❌ Erreur technique. Vérifiez votre connexion.");
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = "Valider ma présence";
                     });
                 });
             </script>

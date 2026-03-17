@@ -107,32 +107,42 @@ def init_sqlite_db():
                 )
             ''')
             
-        # Table centrale des présences
-        execute_sql(cursor, '''
-            CREATE TABLE IF NOT EXISTS presences (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                matricule TEXT,
-                nom TEXT,
-                postnom TEXT,
-                prenom TEXT,
-                sexe TEXT,
-                parcours TEXT,
-                promotion TEXT,
-                filiere TEXT,
-                faculte TEXT,
-                type_presence TEXT,
-                device_signature TEXT,
-                latitude REAL,
-                longitude REAL,
-                date_inscription DATETIME DEFAULT CURRENT_TIMESTAMP
-            )
-        ''')
+# Initialisation et Migration de la base de données
+def upgrade_db():
+    """
+    S'assure que toutes les colonnes nécessaires existent dans la base (MySQL ou SQLite).
+    Ajoute dynamiquement latitude, longitude et device_signature si absents.
+    """
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
         
+        # 1. Vérification pour la table 'presences'
+        columns_to_add = [
+            ('device_signature', 'TEXT' if isinstance(conn, sqlite3.Connection) else 'VARCHAR(100)'),
+            ('latitude', 'REAL' if isinstance(conn, sqlite3.Connection) else 'DOUBLE'),
+            ('longitude', 'REAL' if isinstance(conn, sqlite3.Connection) else 'DOUBLE')
+        ]
+        
+        for col_name, col_type in columns_to_add:
+            try:
+                if isinstance(conn, sqlite3.Connection):
+                    execute_sql(cursor, f"ALTER TABLE presences ADD COLUMN {col_name} {col_type}")
+                else:
+                    execute_sql(cursor, f"ALTER TABLE presences ADD {col_name} {col_type}")
+                print(f"Colonne {col_name} ajoutée avec succès.")
+            except:
+                # La colonne existe déjà probablement
+                pass
+
         conn.commit()
         conn.close()
+    except Exception as e:
+        print(f"Erreur lors de la migration : {e}")
 
-# Initialisation automatique de la base SQLite si nécessaire
+# Initialisation automatique au démarrage
 init_sqlite_db()
+upgrade_db()
 
 # --- ROUTES DE NAVIGATION ---
 
@@ -164,8 +174,8 @@ def check_attendance():
     de promotions (Bac1 IAGE, Bac2 IAGE, etc.), et si l'étudiant existe, 
     elle enregistre sa présence avec l'heure exacte et le type (Entrée/Sortie).
     """
-    # 1. On récupère le matricule depuis le formulaire HTML
-    matricule = request.form['matricule']
+    # 1. On récupère le matricule depuis le formulaire HTML (et on le nettoie)
+    matricule = request.form['matricule'].strip()
     
     # 2. On récupère aussi le type de pointage : 'Entrée' ou 'Sortie'
     type_presence = request.form.get('type_presence', 'Entrée')
@@ -187,42 +197,44 @@ def check_attendance():
         cursor = conn.cursor()
         
         # 4. On boucle à travers chaque table de promotion
+        found = False
         for table in tables:
-            # On cherche si le matricule existe dans CETTE promotion spécifique
             query = f"SELECT nom, postnom, prenom, filiere, promotion, sexe, faculte, parcours FROM {table} WHERE matricule = %s"
             execute_sql(cursor, query, (matricule,))
             result = cursor.fetchone()
             
-            # 5. SI ON TROUVE L'ÉTUDIANT :
             if result:
-                # On extrait ses informations
+                found = True
+                # On extrait ses informations (Tuple unpacking sécurisé)
                 nom, postnom, prenom, filiere, promotion, sexe, faculte, parcours = result
                 
-                # ON ENREGISTRE DANS LA TABLE CENTRALE 'presences'
-                latitude = request.form.get('latitude')
-                longitude = request.form.get('longitude')
+                # Conversion GPS sécurisée
+                try:
+                    lat = float(request.form.get('latitude')) if request.form.get('latitude') else None
+                    lon = float(request.form.get('longitude')) if request.form.get('longitude') else None
+                except:
+                    lat, lon = None, None
 
                 insert_query = """
                     INSERT INTO presences 
                     (matricule, nom, postnom, prenom, sexe, parcours, promotion, filiere, faculte, type_presence, device_signature, latitude, longitude) 
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """
-                execute_sql(cursor, insert_query, (matricule, nom, postnom, prenom, sexe, parcours, promotion, filiere, faculte, type_presence, device_signature, latitude, longitude))
+                execute_sql(cursor, insert_query, (matricule, nom, postnom, prenom, sexe, parcours, promotion, filiere, faculte, type_presence, device_signature, lat, lon))
                 conn.commit()
-                
-                cursor.close()
-                conn.close()
-                
-                # 7. SUCCÈS : On redirige l'utilisateur vers la page qui affiche toutes les présences
-                return redirect(url_for('view_presences'))
+                break
         
-        # 8. SI AUCUN ÉTUDIANT N'EST TROUVÉ
         cursor.close()
         conn.close()
-        return "Erreur : Matricule non trouvé. L'étudiant doit d'abord s'inscrire dans sa promotion."
+
+        if found:
+            return jsonify({"status": "success", "message": "Présence enregistrée"})
+        else:
+            return jsonify({"status": "error", "message": "Matricule non trouvé dans nos listes"}), 404
         
-    except (mysql.connector.Error, sqlite3.Error, Exception) as err:
-        return f"Erreur technique de base de données : {err}"
+    except Exception as e:
+        if 'conn' in locals() and conn: conn.close()
+        return jsonify({"status": "error", "message": str(e)}), 500
 
 
 @app.route('/api/student/<matricule>')
@@ -231,6 +243,7 @@ def get_student_info(matricule):
     Recherche un étudiant par son matricule dans toutes les tables de promotions.
     Retourne les informations au format JSON (Objet avec clés nom, prenom, etc.)
     """
+    matricule = matricule.strip()
     tables = [
         'bac1_IAGE', 'bac2_IAGE', 'bac3_IAGE',
         'bac1_tech_IA', 'bac1_tech_GL', 'bac1_tech_SI',
@@ -485,6 +498,7 @@ def export_sql():
         return f"Erreur lors de l'exportation : {e}"
 
 @app.route('/students')
+@app.route('/students_list')
 @app.route('/students/<promo>')
 def view_students(promo=None):
     """
