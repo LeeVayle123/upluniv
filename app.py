@@ -804,7 +804,7 @@ def admin_dashboard():
         
         cursor.close()
         conn.close()
-        return render_template('admin_dashboard.html', bac1_count=bac1_count, presence_count=presence_count)
+        return render_template('students_list.html', bac1_count=bac1_count, presence_count=presence_count)
     except (mysql.connector.Error, sqlite3.Error, Exception) as err:
         return f"Erreur : {err}"
 
