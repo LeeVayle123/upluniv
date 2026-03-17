@@ -72,6 +72,7 @@ def init_sqlite_db():
         ]
         
         for table in student_tables:
+            # Table des étudiants par promotion
             execute_sql(cursor, f'''
                 CREATE TABLE IF NOT EXISTS {table} (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -88,7 +89,7 @@ def init_sqlite_db():
                 )
             ''')
             
-            # Table de présence pour chaque promotion
+            # Table de présence spécifique par promotion
             execute_sql(cursor, f'''
                 CREATE TABLE IF NOT EXISTS presence_{table} (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -103,9 +104,35 @@ def init_sqlite_db():
                     faculte TEXT,
                     type_presence TEXT,
                     device_signature TEXT,
+                    latitude REAL,
+                    longitude REAL,
                     date_inscription DATETIME DEFAULT CURRENT_TIMESTAMP
                 )
             ''')
+
+        # Table centrale globale des présences
+        execute_sql(cursor, '''
+            CREATE TABLE IF NOT EXISTS presences (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                matricule TEXT,
+                nom TEXT,
+                postnom TEXT,
+                prenom TEXT,
+                sexe TEXT,
+                parcours TEXT,
+                promotion TEXT,
+                filiere TEXT,
+                faculte TEXT,
+                type_presence TEXT,
+                device_signature TEXT,
+                latitude REAL,
+                longitude REAL,
+                date_inscription DATETIME DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        
+        conn.commit()
+        conn.close()
             
 # Initialisation et Migration de la base de données
 def upgrade_db():
@@ -117,7 +144,30 @@ def upgrade_db():
         conn = get_db_connection()
         cursor = conn.cursor()
         
-        # 1. Vérification pour la table 'presences'
+        # 0. Création de 'presences' si elle n'existe pas (Sécurité pour Render)
+        if not isinstance(conn, sqlite3.Connection):
+             # MySQL version
+             execute_sql(cursor, '''
+                CREATE TABLE IF NOT EXISTS presences (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    matricule VARCHAR(50),
+                    nom VARCHAR(100),
+                    postnom VARCHAR(100),
+                    prenom VARCHAR(100),
+                    sexe VARCHAR(10),
+                    parcours VARCHAR(100),
+                    promotion VARCHAR(100),
+                    filiere VARCHAR(100),
+                    faculte VARCHAR(100),
+                    type_presence VARCHAR(20),
+                    device_signature VARCHAR(100),
+                    latitude DOUBLE,
+                    longitude DOUBLE,
+                    date_inscription TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            ''')
+        
+        # 1. Vérification des colonnes pour la table 'presences'
         columns_to_add = [
             ('device_signature', 'TEXT' if isinstance(conn, sqlite3.Connection) else 'VARCHAR(100)'),
             ('latitude', 'REAL' if isinstance(conn, sqlite3.Connection) else 'DOUBLE'),
@@ -130,9 +180,7 @@ def upgrade_db():
                     execute_sql(cursor, f"ALTER TABLE presences ADD COLUMN {col_name} {col_type}")
                 else:
                     execute_sql(cursor, f"ALTER TABLE presences ADD {col_name} {col_type}")
-                print(f"Colonne {col_name} ajoutée avec succès.")
             except:
-                # La colonne existe déjà probablement
                 pass
 
         conn.commit()
