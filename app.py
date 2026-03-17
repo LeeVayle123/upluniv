@@ -122,6 +122,8 @@ def init_sqlite_db():
                 faculte TEXT,
                 type_presence TEXT,
                 device_signature TEXT,
+                latitude REAL,
+                longitude REAL,
                 date_inscription DATETIME DEFAULT CURRENT_TIMESTAMP
             )
         ''')
@@ -197,12 +199,15 @@ def check_attendance():
                 nom, postnom, prenom, filiere, promotion, sexe, faculte, parcours = result
                 
                 # ON ENREGISTRE DANS LA TABLE CENTRALE 'presences'
+                latitude = request.form.get('latitude')
+                longitude = request.form.get('longitude')
+
                 insert_query = """
                     INSERT INTO presences 
-                    (matricule, nom, postnom, prenom, sexe, parcours, promotion, filiere, faculte, type_presence, device_signature) 
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    (matricule, nom, postnom, prenom, sexe, parcours, promotion, filiere, faculte, type_presence, device_signature, latitude, longitude) 
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """
-                execute_sql(cursor, insert_query, (matricule, nom, postnom, prenom, sexe, parcours, promotion, filiere, faculte, type_presence, device_signature))
+                execute_sql(cursor, insert_query, (matricule, nom, postnom, prenom, sexe, parcours, promotion, filiere, faculte, type_presence, device_signature, latitude, longitude))
                 conn.commit()
                 
                 cursor.close()
