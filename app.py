@@ -27,13 +27,6 @@ def execute_sql(cursor, query, params=None):
 # Utile si tu as du mal avec les dossiers sur GitHub
 app = Flask(__name__, template_folder='.', static_folder='.')
 
-# --- MODE DE DÉBOGAGE POUR RENDER ---
-@app.errorhandler(Exception)
-def handle_exception(e):
-    # Passer le traceback au navigateur
-    tb = traceback.format_exc()
-    return f"<h1>Erreur Interne du Serveur</h1><pre>{tb}</pre>", 500
-
 # --- CONFIGURATION DE L'URL PUBLIQUE (NGROK) ---
 # Si vous utilisez Ngrok, modifiez cette variable avec votre lien https://...
 # Sinon, laissez vide pour utiliser l'adresse locale.
@@ -135,7 +128,7 @@ init_sqlite_db()
 # --- ROUTES DE NAVIGATION ---
 
 # Route d'accueil : Affiche le formulaire d'inscription par défaut
-@app.route('/')
+@app.route('/register_student')
 def index():
     return render_template('register.html')
 
@@ -297,6 +290,7 @@ def generate_qr():
     return send_file(img_io, mimetype='image/png', as_attachment=True, download_name='qr_presence_upl.png')
 
 
+@app.route('/')
 @app.route('/official_qr')
 def official_qr():
     """
