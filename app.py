@@ -270,6 +270,16 @@ def check_attendance():
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """
                 execute_sql(cursor, insert_query, (matricule, nom, postnom, prenom, sexe, parcours, promotion, filiere, faculte, type_presence, device_signature, lat, lon))
+                
+                # On enregistre AUSSI dans la table de présence spécifique pour la promotion
+                # car l'API de filtrage lit dans presence_bac1_IAGE, etc.
+                specific_presence_table = f"presence_{table}"
+                execute_sql(cursor, f"""
+                    INSERT INTO {specific_presence_table}
+                    (matricule, nom, postnom, prenom, sexe, parcours, promotion, filiere, faculte, type_presence, device_signature, latitude, longitude)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                """, (matricule, nom, postnom, prenom, sexe, parcours, promotion, filiere, faculte, type_presence, device_signature, lat, lon))
+                
                 conn.commit()
                 break
         
@@ -602,12 +612,21 @@ def api_presences():
                 execute_sql(cursor, f"SELECT * FROM {presence_table} ORDER BY date_inscription DESC")
                 rows = cursor.fetchall()
                 for row in rows:
-                    # Formatage de la date pour l'affichage
-                    if row['date_inscription']:
-                        row['formatted_date'] = row['date_inscription'].strftime('%d/%m/%Y')
-                        row['formatted_time'] = row['date_inscription'].strftime('%H:%M:%S')
-                        # Converti en string pour la sérialisation JSON
-                        row['date_inscription'] = row['date_inscription'].isoformat()
+                    # Formatage de la date pour l'affichage (Gère MySQL et SQLite)
+                    dt = row['date_inscription']
+                    if dt:
+                        if isinstance(dt, str):
+                            try: dt = datetime.strptime(dt.split('.')[0], '%Y-%m-%d %H:%M:%S')
+                            except: pass
+                        
+                        if hasattr(dt, 'strftime'):
+                            row['formatted_date'] = dt.strftime('%d/%m/%Y')
+                            row['formatted_time'] = dt.strftime('%H:%M:%S')
+                            row['date_inscription'] = dt.isoformat()
+                        else:
+                            row['formatted_date'] = str(dt)
+                            row['formatted_time'] = ""
+                            row['date_inscription'] = str(dt)
                     else:
                         row['formatted_date'] = "N/A"
                         row['formatted_time'] = "N/A"
@@ -738,10 +757,21 @@ def api_students():
                 execute_sql(cursor, f"SELECT * FROM {table}")
                 rows = cursor.fetchall()
                 for row in rows:
-                    if row['date_inscription']:
-                        row['formatted_date'] = row['date_inscription'].strftime('%d/%m/%Y %H:%M')
+                    dt = row['date_inscription']
+                    if dt:
+                        if isinstance(dt, str):
+                            try: dt = datetime.strptime(dt.split('.')[0], '%Y-%m-%d %H:%M:%S')
+                            except: pass
+                        
+                        if hasattr(dt, 'strftime'):
+                            row['formatted_date'] = dt.strftime('%d/%m/%Y %H:%M')
+                            row['date_inscription_sort'] = dt.isoformat()
+                        else:
+                            row['formatted_date'] = str(dt)
+                            row['date_inscription_sort'] = str(dt)
                     else:
                         row['formatted_date'] = "N/A"
+                        row['date_inscription_sort'] = ""
                     all_students.append(row)
             except (mysql.connector.Error, sqlite3.Error, Exception):
                 continue
@@ -750,7 +780,7 @@ def api_students():
         conn.close()
 
         # Sort by date descending
-        all_students.sort(key=lambda x: x['date_inscription'].isoformat() if (isinstance(x['date_inscription'], (str, bytes)) or x['date_inscription']) else '', reverse=True)
+        all_students.sort(key=lambda x: x['date_inscription_sort'] if 'date_inscription_sort' in x else '', reverse=True)
 
         return jsonify(all_students)
     except Exception as e:
@@ -815,6 +845,42 @@ def api_stats():
             "total_students": total_count,
             "male_count": male_count,
             "female_count": female_count
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+# --- DEBOGAGE ---
+
+@app.route('/debug_db')
+def debug_db():
+    """
+    Route de secours pour voir si la base contient des données.
+    """
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        # Récupération de toutes les tables
+        if isinstance(conn, sqlite3.Connection):
+            execute_sql(cursor, "SELECT name FROM sqlite_master WHERE type='table'")
+        else:
+            execute_sql(cursor, "SHOW TABLES")
+        
+        tables = [row[0] for row in cursor.fetchall()]
+        
+        db_info = {}
+        for table in tables:
+            try:
+                execute_sql(cursor, f"SELECT COUNT(*) FROM {table}")
+                db_info[table] = cursor.fetchone()[0]
+            except:
+                db_info[table] = "Error"
+        
+        cursor.close()
+        conn.close()
+        return jsonify({
+            "environment": "SQLite (Render/Fallback)" if isinstance(conn, sqlite3.Connection) else "MySQL (Local)",
+            "tables": db_info
         })
     except Exception as e:
         return jsonify({"error": str(e)}), 500
