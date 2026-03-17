@@ -12,6 +12,7 @@ except ImportError:
     host = user = password = database = None
 
 import os
+import math
 
 # Aide pour la compatibilité MySQL/SQLite
 def execute_sql(cursor, query, params=None):
@@ -23,6 +24,26 @@ def execute_sql(cursor, query, params=None):
     if 'sqlite' in str(type(cursor)).lower():
         query = query.replace('%s', '?')
     return cursor.execute(query, params)
+
+def calculate_distance(lat1, lon1, lat2, lon2):
+    """
+    Calcule la distance en mètres entre deux points (Haversine formula).
+    """
+    if lat1 is None or lon1 is None or lat2 is None or lon2 is None:
+        return float('inf')
+        
+    R = 6371000  # Rayon de la Terre en mètres
+    phi1 = math.radians(lat1)
+    phi2 = math.radians(lat2)
+    delta_phi = math.radians(lat2 - lat1)
+    delta_lambda = math.radians(lon2 - lon1)
+    
+    a = math.sin(delta_phi / 2)**2 + \
+        math.cos(phi1) * math.cos(phi2) * \
+        math.sin(delta_lambda / 2)**2
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+    
+    return R * c
 
 # Choix intelligent du dossier de ressources (Compatible PC local et Render)
 if os.path.isdir(os.path.join(os.path.dirname(__file__), 'templates')):
@@ -107,6 +128,7 @@ def init_sqlite_db():
                     device_signature TEXT,
                     latitude REAL,
                     longitude REAL,
+                    status_geoloc TEXT DEFAULT 'Inconnu',
                     date_inscription DATETIME DEFAULT CURRENT_TIMESTAMP
                 )
             ''')
@@ -128,6 +150,7 @@ def init_sqlite_db():
                 device_signature TEXT,
                 latitude REAL,
                 longitude REAL,
+                status_geoloc TEXT DEFAULT 'Inconnu',
                 date_inscription DATETIME DEFAULT CURRENT_TIMESTAMP
             )
         ''')
@@ -258,27 +281,38 @@ def check_attendance():
                 nom, postnom, prenom, filiere, promotion, sexe, faculte, parcours = result
                 
                 # Conversion GPS sécurisée
-                try:
-                    lat = float(request.form.get('latitude')) if request.form.get('latitude') else None
-                    lon = float(request.form.get('longitude')) if request.form.get('longitude') else None
                 except:
                     lat, lon = None, None
+                
+                # 5. SYSTÈME ANTI-FRAUDE : Géolocalisation UPL
+                UPL_LAT = -11.65238
+                UPL_LON = 27.48261
+                ALLOWED_RADIUS = 150  # 150 mètres pour l'enceinte de la parcelle
+                
+                distance = calculate_distance(lat, lon, UPL_LAT, UPL_LON)
+                
+                if lat is None or lon is None:
+                    status_geoloc = "Inconnu (Pas de GPS)"
+                elif distance <= ALLOWED_RADIUS:
+                    status_geoloc = "Validé"
+                else:
+                    status_geoloc = "Fraude Hors-Campus"
 
                 insert_query = """
                     INSERT INTO presences 
-                    (matricule, nom, postnom, prenom, sexe, parcours, promotion, filiere, faculte, type_presence, device_signature, latitude, longitude) 
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    (matricule, nom, postnom, prenom, sexe, parcours, promotion, filiere, faculte, type_presence, device_signature, latitude, longitude, status_geoloc) 
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """
-                execute_sql(cursor, insert_query, (matricule, nom, postnom, prenom, sexe, parcours, promotion, filiere, faculte, type_presence, device_signature, lat, lon))
+                execute_sql(cursor, insert_query, (matricule, nom, postnom, prenom, sexe, parcours, promotion, filiere, faculte, type_presence, device_signature, lat, lon, status_geoloc))
                 
                 # On enregistre AUSSI dans la table de présence spécifique pour la promotion
                 # car l'API de filtrage lit dans presence_bac1_IAGE, etc.
                 specific_presence_table = f"presence_{table}"
                 execute_sql(cursor, f"""
                     INSERT INTO {specific_presence_table}
-                    (matricule, nom, postnom, prenom, sexe, parcours, promotion, filiere, faculte, type_presence, device_signature, latitude, longitude)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-                """, (matricule, nom, postnom, prenom, sexe, parcours, promotion, filiere, faculte, type_presence, device_signature, lat, lon))
+                    (matricule, nom, postnom, prenom, sexe, parcours, promotion, filiere, faculte, type_presence, device_signature, latitude, longitude, status_geoloc)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                """, (matricule, nom, postnom, prenom, sexe, parcours, promotion, filiere, faculte, type_presence, device_signature, lat, lon, status_geoloc))
                 
                 conn.commit()
                 break

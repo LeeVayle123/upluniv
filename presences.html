@@ -409,6 +409,14 @@
             white-space: nowrap;
         }
 
+        /* Ajustement des largeurs de colonnes */
+        thead th:nth-child(1), tbody td:nth-child(1) { width: 25%; } /* Étudiant */
+        thead th:nth-child(2), tbody td:nth-child(2) { width: 12%; } /* Matricule */
+        thead th:nth-child(3), tbody td:nth-child(3) { width: 15%; } /* Promotion */
+        thead th:nth-child(4), tbody td:nth-child(4) { width: 15%; } /* Date/Heure */
+        thead th:nth-child(5), tbody td:nth-child(5) { width: 18%; } /* Statut Géo */
+        thead th:nth-child(6), tbody td:nth-child(6) { width: 15%; } /* Type */
+
         tbody td {
             padding: 13px 18px;
             border-bottom: 1px solid #f1f5f9;
@@ -560,6 +568,46 @@
             body {
                 padding: 16px 12px;
             }
+        }
+
+        /* ===== BADGES GÉOLOCALISATION (ANTI-FRAUDE) ===== */
+        .badge-valide {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.76rem;
+            font-weight: 700;
+            background: #dcfce7;
+            color: #15803d;
+            white-space: nowrap;
+        }
+
+        .badge-fraude {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.76rem;
+            font-weight: 700;
+            background: #fff1f2;
+            color: #e11d48;
+            white-space: nowrap;
+        }
+
+        .badge-gps-off {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.76rem;
+            font-weight: 700;
+            background: #f1f5f9;
+            color: #475569;
+            white-space: nowrap;
         }
     </style>
 </head>
@@ -745,14 +793,14 @@
                             <th>Matricule</th>
                             <th>Promotion / Filière</th>
                             <th>Date &amp; Heure</th>
-                            <!-- Colonne type_presence : 'Entrée' ou 'Sortie' -->
+                            <th>Statut Géo</th>
                             <th>Type</th>
                         </tr>
                     </thead>
                     <!-- Le corps du tableau est rempli dynamiquement par renderRows() -->
                     <tbody id="presencesBody">
                         <tr>
-                            <td colspan="5" style="padding:0; border:none;">
+                            <td colspan="6" style="padding:0; border:none;">
                                 <div class="loading-state">
                                     <i class="fas fa-spinner fa-spin"></i>
                                     Chargement des présences...
@@ -799,7 +847,7 @@
             // Affichage de l'état de chargement
             document.getElementById('presencesBody').innerHTML = `
             <tr>
-                <td colspan="5" style="padding:0;border:none;">
+                <td colspan="6" style="padding:0;border:none;">
                     <div class="loading-state">
                         <i class="fas fa-spinner fa-spin"></i>
                         Chargement des présences...
@@ -886,7 +934,7 @@
                 // Affichage de l'état vide
                 tbody.innerHTML = `
                 <tr>
-                    <td colspan="5" style="padding:0;border:none;">
+                    <td colspan="6" style="padding:0;border:none;">
                         <div class="empty-state">
                             <i class="fas fa-calendar-xmark"></i>
                             <p>Aucune présence enregistrée pour cette promotion.</p>
@@ -940,14 +988,36 @@
                         </div>
                     </td>
 
-                    <!-- Colonne 5 : Type de pointage (Entrée / Sortie) -->
+                    <!-- Colonne 5 : Statut Géolocalisation (Anti-Fraude) -->
+                    <td>
+                        <span class="${getStatusBadgeClass(p.status_geoloc)}">
+                            <i class="${getStatusIcon(p.status_geoloc)}"></i> ${p.status_geoloc || 'Inconnu'}
+                        </span>
+                    </td>
+
+                    <!-- Colonne 6 : Type de pointage (Entrée / Sortie) -->
                     <td>${typeBadge}</td>
                 </tr>`;
             }).join('');
         }
 
         /**
-         * 4. CHANGEMENT D'ONGLET
+         * 4. UTILITAIRES POUR LES BADGES DE GÉOLOCALISATION
+         */
+        function getStatusBadgeClass(status) {
+            if (status === 'Validé') return 'badge-valide';
+            if (status === 'Fraude Hors-Campus') return 'badge-fraude';
+            return 'badge-gps-off';
+        }
+
+        function getStatusIcon(status) {
+            if (status === 'Validé') return 'fas fa-map-marker-alt';
+            if (status === 'Fraude Hors-Campus') return 'fas fa-user-secret';
+            return 'fas fa-location-arrow';
+        }
+
+        /**
+         * 5. CHANGEMENT D'ONGLET
          * =======================
          * Appelé par chaque bouton .promo-tab.
          * Met à jour l'état visuel (classe .active) et recharge les données.
