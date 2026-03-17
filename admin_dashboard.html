@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administration — UPL</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --navy: #000080;
+            --navy-light: #0000a0;
+            --red: #ef4444;
+            --bg: #f8fafc;
+            --white: #ffffff;
+            --text: #1e293b;
+            --muted: #64748b;
+            --radius: 16px;
+            --shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); padding: 30px 20px; }
+        .container { max-width: 1000px; margin: 0 auto; }
+
+        header {
+            background: var(--white);
+            padding: 25px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title h1 { color: var(--navy); font-size: 1.5rem; font-weight: 800; }
+        .header-title p { color: var(--muted); font-size: 0.9rem; }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .stat-card {
+            background: var(--white);
+            padding: 24px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+        .stat-value { font-size: 2rem; font-weight: 800; color: var(--navy); margin: 10px 0; }
+        .stat-label { font-size: 0.85rem; color: var(--muted); font-weight: 600; text-transform: uppercase; }
+
+        .menu-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+        .menu-card {
+            background: var(--white);
+            padding: 30px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            text-decoration: none;
+            color: var(--text);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            border: 2px solid transparent;
+        }
+        .menu-card:hover { transform: translateY(-5px); border-color: var(--navy); }
+        .menu-card i { font-size: 2.5rem; color: var(--navy); margin-bottom: 15px; }
+        .menu-card h3 { font-size: 1.2rem; font-weight: 700; margin-bottom: 10px; }
+        .menu-card p { font-size: 0.9rem; color: var(--muted); }
+
+        .btn-home {
+            background: var(--navy);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 999px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-title">
+                <h1>Tableau de Bord Admin</h1>
+                <p>Gestion de l'Université Protestante de Lubumbashi</p>
+            </div>
+            <a href="/" class="btn-home"><i class="fas fa-home"></i> Retour à l'accueil</a>
+        </header>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <i class="fas fa-user-graduate" style="color: var(--navy);"></i>
+                <div class="stat-value">{{ bac1_count }}</div>
+                <div class="stat-label">Étudiants BAC 1</div>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-calendar-check" style="color: var(--navy);"></i>
+                <div class="stat-value">{{ presence_count }}</div>
+                <div class="stat-label">Total Présences</div>
+            </div>
+        </div>
+
+        <div class="menu-grid">
+            <a href="/presences" class="menu-card">
+                <i class="fas fa-clipboard-list"></i>
+                <h3>Registre des Présences</h3>
+                <p>Consulter les scans GPS, filtrer par promotion et exporter vers XAMPP.</p>
+            </a>
+            <a href="/students" class="menu-card">
+                <i class="fas fa-users-viewfinder"></i>
+                <h3>Liste des Étudiants</h3>
+                <p>Gérer les inscriptions par promotion et voir les détails des élèves.</p>
+            </a>
+            <a href="/register_student" class="menu-card">
+                <i class="fas fa-user-plus"></i>
+                <h3>Inscrire un Étudiant</h3>
+                <p>Ajouter manuellement un nouvel étudiant au système.</p>
+            </a>
+            <a href="/official_qr" class="menu-card">
+                <i class="fas fa-qrcode"></i>
+                <h3>Poster QR Code</h3>
+                <p>Afficher ou imprimer le poster officiel pour les scans.</p>
+            </a>
+        </div>
+    </div>
+</body>
+</html>

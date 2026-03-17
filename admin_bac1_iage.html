@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Liste Étudiants Bac 1 IAGE — Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --navy: #000080; --bg: #f1f5f9; --white: #ffffff; --text: #1e293b; }
+        body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); padding: 20px; }
+        .container { max-width: 1100px; margin: 0 auto; }
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        h1 { color: var(--navy); font-size: 1.4rem; }
+        .count-badge { background: #e0e8ff; color: var(--navy); padding: 5px 15px; border-radius: 20px; font-weight: 700; font-size: 0.8rem; }
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        th { background: #f8fafc; padding: 15px; text-align: left; font-size: 0.75rem; text-transform: uppercase; color: #64748b; border-bottom: 2px solid #e2e8f0; }
+        td { padding: 15px; border-bottom: 1px solid #f1f5f9; font-size: 0.9rem; }
+        tr:hover td { background: #f8fafc; }
+        .sexe-tag { padding: 4px 10px; border-radius: 6px; font-weight: 700; font-size: 0.75rem; }
+        .btn-back { text-decoration: none; color: var(--muted); font-weight: 600; font-size: 0.9rem; display: flex; align-items: center; gap: 8px; }
+        .btn-reset { background: #fee2e2; color: #dc2626; border: none; padding: 8px 15px; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 0.8rem; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <a href="/admin" class="btn-back"><i class="fas fa-arrow-left"></i> Retour Admin</a>
+            <h1>Promotion : Bac 1 IAGE</h1>
+            <span class="count-badge">{{ count }} Étudiants</span>
+        </header>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Matricule</th>
+                    <th>Nom Complet</th>
+                    <th>Genre</th>
+                    <th>Filière</th>
+                    <th>Date Inscription</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in students %}
+                <tr>
+                    <td style="font-family: monospace; font-weight: 700;">{{ s.matricule }}</td>
+                    <td>{{ s.nom }} {{ s.postnom }} {{ s.prenom }}</td>
+                    <td>
+                        <span class="sexe-tag" style="background: {{ s.sexe_bg }}; color: {{ s.sexe_color }};">
+                            {{ s.sexe }}
+                        </span>
+                    </td>
+                    <td>{{ s.filiere }}</td>
+                    <td style="color: #64748b; font-size: 0.8rem;">{{ s.formatted_date }}</td>
+                    <td>
+                        <form action="/admin/reset_table" method="POST" onsubmit="return confirm('Vider toute la table ?');" style="display:inline;">
+                            <input type="hidden" name="table_name" value="bac1_IAGE">
+                            <button type="submit" class="btn-reset"><i class="fas fa-trash"></i></button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

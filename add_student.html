@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscrire un Étudiant — UPL</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --navy: #000080;
+            --navy-hover: #0000a0;
+            --bg: #f1f5f9;
+            --white: #ffffff;
+            --text: #1e293b;
+            --muted: #64748b;
+            --border: #e2e8f0;
+            --radius: 16px;
+            --shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); padding: 50px 20px; }
+        .container { max-width: 600px; margin: 0 auto; }
+
+        .card {
+            background: var(--white);
+            padding: 40px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .header { text-align: center; margin-bottom: 30px; }
+        .header h1 { color: var(--navy); font-size: 1.8rem; font-weight: 800; }
+        .header p { color: var(--muted); font-size: 0.9rem; margin-top: 5px; }
+
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; font-size: 0.85rem; font-weight: 700; color: var(--navy); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em; }
+        .form-input { 
+            width: 100%; 
+            padding: 12px 16px; 
+            border: 2px solid var(--border); 
+            border-radius: 12px; 
+            font-family: inherit; 
+            font-size: 0.95rem; 
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .form-input:focus { border-color: var(--navy); }
+
+        .row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+
+        .btn-submit {
+            width: 100%;
+            background: var(--navy);
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 12px;
+            font-weight: 800;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,128,0.2);
+            transition: all 0.2s;
+        }
+        .btn-submit:hover { background: var(--navy-hover); transform: translateY(-2px); }
+
+        .btn-back { display: block; text-align: center; margin-top: 25px; color: var(--muted); text-decoration: none; font-size: 0.9rem; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <header class="header">
+                <h1>Nouvel Étudiant</h1>
+                <p>Enregistrement manuel dans la base de données</p>
+            </header>
+
+            <form action="/register_student" method="POST">
+                <div class="form-group">
+                    <label class="form-label">Numéro Matricule</label>
+                    <input type="text" name="matricule" class="form-input" placeholder="Ex: 24-001" required>
+                </div>
+
+                <div class="row">
+                    <div class="form-group">
+                        <label class="form-label">Nom</label>
+                        <input type="text" name="nom" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Postnom</label>
+                        <input type="text" name="postnom" class="form-input" required>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="form-group">
+                        <label class="form-label">Prénom</label>
+                        <input type="text" name="prenom" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Sexe</label>
+                        <select name="sexe" class="form-input" required>
+                            <option value="M">Masculin</option>
+                            <option value="F">Féminin</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Promotion</label>
+                    <select name="table_name" class="form-input" required>
+                        <option value="bac1_IAGE">BAC 1 IAGE</option>
+                        <option value="bac2_IAGE">BAC 2 IAGE</option>
+                        <option value="bac3_IAGE">BAC 3 IAGE</option>
+                        <option value="bac1_tech_IA">BAC 1 TECH IA</option>
+                        <option value="bac1_tech_GL">BAC 1 TECH GL</option>
+                        <option value="bac1_tech_SI">BAC 1 TECH SI</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Faculté / Parcours</label>
+                    <input type="text" name="faculte" class="form-input" placeholder="Ex: Informatique de Gestion" required>
+                </div>
+
+                <button type="submit" class="btn-submit">Valider l'Inscription</button>
+            </form>
+            <a href="/admin" class="btn-back"><i class="fas fa-chevron-left"></i> Retour à l'administration</a>
+        </div>
+    </div>
+</body>
+</html>
