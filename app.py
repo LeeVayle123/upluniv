@@ -472,9 +472,16 @@ def view_presences():
 
         # 3. FORMATAGE DES DATES pour un affichage propre à l'écran
         for presence in all_presences:
-            if presence['date_inscription']:
-                # On transforme la date brute en format lisible : Jour/Mois/Année à Heure:Minute
-                presence['formatted_date'] = presence['date_inscription'].strftime('%d/%m/%Y à %H:%M:%S')
+            dt = presence['date_inscription']
+            if dt:
+                if isinstance(dt, str):
+                    try: dt = datetime.strptime(dt.split('.')[0], '%Y-%m-%d %H:%M:%S')
+                    except: pass
+                
+                if hasattr(dt, 'strftime'):
+                    presence['formatted_date'] = dt.strftime('%d/%m/%Y à %H:%M:%S')
+                else:
+                    presence['formatted_date'] = str(dt)
             else:
                 presence['formatted_date'] = "Inconnue"
         
@@ -947,8 +954,16 @@ def admin_bac1_iage():
         
         # Pré-formatage des données pour le template
         for student in students:
-            if student['date_inscription']:
-                student['formatted_date'] = student['date_inscription'].strftime('%d/%m/%Y %H:%M')
+            dt = student['date_inscription']
+            if dt:
+                if isinstance(dt, str):
+                    try: dt = datetime.strptime(dt.split('.')[0], '%Y-%m-%d %H:%M:%S')
+                    except: pass
+                
+                if hasattr(dt, 'strftime'):
+                    student['formatted_date'] = dt.strftime('%d/%m/%Y %H:%M')
+                else:
+                    student['formatted_date'] = str(dt)
             else:
                 student['formatted_date'] = "N/A"
             
@@ -997,10 +1012,19 @@ def admin_attendance():
                 continue
         
         for p in all_presences:
-            if p['date_inscription']:
-                # Formatage complet pour l'admin
-                p['formatted_time'] = p['date_inscription'].strftime('%H:%M:%S')
-                p['formatted_date'] = p['date_inscription'].strftime('%d/%m/%Y')
+            dt = p['date_inscription']
+            if dt:
+                if isinstance(dt, str):
+                    try: dt = datetime.strptime(dt.split('.')[0], '%Y-%m-%d %H:%M:%S')
+                    except: pass
+                
+                if hasattr(dt, 'strftime'):
+                    # Formatage complet pour l'admin
+                    p['formatted_time'] = dt.strftime('%H:%M:%S')
+                    p['formatted_date'] = dt.strftime('%d/%m/%Y')
+                else:
+                    p['formatted_time'] = "N/A"
+                    p['formatted_date'] = str(dt)
                 p['initials'] = f"{p['nom'][0]}{p['prenom'][0]}" if p['nom'] and p['prenom'] else "??"
             else:
                 p['formatted_time'] = "N/A"
