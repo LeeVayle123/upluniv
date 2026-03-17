@@ -23,9 +23,16 @@ def execute_sql(cursor, query, params=None):
         query = query.replace('%s', '?')
     return cursor.execute(query, params)
 
-# Configuration pour charger les fichiers directement à la racine (sans dossier templates)
-# Utile si tu as du mal avec les dossiers sur GitHub
-app = Flask(__name__, template_folder='.', static_folder='.')
+# Choix intelligent du dossier de ressources (Compatible PC local et Render)
+if os.path.isdir(os.path.join(os.path.dirname(__file__), 'templates')):
+    template_dir = 'templates'
+    static_dir = 'static'
+else:
+    # Fallback pour GitHub/Render si les fichiers sont à la racine
+    template_dir = '.'
+    static_dir = '.'
+
+app = Flask(__name__, template_folder=template_dir, static_folder=static_dir)
 
 # --- CONFIGURATION DE L'URL PUBLIQUE (NGROK) ---
 # Si vous utilisez Ngrok, modifiez cette variable avec votre lien https://...
@@ -399,6 +406,75 @@ def view_presences():
         return render_template('presences.html', presences=all_presences)
     except (mysql.connector.Error, sqlite3.Error, Exception) as err:
         return f"Erreur lors de la récupération des présences : {err}"
+
+@app.route('/export_sql')
+def export_sql():
+    """
+    Génère un fichier .sql compatible MySQL pour importer les présences 
+    depuis Render vers XAMPP.
+    """
+    try:
+        conn = get_db_connection()
+        if isinstance(conn, sqlite3.Connection):
+            cursor = conn.cursor()
+        else:
+            cursor = conn.cursor(dictionary=True)
+            
+        # On récupère toutes les présences
+        execute_sql(cursor, "SELECT * FROM presences ORDER BY date_inscription ASC")
+        rows = cursor.fetchall()
+        
+        # Construction du script SQL
+        sql_content = "/* EXPORT DES PRÉSENCES UPL - DEPUIS RENDER VERS XAMPP */\n"
+        sql_content += "/* Importez ce fichier dans l'onglet 'Importer' de phpMyAdmin */\n\n"
+        
+        # On s'assure que la table existe côté MySQL (au cas où)
+        # Mais l'utilisateur l'a déjà normalement.
+        
+        for row in rows:
+            # Formattage des valeurs pour SQL
+            # On échappe les guillemets simples pour éviter les erreurs SQL
+            def escape(val):
+                if val is None: return "NULL"
+                if isinstance(val, (int, float)): return str(val)
+                # Conversion date
+                if hasattr(val, 'strftime'):
+                    return f"'{val.strftime('%Y-%m-%d %H:%M:%S')}'"
+                # String simple
+                safe_val = str(val).replace("'", "''")
+                return f"'{safe_val}'"
+
+            vals = [
+                escape(row['matricule']),
+                escape(row['nom']),
+                escape(row['postnom']),
+                escape(row['prenom']),
+                escape(row['sexe']),
+                escape(row['parcours']),
+                escape(row['promotion']),
+                escape(row['filiere']),
+                escape(row['faculte']),
+                escape(row['type_presence']),
+                escape(row['device_signature']),
+                escape(row['date_inscription'])
+            ]
+            
+            sql_content += f"INSERT INTO presences (matricule, nom, postnom, prenom, sexe, parcours, promotion, filiere, faculte, type_presence, device_signature, date_inscription) VALUES ({', '.join(vals)});\n"
+        
+        cursor.close()
+        conn.close()
+        
+        # Envoi du fichier au navigateur
+        output = io.BytesIO(sql_content.encode('utf-8'))
+        return send_file(
+            output,
+            mimetype='text/sql',
+            as_attachment=True,
+            download_name=f"export_presences_upl_{datetime.now().strftime('%d_%m_%Y')}.sql"
+        )
+        
+    except Exception as e:
+        return f"Erreur lors de l'exportation : {e}"
 
 @app.route('/students')
 @app.route('/students/<promo>')
