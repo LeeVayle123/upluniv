@@ -4,7 +4,7 @@ import qrcode
 import io
 import traceback
 from flask import Flask, request, render_template, redirect, url_for, jsonify, send_file
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 try:
     from db_config import host, user, password, database
 except ImportError:
@@ -287,6 +287,10 @@ def check_attendance():
                 except:
                     lat, lon = None, None
                 
+                # 4.5 Gestion du temps (Lubumbashi UTC+2)
+                # On calcule l'heure actuelle avec un décalage de +2 heures par rapport à UTC
+                now_lubumbashi = datetime.now(timezone(timedelta(hours=2))).replace(tzinfo=None)
+                
                 # 5. SYSTÈME ANTI-FRAUDE : Géolocalisation UPL
                 UPL_LAT = -11.65238
                 UPL_LON = 27.48261
@@ -303,19 +307,19 @@ def check_attendance():
 
                 insert_query = """
                     INSERT INTO presences 
-                    (matricule, nom, postnom, prenom, sexe, parcours, promotion, filiere, faculte, type_presence, device_signature, latitude, longitude, status_geoloc) 
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    (matricule, nom, postnom, prenom, sexe, parcours, promotion, filiere, faculte, type_presence, device_signature, latitude, longitude, status_geoloc, date_inscription) 
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """
-                execute_sql(cursor, insert_query, (matricule, nom, postnom, prenom, sexe, parcours, promotion, filiere, faculte, type_presence, device_signature, lat, lon, status_geoloc))
+                execute_sql(cursor, insert_query, (matricule, nom, postnom, prenom, sexe, parcours, promotion, filiere, faculte, type_presence, device_signature, lat, lon, status_geoloc, now_lubumbashi))
                 
                 # On enregistre AUSSI dans la table de présence spécifique pour la promotion
                 # car l'API de filtrage lit dans presence_bac1_IAGE, etc.
                 specific_presence_table = f"presence_{table}"
                 execute_sql(cursor, f"""
                     INSERT INTO {specific_presence_table}
-                    (matricule, nom, postnom, prenom, sexe, parcours, promotion, filiere, faculte, type_presence, device_signature, latitude, longitude, status_geoloc)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-                """, (matricule, nom, postnom, prenom, sexe, parcours, promotion, filiere, faculte, type_presence, device_signature, lat, lon, status_geoloc))
+                    (matricule, nom, postnom, prenom, sexe, parcours, promotion, filiere, faculte, type_presence, device_signature, latitude, longitude, status_geoloc, date_inscription)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                """, (matricule, nom, postnom, prenom, sexe, parcours, promotion, filiere, faculte, type_presence, device_signature, lat, lon, status_geoloc, now_lubumbashi))
                 
                 conn.commit()
                 break
