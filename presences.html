@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,21 +16,25 @@
     <style>
         /* ===== VARIABLES DE DESIGN ===== */
         :root {
-            --navy:         #000080;
-            --navy-hover:   #0000a0;
-            --red:          #ef4444;
-            --bg:           #f1f5f9;
-            --white:        #ffffff;
-            --text:         #1e293b;
-            --muted:        #64748b;
-            --border:       #e2e8f0;
-            --radius-lg:    16px;
-            --radius-md:    12px;
-            --shadow:       0 4px 20px rgba(0,0,0,0.07);
-            --transition:   all 0.22s ease;
+            --navy: #000080;
+            --navy-hover: #0000a0;
+            --red: #ef4444;
+            --bg: #f1f5f9;
+            --white: #ffffff;
+            --text: #1e293b;
+            --muted: #64748b;
+            --border: #e2e8f0;
+            --radius-lg: 16px;
+            --radius-md: 12px;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.07);
+            --transition: all 0.22s ease;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
         body {
             font-family: 'Outfit', sans-serif;
@@ -39,7 +44,10 @@
             padding: 24px 20px;
         }
 
-        .container { max-width: 1180px; margin: 0 auto; }
+        .container {
+            max-width: 1180px;
+            margin: 0 auto;
+        }
 
         /* ===== EN-TÊTE ===== */
         header {
@@ -109,13 +117,32 @@
             background: transparent;
             color: var(--text);
         }
-        .btn-outline:hover { background: var(--bg); border-color: var(--navy); color: var(--navy); }
 
-        .btn-navy { background: var(--navy); color: white; }
-        .btn-navy:hover { background: var(--navy-hover); transform: translateY(-1px); }
+        .btn-outline:hover {
+            background: var(--bg);
+            border-color: var(--navy);
+            color: var(--navy);
+        }
 
-        .btn-green { background: #16a34a; color: white; }
-        .btn-green:hover { background: #15803d; transform: translateY(-1px); }
+        .btn-navy {
+            background: var(--navy);
+            color: white;
+        }
+
+        .btn-navy:hover {
+            background: var(--navy-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-green {
+            background: #16a34a;
+            color: white;
+        }
+
+        .btn-green:hover {
+            background: #15803d;
+            transform: translateY(-1px);
+        }
 
         /* ===== ONGLETS DE PROMOTION ===== */
         /*
@@ -193,7 +220,11 @@
             min-width: 52px;
         }
 
-        .inner-tabs { display: flex; gap: 5px; flex: 1; }
+        .inner-tabs {
+            display: flex;
+            gap: 5px;
+            flex: 1;
+        }
 
         /* Bouton d'onglet individuel */
         .promo-tab {
@@ -221,7 +252,7 @@
             background: var(--navy);
             color: white;
             border-color: var(--navy);
-            box-shadow: 0 2px 8px rgba(0,0,128,0.25);
+            box-shadow: 0 2px 8px rgba(0, 0, 128, 0.25);
         }
 
         /* ===== CARTES DE STATISTIQUES ===== */
@@ -254,9 +285,20 @@
             flex-shrink: 0;
         }
 
-        .stat-icon.total   { background: #eff6ff; color: var(--navy); }
-        .stat-icon.entree  { background: #f0fdf4; color: #16a34a; }
-        .stat-icon.sortie  { background: #fff5f5; color: var(--red); }
+        .stat-icon.total {
+            background: #eff6ff;
+            color: var(--navy);
+        }
+
+        .stat-icon.entree {
+            background: #f0fdf4;
+            color: #16a34a;
+        }
+
+        .stat-icon.sortie {
+            background: #fff5f5;
+            color: var(--red);
+        }
 
         .stat-label {
             font-size: 0.75rem;
@@ -341,11 +383,13 @@
 
         .search-input:focus {
             border-color: var(--navy);
-            box-shadow: 0 0 0 3px rgba(0,0,128,0.08);
+            box-shadow: 0 0 0 3px rgba(0, 0, 128, 0.08);
         }
 
         /* Conteneur scrollable pour le tableau sur petits écrans */
-        .table-responsive { overflow-x: auto; }
+        .table-responsive {
+            overflow-x: auto;
+        }
 
         table {
             width: 100%;
@@ -372,13 +416,21 @@
             vertical-align: middle;
         }
 
-        tbody tr:hover td { background: #f8fafc; }
+        tbody tr:hover td {
+            background: #f8fafc;
+        }
 
         /* Ligne cachée par la fonction de recherche */
-        tbody tr.hidden { display: none; }
+        tbody tr.hidden {
+            display: none;
+        }
 
         /* ===== CELLULE ÉTUDIANT : avatar + nom ===== */
-        .student-info { display: flex; align-items: center; gap: 10px; }
+        .student-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
         .avatar {
             width: 36px;
@@ -447,8 +499,16 @@
         }
 
         /* Heure et date affichées l'une en dessous de l'autre */
-        .date-cell .time { font-weight: 700; color: var(--navy); }
-        .date-cell .date { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
+        .date-cell .time {
+            font-weight: 700;
+            color: var(--navy);
+        }
+
+        .date-cell .date {
+            font-size: 0.75rem;
+            color: var(--muted);
+            margin-top: 2px;
+        }
 
         /* ===== ÉTAT VIDE : aucune présence ===== */
         .empty-state {
@@ -464,7 +524,9 @@
             display: block;
         }
 
-        .empty-state p { font-size: 0.95rem; }
+        .empty-state p {
+            font-size: 0.95rem;
+        }
 
         /* ===== ÉTAT DE CHARGEMENT ===== */
         .loading-state {
@@ -482,184 +544,192 @@
 
         /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
-            header { flex-direction: column; text-align: center; }
-            .header-left { flex-direction: column; }
-            .stats-grid { grid-template-columns: 1fr; }
-            body { padding: 16px 12px; }
+            header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .header-left {
+                flex-direction: column;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            body {
+                padding: 16px 12px;
+            }
         }
     </style>
 </head>
 
 <body>
-<div class="container">
+    <div class="container">
 
-    <!-- ===== EN-TÊTE DE LA PAGE ===== -->
-    <header>
-        <div class="header-left">
-            <!-- Logo situé dans static/uupl.png -->
-            <img src="{{ url_for('static', filename='uupl.png') }}"
-                 alt="Logo UPL"
-                 class="logo-img"
-                 onerror="this.style.display='none'">
-            <div>
-                <div class="header-title">Université Protestante de Lubumbashi</div>
-                <div class="header-sub" id="pageSubtitle">Registre des présences — Toutes les promotions</div>
+        <!-- ===== EN-TÊTE DE LA PAGE ===== -->
+        <header>
+            <div class="header-left">
+                <!-- Logo situé dans static/uupl.png -->
+                <img src="{{ url_for('static', filename='uupl.png') }}" alt="Logo UPL" class="logo-img"
+                    onerror="this.style.display='none'">
+                <div>
+                    <div class="header-title">Université Protestante de Lubumbashi</div>
+                    <div class="header-sub" id="pageSubtitle">Registre des présences — Toutes les promotions</div>
+                </div>
             </div>
-        </div>
 
-        <!-- Boutons de navigation vers les autres interfaces -->
-        <nav class="nav-btns">
-            <a href="/attendance" class="btn btn-outline">
-                <i class="fas fa-barcode"></i> Pointer une présence
-            </a>
-            <a href="/students" class="btn btn-outline">
-                <i class="fas fa-users"></i> Liste des étudiants
-            </a>
-            <!-- Déclencheur de l'export Excel (voir fonction exportExcel() plus bas) -->
-            <button onclick="exportExcel()" class="btn btn-green">
-                <i class="fas fa-file-excel"></i> Exporter Excel
-            </button>
-        </nav>
-    </header>
+            <!-- Boutons de navigation vers les autres interfaces -->
+            <nav class="nav-btns">
+                <a href="/register" class="btn btn-outline">
+                    <i class="fas fa-barcode"></i> Pointer une présence
+                </a>
+                <a href="/students" class="btn btn-outline">
+                    <i class="fas fa-users"></i> Liste des étudiants
+                </a>
+                <!-- Déclencheur de l'export Excel (voir fonction exportExcel() plus bas) -->
+                <button onclick="exportExcel()" class="btn btn-green">
+                    <i class="fas fa-file-excel"></i> Exporter Excel
+                </button>
+                <a href="/export_sql" class="btn btn-navy">
+                    <i class="fas fa-database"></i> Exporter pour XAMPP (.sql)
+                </a>
+            </nav>
+        </header>
 
-    <!-- ===== ONGLETS DE FILTRAGE PAR PROMOTION =====
+        <!-- ===== ONGLETS DE FILTRAGE PAR PROMOTION =====
          Chaque bouton correspond à UNE table de présence dans la base de données.
          La structure exactement ici correspond à setup_db.py :
 
          IAGE : bac1_IAGE, bac2_IAGE, bac3_IAGE
          TECHNOLOGIE : bac1/2/3/4 × (IA, GL, SI)
     -->
-    <div class="tabs-wrapper">
+        <div class="tabs-wrapper">
 
-        <!-- Section IAGE -->
-        <div class="faculty-section">
-            <div class="faculty-label">
-                <i class="fas fa-graduation-cap"></i> Parcours IAGE
+            <!-- Section IAGE -->
+            <div class="faculty-section">
+                <div class="faculty-label">
+                    <i class="fas fa-graduation-cap"></i> Parcours IAGE
+                </div>
+                <div class="tab-row">
+                    <!-- Onglet Global (lit toutes les tables) -->
+                    <button class="promo-tab active" data-promo="" onclick="switchTab(this)">
+                        <i class="fas fa-globe"></i> Global
+                    </button>
+                    <!-- Onglet BAC 1 IAGE → table presence_bac1_IAGE -->
+                    <button class="promo-tab" data-promo="bac1_IAGE" onclick="switchTab(this)">BAC 1</button>
+                    <!-- Onglet BAC 2 IAGE → table presence_bac2_IAGE -->
+                    <button class="promo-tab" data-promo="bac2_IAGE" onclick="switchTab(this)">BAC 2</button>
+                    <!-- Onglet BAC 3 IAGE → table presence_bac3_IAGE -->
+                    <button class="promo-tab" data-promo="bac3_IAGE" onclick="switchTab(this)">BAC 3</button>
+                </div>
             </div>
-            <div class="tab-row">
-                <!-- Onglet Global (lit toutes les tables) -->
-                <button class="promo-tab active" data-promo="" onclick="switchTab(this)">
-                    <i class="fas fa-globe"></i> Global
-                </button>
-                <!-- Onglet BAC 1 IAGE → table presence_bac1_IAGE -->
-                <button class="promo-tab" data-promo="bac1_IAGE" onclick="switchTab(this)">BAC 1</button>
-                <!-- Onglet BAC 2 IAGE → table presence_bac2_IAGE -->
-                <button class="promo-tab" data-promo="bac2_IAGE" onclick="switchTab(this)">BAC 2</button>
-                <!-- Onglet BAC 3 IAGE → table presence_bac3_IAGE -->
-                <button class="promo-tab" data-promo="bac3_IAGE" onclick="switchTab(this)">BAC 3</button>
+
+            <!-- Section TECHNOLOGIE -->
+            <div class="faculty-section">
+                <div class="faculty-label">
+                    <i class="fas fa-microchip"></i> Parcours Technologie
+                </div>
+                <div class="tech-grid">
+
+                    <!-- BAC 1 TECHNOLOGIE : IA / GL / SI -->
+                    <!-- → tables : presence_bac1_tech_IA, presence_bac1_tech_GL, presence_bac1_tech_SI -->
+                    <div class="year-row">
+                        <span class="year-label">BAC 1 :</span>
+                        <div class="inner-tabs">
+                            <button class="promo-tab" data-promo="bac1_tech_IA" onclick="switchTab(this)">IA</button>
+                            <button class="promo-tab" data-promo="bac1_tech_GL" onclick="switchTab(this)">GL</button>
+                            <button class="promo-tab" data-promo="bac1_tech_SI" onclick="switchTab(this)">SI</button>
+                        </div>
+                    </div>
+
+                    <!-- BAC 2 TECHNOLOGIE -->
+                    <!-- → tables : presence_bac2_tech_IA, presence_bac2_tech_GL, presence_bac2_tech_SI -->
+                    <div class="year-row">
+                        <span class="year-label">BAC 2 :</span>
+                        <div class="inner-tabs">
+                            <button class="promo-tab" data-promo="bac2_tech_IA" onclick="switchTab(this)">IA</button>
+                            <button class="promo-tab" data-promo="bac2_tech_GL" onclick="switchTab(this)">GL</button>
+                            <button class="promo-tab" data-promo="bac2_tech_SI" onclick="switchTab(this)">SI</button>
+                        </div>
+                    </div>
+
+                    <!-- BAC 3 TECHNOLOGIE -->
+                    <!-- → tables : presence_bac3_tech_IA, presence_bac3_tech_GL, presence_bac3_tech_SI -->
+                    <div class="year-row">
+                        <span class="year-label">BAC 3 :</span>
+                        <div class="inner-tabs">
+                            <button class="promo-tab" data-promo="bac3_tech_IA" onclick="switchTab(this)">IA</button>
+                            <button class="promo-tab" data-promo="bac3_tech_GL" onclick="switchTab(this)">GL</button>
+                            <button class="promo-tab" data-promo="bac3_tech_SI" onclick="switchTab(this)">SI</button>
+                        </div>
+                    </div>
+
+                    <!-- BAC 4 TECHNOLOGIE -->
+                    <!-- → tables : presence_bac4_tech_IA, presence_bac4_tech_GL, presence_bac4_tech_SI -->
+                    <div class="year-row">
+                        <span class="year-label">BAC 4 :</span>
+                        <div class="inner-tabs">
+                            <button class="promo-tab" data-promo="bac4_tech_IA" onclick="switchTab(this)">IA</button>
+                            <button class="promo-tab" data-promo="bac4_tech_GL" onclick="switchTab(this)">GL</button>
+                            <button class="promo-tab" data-promo="bac4_tech_SI" onclick="switchTab(this)">SI</button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- Section TECHNOLOGIE -->
-        <div class="faculty-section">
-            <div class="faculty-label">
-                <i class="fas fa-microchip"></i> Parcours Technologie
-            </div>
-            <div class="tech-grid">
-
-                <!-- BAC 1 TECHNOLOGIE : IA / GL / SI -->
-                <!-- → tables : presence_bac1_tech_IA, presence_bac1_tech_GL, presence_bac1_tech_SI -->
-                <div class="year-row">
-                    <span class="year-label">BAC 1 :</span>
-                    <div class="inner-tabs">
-                        <button class="promo-tab" data-promo="bac1_tech_IA" onclick="switchTab(this)">IA</button>
-                        <button class="promo-tab" data-promo="bac1_tech_GL" onclick="switchTab(this)">GL</button>
-                        <button class="promo-tab" data-promo="bac1_tech_SI" onclick="switchTab(this)">SI</button>
-                    </div>
-                </div>
-
-                <!-- BAC 2 TECHNOLOGIE -->
-                <!-- → tables : presence_bac2_tech_IA, presence_bac2_tech_GL, presence_bac2_tech_SI -->
-                <div class="year-row">
-                    <span class="year-label">BAC 2 :</span>
-                    <div class="inner-tabs">
-                        <button class="promo-tab" data-promo="bac2_tech_IA" onclick="switchTab(this)">IA</button>
-                        <button class="promo-tab" data-promo="bac2_tech_GL" onclick="switchTab(this)">GL</button>
-                        <button class="promo-tab" data-promo="bac2_tech_SI" onclick="switchTab(this)">SI</button>
-                    </div>
-                </div>
-
-                <!-- BAC 3 TECHNOLOGIE -->
-                <!-- → tables : presence_bac3_tech_IA, presence_bac3_tech_GL, presence_bac3_tech_SI -->
-                <div class="year-row">
-                    <span class="year-label">BAC 3 :</span>
-                    <div class="inner-tabs">
-                        <button class="promo-tab" data-promo="bac3_tech_IA" onclick="switchTab(this)">IA</button>
-                        <button class="promo-tab" data-promo="bac3_tech_GL" onclick="switchTab(this)">GL</button>
-                        <button class="promo-tab" data-promo="bac3_tech_SI" onclick="switchTab(this)">SI</button>
-                    </div>
-                </div>
-
-                <!-- BAC 4 TECHNOLOGIE -->
-                <!-- → tables : presence_bac4_tech_IA, presence_bac4_tech_GL, presence_bac4_tech_SI -->
-                <div class="year-row">
-                    <span class="year-label">BAC 4 :</span>
-                    <div class="inner-tabs">
-                        <button class="promo-tab" data-promo="bac4_tech_IA" onclick="switchTab(this)">IA</button>
-                        <button class="promo-tab" data-promo="bac4_tech_GL" onclick="switchTab(this)">GL</button>
-                        <button class="promo-tab" data-promo="bac4_tech_SI" onclick="switchTab(this)">SI</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ===== STATISTIQUES DYNAMIQUES =====
+        <!-- ===== STATISTIQUES DYNAMIQUES =====
          Mises à jour à chaque changement d'onglet
          via l'API /api/presence_stats?promotion=xxx
     -->
-    <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-icon total"><i class="fas fa-list-check"></i></div>
-            <div>
-                <div class="stat-label">Total pointages</div>
-                <!-- Mis à jour par loadStats() -->
-                <div class="stat-value" id="statTotal">—</div>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon total"><i class="fas fa-list-check"></i></div>
+                <div>
+                    <div class="stat-label">Total pointages</div>
+                    <!-- Mis à jour par loadStats() -->
+                    <div class="stat-value" id="statTotal">—</div>
+                </div>
             </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon entree"><i class="fas fa-arrow-right-to-bracket"></i></div>
-            <div>
-                <div class="stat-label">Entrées</div>
-                <!-- Mis à jour par loadStats() -->
-                <div class="stat-value" id="statEntrees">—</div>
+            <div class="stat-card">
+                <div class="stat-icon entree"><i class="fas fa-arrow-right-to-bracket"></i></div>
+                <div>
+                    <div class="stat-label">Entrées</div>
+                    <!-- Mis à jour par loadStats() -->
+                    <div class="stat-value" id="statEntrees">—</div>
+                </div>
             </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon sortie"><i class="fas fa-arrow-right-from-bracket"></i></div>
-            <div>
-                <div class="stat-label">Sorties</div>
-                <!-- Mis à jour par loadStats() -->
-                <div class="stat-value" id="statSorties">—</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ===== TABLEAU DES PRÉSENCES ===== -->
-    <div class="table-card">
-        <!-- Barre d'outils : titre + compteur + barre de recherche -->
-        <div class="toolbar">
-            <div class="toolbar-title">
-                <i class="fas fa-table-list"></i>
-                <span id="tableTitle">Registre Global des Présences</span>
-                <!-- Badge compteur mis à jour dynamiquement -->
-                <span class="count-badge" id="countBadge">—</span>
-            </div>
-            <!-- Champ de recherche qui filtre les lignes visibles en temps réel -->
-            <div class="search-wrap">
-                <i class="fas fa-search"></i>
-                <input
-                    type="text"
-                    class="search-input"
-                    id="searchInput"
-                    placeholder="Rechercher..."
-                    oninput="filterTable()"
-                >
+            <div class="stat-card">
+                <div class="stat-icon sortie"><i class="fas fa-arrow-right-from-bracket"></i></div>
+                <div>
+                    <div class="stat-label">Sorties</div>
+                    <!-- Mis à jour par loadStats() -->
+                    <div class="stat-value" id="statSorties">—</div>
+                </div>
             </div>
         </div>
 
-        <div class="table-responsive">
-            <!--
+        <!-- ===== TABLEAU DES PRÉSENCES ===== -->
+        <div class="table-card">
+            <!-- Barre d'outils : titre + compteur + barre de recherche -->
+            <div class="toolbar">
+                <div class="toolbar-title">
+                    <i class="fas fa-table-list"></i>
+                    <span id="tableTitle">Registre Global des Présences</span>
+                    <!-- Badge compteur mis à jour dynamiquement -->
+                    <span class="count-badge" id="countBadge">—</span>
+                </div>
+                <!-- Champ de recherche qui filtre les lignes visibles en temps réel -->
+                <div class="search-wrap">
+                    <i class="fas fa-search"></i>
+                    <input type="text" class="search-input" id="searchInput" placeholder="Rechercher..."
+                        oninput="filterTable()">
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <!--
                 TABLE PRINCIPALE
                 Colonnes :
                   1. Étudiant   → Nom complet + avatar avec initiales
@@ -668,66 +738,66 @@
                   4. Date/Heure → Horodatage exact du pointage (colonne date_inscription)
                   5. Type       → Badge Entrée (vert) ou Sortie (rouge)
             -->
-            <table id="presencesTable">
-                <thead>
-                    <tr>
-                        <th>Étudiant</th>
-                        <th>Matricule</th>
-                        <th>Promotion / Filière</th>
-                        <th>Date &amp; Heure</th>
-                        <!-- Colonne type_presence : 'Entrée' ou 'Sortie' -->
-                        <th>Type</th>
-                    </tr>
-                </thead>
-                <!-- Le corps du tableau est rempli dynamiquement par renderRows() -->
-                <tbody id="presencesBody">
-                    <tr>
-                        <td colspan="5" style="padding:0; border:none;">
-                            <div class="loading-state">
-                                <i class="fas fa-spinner fa-spin"></i>
-                                Chargement des présences...
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+                <table id="presencesTable">
+                    <thead>
+                        <tr>
+                            <th>Étudiant</th>
+                            <th>Matricule</th>
+                            <th>Promotion / Filière</th>
+                            <th>Date &amp; Heure</th>
+                            <!-- Colonne type_presence : 'Entrée' ou 'Sortie' -->
+                            <th>Type</th>
+                        </tr>
+                    </thead>
+                    <!-- Le corps du tableau est rempli dynamiquement par renderRows() -->
+                    <tbody id="presencesBody">
+                        <tr>
+                            <td colspan="5" style="padding:0; border:none;">
+                                <div class="loading-state">
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                    Chargement des présences...
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
-    </div>
 
-</div><!-- /container -->
+    </div><!-- /container -->
 
-<script>
-    /**
-     * =======================================================
-     *  GESTION DES PRÉSENCES — JavaScript côté client
-     * =======================================================
-     *
-     *  Ce script gère :
-     *    1. loadData(promo)     — Chargement des présences depuis l'API /api/presences
-     *    2. loadStats(promo)    — Chargement des stats depuis /api/presence_stats
-     *    3. renderRows(data)    — Construction des lignes HTML du tableau
-     *    4. switchTab(btn)      — Changement d'onglet de promotion
-     *    5. filterTable()       — Filtrage local par le champ de recherche
-     *    6. exportExcel()       — Export du tableau visible en fichier .xlsx
-     */
+    <script>
+        /**
+         * =======================================================
+         *  GESTION DES PRÉSENCES — JavaScript côté client
+         * =======================================================
+         *
+         *  Ce script gère :
+         *    1. loadData(promo)     — Chargement des présences depuis l'API /api/presences
+         *    2. loadStats(promo)    — Chargement des stats depuis /api/presence_stats
+         *    3. renderRows(data)    — Construction des lignes HTML du tableau
+         *    4. switchTab(btn)      — Changement d'onglet de promotion
+         *    5. filterTable()       — Filtrage local par le champ de recherche
+         *    6. exportExcel()       — Export du tableau visible en fichier .xlsx
+         */
 
-    // Promotion actuellement affichée ('' = toutes)
-    let currentPromo = '';
+        // Promotion actuellement affichée ('' = toutes)
+        let currentPromo = '';
 
-    // Données brutes chargées depuis l'API (utiles pour l'export Excel)
-    let currentData  = [];
+        // Données brutes chargées depuis l'API (utiles pour l'export Excel)
+        let currentData = [];
 
-    /**
-     * 1. CHARGEMENT DES PRÉSENCES
-     * ============================
-     * Interroge l'API /api/presences (éventuellement filtrée par ?promotion=xxx)
-     * et appelle renderRows() pour afficher le résultat.
-     *
-     * @param {string} promo - Nom de la table (ex: 'bac1_IAGE') ou '' pour tout.
-     */
-    async function loadData(promo = '') {
-        // Affichage de l'état de chargement
-        document.getElementById('presencesBody').innerHTML = `
+        /**
+         * 1. CHARGEMENT DES PRÉSENCES
+         * ============================
+         * Interroge l'API /api/presences (éventuellement filtrée par ?promotion=xxx)
+         * et appelle renderRows() pour afficher le résultat.
+         *
+         * @param {string} promo - Nom de la table (ex: 'bac1_IAGE') ou '' pour tout.
+         */
+        async function loadData(promo = '') {
+            // Affichage de l'état de chargement
+            document.getElementById('presencesBody').innerHTML = `
             <tr>
                 <td colspan="5" style="padding:0;border:none;">
                     <div class="loading-state">
@@ -736,22 +806,22 @@
                     </div>
                 </td>
             </tr>`;
-        document.getElementById('countBadge').textContent = '—';
+            document.getElementById('countBadge').textContent = '—';
 
-        const query = promo ? `?promotion=${promo}` : '';
+            const query = promo ? `?promotion=${promo}` : '';
 
-        try {
-            // Appel à l'API Flask /api/presences (défini dans app.py)
-            const resp = await fetch(`/api/presences${query}`);
-            if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-            const data = await resp.json();
+            try {
+                // Appel à l'API Flask /api/presences (défini dans app.py)
+                const resp = await fetch(`/api/presences${query}`);
+                if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+                const data = await resp.json();
 
-            currentData = data;
-            renderRows(data);
+                currentData = data;
+                renderRows(data);
 
-        } catch (err) {
-            // Affichage d'un message d'erreur dans le tableau si l'API échoue
-            document.getElementById('presencesBody').innerHTML = `
+            } catch (err) {
+                // Affichage d'un message d'erreur dans le tableau si l'API échoue
+                document.getElementById('presencesBody').innerHTML = `
                 <tr>
                     <td colspan="5" style="padding:0;border:none;">
                         <div class="empty-state">
@@ -760,61 +830,61 @@
                         </div>
                     </td>
                 </tr>`;
-            console.error('Erreur loadData:', err);
+                console.error('Erreur loadData:', err);
+            }
         }
-    }
 
-    /**
-     * 2. CHARGEMENT DES STATISTIQUES
-     * ================================
-     * Interroge /api/presence_stats et met à jour les 3 cartes de stats.
-     *
-     * @param {string} promo - Même filtre que loadData().
-     */
-    async function loadStats(promo = '') {
-        // Réinitialisation pendant le chargement
-        ['statTotal', 'statEntrees', 'statSorties'].forEach(id => {
-            document.getElementById(id).textContent = '...';
-        });
-
-        const query = promo ? `?promotion=${promo}` : '';
-
-        try {
-            const resp  = await fetch(`/api/presence_stats${query}`);
-            if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-            const stats = await resp.json();
-
-            // Mise à jour des valeurs dans le DOM
-            document.getElementById('statTotal').textContent   = stats.total;
-            document.getElementById('statEntrees').textContent = stats.entrees;
-            document.getElementById('statSorties').textContent = stats.sorties;
-
-        } catch (err) {
+        /**
+         * 2. CHARGEMENT DES STATISTIQUES
+         * ================================
+         * Interroge /api/presence_stats et met à jour les 3 cartes de stats.
+         *
+         * @param {string} promo - Même filtre que loadData().
+         */
+        async function loadStats(promo = '') {
+            // Réinitialisation pendant le chargement
             ['statTotal', 'statEntrees', 'statSorties'].forEach(id => {
-                document.getElementById(id).textContent = '—';
+                document.getElementById(id).textContent = '...';
             });
-            console.error('Erreur loadStats:', err);
+
+            const query = promo ? `?promotion=${promo}` : '';
+
+            try {
+                const resp = await fetch(`/api/presence_stats${query}`);
+                if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+                const stats = await resp.json();
+
+                // Mise à jour des valeurs dans le DOM
+                document.getElementById('statTotal').textContent = stats.total;
+                document.getElementById('statEntrees').textContent = stats.entrees;
+                document.getElementById('statSorties').textContent = stats.sorties;
+
+            } catch (err) {
+                ['statTotal', 'statEntrees', 'statSorties'].forEach(id => {
+                    document.getElementById(id).textContent = '—';
+                });
+                console.error('Erreur loadStats:', err);
+            }
         }
-    }
 
-    /**
-     * 3. GÉNÉRATION DES LIGNES HTML
-     * ==============================
-     * Construit et insère les <tr> dans le <tbody> du tableau.
-     * Met aussi à jour le badge compteur.
-     *
-     * @param {Array} data - Tableau de présences retourné par l'API.
-     */
-    function renderRows(data) {
-        const tbody = document.getElementById('presencesBody');
-        const badge = document.getElementById('countBadge');
+        /**
+         * 3. GÉNÉRATION DES LIGNES HTML
+         * ==============================
+         * Construit et insère les <tr> dans le <tbody> du tableau.
+         * Met aussi à jour le badge compteur.
+         *
+         * @param {Array} data - Tableau de présences retourné par l'API.
+         */
+        function renderRows(data) {
+            const tbody = document.getElementById('presencesBody');
+            const badge = document.getElementById('countBadge');
 
-        // Mise à jour du compteur
-        badge.textContent = `${data.length} enregistrement${data.length > 1 ? 's' : ''}`;
+            // Mise à jour du compteur
+            badge.textContent = `${data.length} enregistrement${data.length > 1 ? 's' : ''}`;
 
-        if (data.length === 0) {
-            // Affichage de l'état vide
-            tbody.innerHTML = `
+            if (data.length === 0) {
+                // Affichage de l'état vide
+                tbody.innerHTML = `
                 <tr>
                     <td colspan="5" style="padding:0;border:none;">
                         <div class="empty-state">
@@ -823,24 +893,24 @@
                         </div>
                     </td>
                 </tr>`;
-            return;
-        }
+                return;
+            }
 
-        // Construction de toutes les lignes en une seule passe
-        tbody.innerHTML = data.map(p => {
-            // Initiales pour l'avatar (1ère lettre Nom + 1ère lettre Prénom)
-            const initials = `${(p.nom  || '?')[0]}${(p.prenom || '?')[0]}`.toUpperCase();
+            // Construction de toutes les lignes en une seule passe
+            tbody.innerHTML = data.map(p => {
+                // Initiales pour l'avatar (1ère lettre Nom + 1ère lettre Prénom)
+                const initials = `${(p.nom || '?')[0]}${(p.prenom || '?')[0]}`.toUpperCase();
 
-            // Badge coloré selon le type de pointage
-            // 'Entrée' → vert (badge-entree),  'Sortie' → rouge (badge-sortie)
-            const typeBadge = p.type_presence === 'Sortie'
-                ? `<span class="badge-sortie"><i class="fas fa-arrow-right-from-bracket"></i> Sortie</span>`
-                : `<span class="badge-entree"><i class="fas fa-arrow-right-to-bracket"></i> Entrée</span>`;
+                // Badge coloré selon le type de pointage
+                // 'Entrée' → vert (badge-entree),  'Sortie' → rouge (badge-sortie)
+                const typeBadge = p.type_presence === 'Sortie'
+                    ? `<span class="badge-sortie"><i class="fas fa-arrow-right-from-bracket"></i> Sortie</span>`
+                    : `<span class="badge-entree"><i class="fas fa-arrow-right-to-bracket"></i> Entrée</span>`;
 
-            // Filière affichée en dessous de la promotion (ou tiret si IAGE sans filière)
-            const filiere = p.filiere ? p.filiere : '—';
+                // Filière affichée en dessous de la promotion (ou tiret si IAGE sans filière)
+                const filiere = p.filiere ? p.filiere : '—';
 
-            return `
+                return `
                 <tr>
                     <!-- Colonne 1 : Étudiant (avatar + nom complet) -->
                     <td>
@@ -873,125 +943,126 @@
                     <!-- Colonne 5 : Type de pointage (Entrée / Sortie) -->
                     <td>${typeBadge}</td>
                 </tr>`;
-        }).join('');
-    }
-
-    /**
-     * 4. CHANGEMENT D'ONGLET
-     * =======================
-     * Appelé par chaque bouton .promo-tab.
-     * Met à jour l'état visuel (classe .active) et recharge les données.
-     *
-     * @param {HTMLElement} btn - Le bouton cliqué.
-     */
-    function switchTab(btn) {
-        const promo = btn.dataset.promo;
-        currentPromo = promo;
-
-        // Retirer la classe active de TOUS les onglets
-        document.querySelectorAll('.promo-tab').forEach(t => t.classList.remove('active'));
-        // Mettre l'onglet cliqué en actif
-        btn.classList.add('active');
-
-        // Mettre à jour le sous-titre de la page
-        const subtitle = document.getElementById('pageSubtitle');
-        const tableTitle = document.getElementById('tableTitle');
-
-        if (promo) {
-            // Formatage lisible du nom de table : bac1_tech_IA → BAC 1 — TECHNO IA
-            let label = promo.replace(/_/g, ' ').toUpperCase();
-            label = label.replace('TECH', '— TECHNO');
-            subtitle.textContent   = `Présences — ${label}`;
-            tableTitle.textContent = `Registre — ${label}`;
-        } else {
-            subtitle.textContent   = 'Registre des présences — Toutes les promotions';
-            tableTitle.textContent = 'Registre Global des Présences';
+            }).join('');
         }
 
-        // Effacer la recherche en cours avant de recharger
-        document.getElementById('searchInput').value = '';
+        /**
+         * 4. CHANGEMENT D'ONGLET
+         * =======================
+         * Appelé par chaque bouton .promo-tab.
+         * Met à jour l'état visuel (classe .active) et recharge les données.
+         *
+         * @param {HTMLElement} btn - Le bouton cliqué.
+         */
+        function switchTab(btn) {
+            const promo = btn.dataset.promo;
+            currentPromo = promo;
 
-        // Charger les données et les stats pour cet onglet
-        loadData(promo);
-        loadStats(promo);
-    }
+            // Retirer la classe active de TOUS les onglets
+            document.querySelectorAll('.promo-tab').forEach(t => t.classList.remove('active'));
+            // Mettre l'onglet cliqué en actif
+            btn.classList.add('active');
 
-    /**
-     * 5. FILTRAGE LOCAL PAR RECHERCHE
-     * ================================
-     * Filtre les lignes affichées en fonction du texte tapé dans la barre de recherche.
-     * La recherche est insensible à la casse.
-     * La function lit directement le DOM (pas de nouvel appel API).
-     */
-    function filterTable() {
-        const query = document.getElementById('searchInput').value.toUpperCase();
-        const rows  = document.querySelectorAll('#presencesBody tr');
-        let visibleCount = 0;
+            // Mettre à jour le sous-titre de la page
+            const subtitle = document.getElementById('pageSubtitle');
+            const tableTitle = document.getElementById('tableTitle');
 
-        rows.forEach(row => {
-            // On cherche dans le texte complet de la ligne
-            const text = row.textContent || '';
-            if (text.toUpperCase().includes(query)) {
-                row.classList.remove('hidden');
-                visibleCount++;
+            if (promo) {
+                // Formatage lisible du nom de table : bac1_tech_IA → BAC 1 — TECHNO IA
+                let label = promo.replace(/_/g, ' ').toUpperCase();
+                label = label.replace('TECH', '— TECHNO');
+                subtitle.textContent = `Présences — ${label}`;
+                tableTitle.textContent = `Registre — ${label}`;
             } else {
-                row.classList.add('hidden');
+                subtitle.textContent = 'Registre des présences — Toutes les promotions';
+                tableTitle.textContent = 'Registre Global des Présences';
             }
-        });
 
-        // Mise à jour du badge avec le nombre de lignes visibles
-        document.getElementById('countBadge').textContent =
-            `${visibleCount} enregistrement${visibleCount > 1 ? 's' : ''}`;
-    }
+            // Effacer la recherche en cours avant de recharger
+            document.getElementById('searchInput').value = '';
 
-    /**
-     * 6. EXPORT EXCEL (SheetJS)
-     * ==========================
-     * Convertit le tableau HTML #presencesTable en fichier .xlsx
-     * et déclenche son téléchargement.
-     *
-     * Étapes :
-     *   1. Sélection du tableau HTML
-     *   2. Conversion via XLSX.utils.table_to_sheet()
-     *   3. Création d'un classeur et ajout de la feuille
-     *   4. Génération du fichier avec la date du jour dans le nom
-     */
-    function exportExcel() {
-        const table = document.getElementById('presencesTable');
-
-        if (!table || currentData.length === 0) {
-            alert('Aucune donnée à exporter.');
-            return;
+            // Charger les données et les stats pour cet onglet
+            loadData(promo);
+            loadStats(promo);
         }
 
-        // Conversion du tableau HTML en feuille SheetJS
-        const ws = XLSX.utils.table_to_sheet(table);
+        /**
+         * 5. FILTRAGE LOCAL PAR RECHERCHE
+         * ================================
+         * Filtre les lignes affichées en fonction du texte tapé dans la barre de recherche.
+         * La recherche est insensible à la casse.
+         * La function lit directement le DOM (pas de nouvel appel API).
+         */
+        function filterTable() {
+            const query = document.getElementById('searchInput').value.toUpperCase();
+            const rows = document.querySelectorAll('#presencesBody tr');
+            let visibleCount = 0;
 
-        // Création du classeur Excel
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, 'Présences');
+            rows.forEach(row => {
+                // On cherche dans le texte complet de la ligne
+                const text = row.textContent || '';
+                if (text.toUpperCase().includes(query)) {
+                    row.classList.remove('hidden');
+                    visibleCount++;
+                } else {
+                    row.classList.add('hidden');
+                }
+            });
 
-        // Nom de fichier avec la date : Presences_UPL_16-03-2026.xlsx
-        const today   = new Date();
-        const dateStr = today.toLocaleDateString('fr-FR').replace(/\//g, '-');
-        const promo   = currentPromo ? `_${currentPromo}` : '_Global';
-        const filename = `Presences_UPL${promo}_${dateStr}.xlsx`;
+            // Mise à jour du badge avec le nombre de lignes visibles
+            document.getElementById('countBadge').textContent =
+                `${visibleCount} enregistrement${visibleCount > 1 ? 's' : ''}`;
+        }
 
-        // Déclenchement du téléchargement automatique
-        XLSX.writeFile(wb, filename);
-    }
+        /**
+         * 6. EXPORT EXCEL (SheetJS)
+         * ==========================
+         * Convertit le tableau HTML #presencesTable en fichier .xlsx
+         * et déclenche son téléchargement.
+         *
+         * Étapes :
+         *   1. Sélection du tableau HTML
+         *   2. Conversion via XLSX.utils.table_to_sheet()
+         *   3. Création d'un classeur et ajout de la feuille
+         *   4. Génération du fichier avec la date du jour dans le nom
+         */
+        function exportExcel() {
+            const table = document.getElementById('presencesTable');
 
-    /**
-     * INITIALISATION AU CHARGEMENT DE LA PAGE
-     * =========================================
-     * On lance le chargement global (aucune promotion filtrée)
-     * dès que la page est prête.
-     */
-    window.addEventListener('DOMContentLoaded', () => {
-        loadData('');
-        loadStats('');
-    });
-</script>
+            if (!table || currentData.length === 0) {
+                alert('Aucune donnée à exporter.');
+                return;
+            }
+
+            // Conversion du tableau HTML en feuille SheetJS
+            const ws = XLSX.utils.table_to_sheet(table);
+
+            // Création du classeur Excel
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Présences');
+
+            // Nom de fichier avec la date : Presences_UPL_16-03-2026.xlsx
+            const today = new Date();
+            const dateStr = today.toLocaleDateString('fr-FR').replace(/\//g, '-');
+            const promo = currentPromo ? `_${currentPromo}` : '_Global';
+            const filename = `Presences_UPL${promo}_${dateStr}.xlsx`;
+
+            // Déclenchement du téléchargement automatique
+            XLSX.writeFile(wb, filename);
+        }
+
+        /**
+         * INITIALISATION AU CHARGEMENT DE LA PAGE
+         * =========================================
+         * On lance le chargement global (aucune promotion filtrée)
+         * dès que la page est prête.
+         */
+        window.addEventListener('DOMContentLoaded', () => {
+            loadData('');
+            loadStats('');
+        });
+    </script>
 
 </body>
+
 </html>
