@@ -229,7 +229,7 @@ def check_attendance():
 def get_student_info(matricule):
     """
     Recherche un étudiant par son matricule dans toutes les tables de promotions.
-    Retourne les informations au format JSON.
+    Retourne les informations au format JSON (Objet avec clés nom, prenom, etc.)
     """
     tables = [
         'bac1_IAGE', 'bac2_IAGE', 'bac3_IAGE',
@@ -241,21 +241,24 @@ def get_student_info(matricule):
     
     try:
         conn = get_db_connection()
+        # On utilise un dictionnaire pour que le JS reçoive des clés (nom, prenom...)
         if isinstance(conn, sqlite3.Connection):
+            conn.row_factory = sqlite3.Row
             cursor = conn.cursor()
         else:
             cursor = conn.cursor(dictionary=True)
         
         for table in tables:
-
             query = f"SELECT * FROM {table} WHERE matricule = %s"
             execute_sql(cursor, query, (matricule,))
             result = cursor.fetchone()
             
             if result:
+                # Conversion en dictionnaire pour SQLite
+                student_dict = dict(result) if isinstance(conn, sqlite3.Connection) else result
                 cursor.close()
                 conn.close()
-                return jsonify(result)
+                return jsonify(student_dict)
         
         cursor.close()
         conn.close()
