@@ -4,6 +4,7 @@ import qrcode
 import io
 import traceback
 from flask import Flask, request, render_template, redirect, url_for, jsonify, send_file
+from datetime import datetime
 try:
     from db_config import host, user, password, database
 except ImportError:
