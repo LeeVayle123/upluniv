@@ -281,6 +281,9 @@ def check_attendance():
                 nom, postnom, prenom, filiere, promotion, sexe, faculte, parcours = result
                 
                 # Conversion GPS sécurisée
+                try:
+                    lat = float(request.form.get('latitude')) if request.form.get('latitude') else None
+                    lon = float(request.form.get('longitude')) if request.form.get('longitude') else None
                 except:
                     lat, lon = None, None
                 
