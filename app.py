@@ -463,7 +463,9 @@ def view_presences():
 
         try:
             execute_sql(cursor, "SELECT * FROM presences ORDER BY date_inscription DESC")
-            all_presences = cursor.fetchall()
+            rows = cursor.fetchall()
+            # On convertit en ddictionnaire car sqlite3.Row est immuable
+            all_presences = [dict(r) if isinstance(r, sqlite3.Row) else r for r in rows]
         except (mysql.connector.Error, sqlite3.Error, Exception):
             all_presences = []
 
@@ -615,10 +617,11 @@ def api_presences():
         for table in tables:
             presence_table = f"presence_{table}"
             try:
-                # On récupère toutes les présences de cette table
                 execute_sql(cursor, f"SELECT * FROM {presence_table} ORDER BY date_inscription DESC")
-                rows = cursor.fetchall()
-                for row in rows:
+                rows_raw = cursor.fetchall()
+                for row_raw in rows_raw:
+                    # On convertit en dictionnaire pour permettre l'assignation (SQLite)
+                    row = dict(row_raw) if isinstance(row_raw, sqlite3.Row) else row_raw
                     # Formatage de la date pour l'affichage (Gère MySQL et SQLite)
                     dt = row['date_inscription']
                     if dt:
@@ -762,8 +765,10 @@ def api_students():
         for table in tables:
             try:
                 execute_sql(cursor, f"SELECT * FROM {table}")
-                rows = cursor.fetchall()
-                for row in rows:
+                rows_raw = cursor.fetchall()
+                for row_raw in rows_raw:
+                    # On convertit en dictionnaire pour permettre l'assignation (SQLite)
+                    row = dict(row_raw) if isinstance(row_raw, sqlite3.Row) else row_raw
                     dt = row['date_inscription']
                     if dt:
                         if isinstance(dt, str):
@@ -950,7 +955,8 @@ def admin_bac1_iage():
         
         # Récupération de la liste complète
         execute_sql(cursor, "SELECT * FROM bac1_IAGE ORDER BY date_inscription DESC")
-        students = cursor.fetchall()
+        rows_raw = cursor.fetchall()
+        students = [dict(r) if isinstance(r, sqlite3.Row) else r for r in rows_raw]
         
         # Pré-formatage des données pour le template
         for student in students:
@@ -1006,8 +1012,8 @@ def admin_attendance():
         for table in tables:
             try:
                 execute_sql(cursor, f"SELECT * FROM presence_{table}")
-                rows = cursor.fetchall()
-                all_presences.extend(rows)
+                rows_raw = cursor.fetchall()
+                all_presences.extend([dict(r) if isinstance(r, sqlite3.Row) else r for r in rows_raw])
             except:
                 continue
         

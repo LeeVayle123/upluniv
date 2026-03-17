@@ -141,7 +141,7 @@
 
         .stat-card {
             background: var(--bg-card);
-            padding: 1.5rem;
+            padding: 1rem; /* Réduit de 1.5rem */
             border-radius: var(--radius);
             border: 1px solid var(--border);
             box-shadow: var(--shadow);
@@ -155,7 +155,7 @@
         }
 
         .stat-card .value {
-            font-size: 1.5rem;
+            font-size: 1.25rem; /* Réduit de 1.5rem */
             font-weight: 700;
             color: var(--primary);
         }
@@ -195,12 +195,13 @@
 
         .search-box input {
             width: 100%;
-            padding: 0.625rem 1rem 0.625rem 2.5rem;
+            padding: 0.5rem 1rem 0.5rem 2.5rem; /* Réduit le padding vertical */
             border: 1px solid var(--border);
             border-radius: var(--radius);
             font-family: inherit;
             outline: none;
             transition: border-color 0.2s;
+            font-size: 0.85rem;
         }
 
         .search-box input:focus {
@@ -234,6 +235,14 @@
         tr:hover td {
             background-color: #f8fafc;
         }
+
+        /* Fixation des largeurs de colonnes pour éviter les sauts */
+        th:nth-child(1), td:nth-child(1) { width: 30%; } /* Étudiant */
+        th:nth-child(2), td:nth-child(2) { width: 15%; } /* Matricule */
+        th:nth-child(3), td:nth-child(3) { width: 10%; } /* Sexe */
+        th:nth-child(4), td:nth-child(4) { width: 15%; } /* Promotion */
+        th:nth-child(5), td:nth-child(5) { width: 15%; } /* Parcours */
+        th:nth-child(6), td:nth-child(6) { width: 15%; } /* Date */
 
         .student-info {
             display: flex;
@@ -473,9 +482,9 @@
 
             .promotion-tabs {
                 display: flex;
-                gap: 0.5rem;
+                gap: 0.4rem;
                 background: #e2e8f0;
-                padding: 0.4rem;
+                padding: 0.3rem; /* Réduit de 0.4rem */
                 border-radius: 12px;
                 overflow-x: auto;
             }
@@ -489,9 +498,9 @@
             .year-row {
                 display: flex;
                 align-items: center;
-                gap: 0.75rem;
+                gap: 0.6rem;
                 background: white;
-                padding: 0.4rem 0.75rem;
+                padding: 0.3rem 0.6rem; /* Réduit de 0.4rem 0.75rem */
                 border-radius: 12px;
                 border: 1px solid var(--border);
                 box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
@@ -512,13 +521,13 @@
 
             .promo-tab {
                 flex: 1;
-                padding: 0.6rem 0.5rem;
+                padding: 0.45rem 0.4rem; /* Réduit de 0.6rem */
                 border: none;
                 border-radius: 8px;
                 background: transparent;
                 font-weight: 600;
                 font-family: inherit;
-                font-size: 0.85rem;
+                font-size: 0.8rem; /* Réduit de 0.85rem */
                 cursor: pointer;
                 white-space: nowrap;
                 transition: all 0.2s;
