@@ -18,13 +18,13 @@
             --transition: all 0.2s ease;
         }
 
-        .logo-container {
+        .conteneur-logo {
             display: flex;
             justify-content: flex-start;
             margin-bottom: 15px;
         }
 
-        .university-logo {
+        .logo-universitaire {
             width: 70px;
             height: 70px;
             border-radius: 50%;
@@ -51,7 +51,7 @@
             color: var(--text-main);
         }
 
-        .container {
+        .Conteneur {
             width: 100%;
             max-width: 650px;
             display: flex;
@@ -62,7 +62,7 @@
             border: 1px solid #e2e8f0;
         }
 
-        .side-panel {
+        .panneau-lateral {
             flex: 0.7;
             background: navy;
             padding: 24px;
@@ -72,20 +72,20 @@
             justify-content: center;
         }
 
-        .brand-title {
+        .titre-marque {
             font-size: 1.5rem;
             font-weight: 800;
             margin-bottom: 8px;
         }
 
-        .brand-desc {
+        .description-marque {
             font-size: 0.85rem;
             opacity: 0.9;
             line-height: 1.4;
             margin-bottom: 20px;
         }
 
-        .btn-outline {
+        .bouton-contour {
             display: inline-flex;
             padding: 6px 16px;
             border: 1.5px solid rgb(252, 252, 252);
@@ -97,35 +97,35 @@
             transition: var(--transition);
         }
 
-        .btn-outline:hover {
+        .bouton-contour:hover {
             background: red;
             border-color: white;
         }
 
-        .form-panel {
+        .panneau-formulaire {
             flex: 1.3;
             padding: 24px 28px;
             background: white;
         }
 
-        .form-title {
+        .titre-formulaire {
             font-size: 1.25rem;
             font-weight: 700;
             margin-bottom: 16px;
         }
 
-        .form-group {
+        .groupe-formulaire {
             margin-bottom: 12px;
         }
 
-        .form-label {
+        .etiquette-formulaire {
             display: block;
             font-size: 0.75rem;
             font-weight: 600;
             margin-bottom: 4px;
         }
 
-        .form-input {
+        .champ-formulaire {
             width: 100%;
             padding: 10px 14px;
             background: #f8fafc;
@@ -136,14 +136,14 @@
             transition: var(--transition);
         }
 
-        .form-input:focus {
+        .champ-formulaire:focus {
             outline: none;
             border-color: var(--primary);
             background: white;
             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
         }
 
-        .btn-submit {
+        .bouton-validation {
             width: 100%;
             background: var(--primary);
             color: white;
@@ -156,24 +156,24 @@
             transition: var(--transition);
         }
 
-        .btn-submit:hover {
+        .bouton-validation:hover {
             background: var(--primary-dark);
             transform: translateY(-1px);
         }
 
         @media (max-width: 550px) {
-            .container {
+            .Conteneur {
                 flex-direction: column;
                 max-width: 350px;
             }
 
-            .side-panel {
+            .panneau-lateral {
                 padding: 20px;
                 text-align: center;
                 align-items: center;
             }
 
-            .form-panel {
+            .panneau-formulaire {
                 padding: 20px;
             }
         }
@@ -181,17 +181,17 @@
 </head>
 
 <body>
-    <div class="container">
-        <aside class="side-panel">
-            <div class="logo-container">
-                <img src="{{ url_for('static', filename='logo_upl.png') }}" alt="UPL Logo" class="university-logo">
+    <div class="Conteneur">
+        <aside class="panneau-lateral">
+            <div class="conteneur-logo">
+                <img src="{{ url_for('static', filename='logo_upl.png') }}" alt="UPL Logo" class="logo-universitaire">
             </div>
-            <h1 class="brand-title">UPL</h1>
-            <p class="brand-desc">Scanner ou saisir votre matricule pour la présence.</p>
+            <h1 class="titre-marque">UPL</h1>
+            <p class="description-marque">Scanner ou saisir votre matricule pour la présence.</p>
         </aside>
 
-        <main class="form-panel">
-            <h2 class="form-title">Présence</h2>
+        <main class="panneau-formulaire">
+            <h2 class="titre-formulaire">Présence</h2>
             
             <!-- Zone d'affichage des infos de l'étudiant trouvées via AJAX -->
                 <div id="student-info-badge" style="display: none; background: #f1f5f9; padding: 12px; border-radius: 12px; margin-bottom: 15px; border-left: 4px solid navy;">
@@ -214,15 +214,15 @@
                     <input type="hidden" name="latitude" id="latitude">
                     <input type="hidden" name="longitude" id="longitude">
                     
-                    <div class="form-group">
-                        <label class="form-label" for="matricule">Matricule</label>
-                        <input type="text" id="matricule" name="matricule" class="form-input" required
+                    <div class="groupe-formulaire">
+                        <label class="etiquette-formulaire" for="matricule">Matricule</label>
+                        <input type="text" id="matricule" name="matricule" class="champ-formulaire" required
                             placeholder="Ex: 24-1234" autofocus autocomplete="off">
                     </div>
 
-                    <div class="form-group">
-                        <label class="form-label" for="type_presence">Type de pointage</label>
-                        <select id="type_presence" name="type_presence" class="form-input">
+                    <div class="groupe-formulaire">
+                        <label class="etiquette-formulaire" for="type_presence">Type de pointage</label>
+                        <select id="type_presence" name="type_presence" class="champ-formulaire">
                             <option value="Entrée">✅ Entrée (Début de cours)</option>
                             <option value="Sortie">🚪 Sortie (Fin de cours)</option>
                         </select>
@@ -236,7 +236,7 @@
                         <span>🔍 Vérification...</span>
                     </div>
 
-                    <button type="submit" class="btn-submit" id="submit-btn" disabled>Valider ma présence</button>
+                    <button type="submit" class="bouton-validation" id="submit-btn" disabled>Valider ma présence</button>
                 </form>
             </main>
 

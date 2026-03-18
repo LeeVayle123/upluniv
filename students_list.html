@@ -39,7 +39,7 @@
             min-height: 100vh;
         }
 
-        .container {
+        .Conteneur {
             max-width: 1200px;
             margin: 0 auto;
         }
@@ -51,17 +51,17 @@
             margin-bottom: 2rem;
         }
 
-        .title-section {
+        .section-titre {
             display: flex;
             align-items: center;
             gap: 1.5rem;
         }
 
-        .university-logo-container {
+        .conteneur-logo-universite {
             flex-shrink: 0;
         }
 
-        .university-logo {
+        .logo-universitaire {
             width: 80px;
             height: 80px;
             border-radius: 50%;
@@ -71,14 +71,14 @@
             background: white;
         }
 
-        .title-text h1 {
+        .titre-texte h1 {
             font-size: 1.875rem;
             font-weight: 800;
             color: var(--primary);
             letter-spacing: -0.025em;
         }
 
-        .title-text p {
+        .titre-texte p {
             color: var(--text-muted);
             font-size: 0.95rem;
         }
@@ -88,7 +88,7 @@
             gap: 1rem;
         }
 
-        .btn {
+        .bouton {
             display: inline-flex;
             align-items: center;
             padding: 0.625rem 1.25rem;
@@ -101,67 +101,69 @@
             font-size: 0.875rem;
         }
 
-        .btn-primary {
+        .bouton-primaire {
             background-color: var(--primary);
             color: white;
         }
 
-        .btn-primary:hover {
+        .bouton-primaire:hover {
             background-color: var(--secondary);
             transform: translateY(-1px);
         }
 
-        .btn-outline {
+        .bouton-contour {
             background-color: transparent;
             border: 1px solid var(--border);
             color: var(--text-main);
         }
 
-        .btn-outline:hover {
+        .bouton-contour:hover {
             background-color: #f8fafc;
         }
 
-        .btn-danger {
+        .bouton-danger {
             background-color: var(--secondary);
             color: white;
         }
 
-        .btn-danger:hover {
+        .bouton-danger:hover {
             background-color: #dc2626;
             transform: translateY(-1px);
         }
 
         /* Stats Cards */
-        .stats-grid {
+        .grille-stats {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 1.5rem;
             margin-bottom: 2rem;
         }
 
-        .stat-card {
+        .carte-stat {
             background: var(--bg-card);
-            padding: 1rem; /* Réduit de 1.5rem */
+            padding: 1rem;
+            /* Réduit de 1.5rem */
             border-radius: var(--radius);
             border: 1px solid var(--border);
             box-shadow: var(--shadow);
         }
 
-        .stat-card .label {
+        .carte-stat .etiquette {
             font-size: 0.875rem;
             color: var(--text-muted);
             margin-bottom: 0.5rem;
             display: block;
         }
 
-        .stat-card .value {
-            font-size: 1.25rem; /* Réduit de 1.5rem */
+        .carte-stat .valeur {
+            font-size: 1.25rem;
+            /* Réduit de 1.5rem */
             font-weight: 700;
             color: var(--primary);
         }
 
         /* Table Section */
-        .table-container {
+        .conteneur-table {
             background: var(--bg-card);
             border-radius: var(--radius);
             border: 1px solid var(--border);
@@ -169,7 +171,7 @@
             overflow: hidden;
         }
 
-        .table-header {
+        .entete-table {
             padding: 1.5rem;
             border-bottom: 1px solid var(--border);
             display: flex;
@@ -179,13 +181,13 @@
             gap: 1rem;
         }
 
-        .search-box {
+        .boite-recherche {
             position: relative;
             flex: 1;
             max-width: 400px;
         }
 
-        .search-box i {
+        .boite-recherche i {
             position: absolute;
             left: 1rem;
             top: 50%;
@@ -193,9 +195,10 @@
             color: var(--text-muted);
         }
 
-        .search-box input {
+        .boite-recherche input {
             width: 100%;
-            padding: 0.5rem 1rem 0.5rem 2.5rem; /* Réduit le padding vertical */
+            padding: 0.5rem 1rem 0.5rem 2.5rem;
+            /* Réduit le padding vertical */
             border: 1px solid var(--border);
             border-radius: var(--radius);
             font-family: inherit;
@@ -204,7 +207,7 @@
             font-size: 0.85rem;
         }
 
-        .search-box input:focus {
+        .boite-recherche input:focus {
             border-color: var(--primary);
         }
 
@@ -237,14 +240,44 @@
         }
 
         /* Fixation des largeurs de colonnes pour éviter les sauts */
-        th:nth-child(1), td:nth-child(1) { width: 30%; } /* Étudiant */
-        th:nth-child(2), td:nth-child(2) { width: 15%; } /* Matricule */
-        th:nth-child(3), td:nth-child(3) { width: 10%; } /* Sexe */
-        th:nth-child(4), td:nth-child(4) { width: 15%; } /* Promotion */
-        th:nth-child(5), td:nth-child(5) { width: 15%; } /* Parcours */
-        th:nth-child(6), td:nth-child(6) { width: 15%; } /* Date */
+        th:nth-child(1),
+        td:nth-child(1) {
+            width: 30%;
+        }
 
-        .student-info {
+        /* Étudiant */
+        th:nth-child(2),
+        td:nth-child(2) {
+            width: 15%;
+        }
+
+        /* Matricule */
+        th:nth-child(3),
+        td:nth-child(3) {
+            width: 10%;
+        }
+
+        /* Sexe */
+        th:nth-child(4),
+        td:nth-child(4) {
+            width: 15%;
+        }
+
+        /* Promotion */
+        th:nth-child(5),
+        td:nth-child(5) {
+            width: 15%;
+        }
+
+        /* Parcours */
+        th:nth-child(6),
+        td:nth-child(6) {
+            width: 15%;
+        }
+
+        /* Date */
+
+        .info-etudiant {
             display: flex;
             align-items: center;
             gap: 0.75rem;
@@ -293,7 +326,7 @@
         }
 
         /* Modal styling */
-        .modal-overlay {
+        .superposition-modale {
             position: fixed;
             top: 0;
             left: 0;
@@ -307,7 +340,7 @@
             z-index: 1000;
         }
 
-        .modal-card {
+        .carte-modale {
             background: white;
             padding: 2rem;
             border-radius: var(--radius);
@@ -319,20 +352,20 @@
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
         }
 
-        .modal-card h2 {
+        .carte-modale h2 {
             margin-bottom: 1rem;
             color: var(--primary);
             font-size: 1.5rem;
         }
 
-        .table-groups {
+        .groupes-tables {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 1.5rem;
             margin-bottom: 1.5rem;
         }
 
-        .group-h {
+        .entete-groupe {
             font-weight: 800;
             font-size: 0.75rem;
             color: var(--text-muted);
@@ -340,13 +373,13 @@
             text-transform: uppercase;
         }
 
-        .table-list {
+        .liste-tables {
             display: flex;
             flex-direction: column;
             gap: 0.5rem;
         }
 
-        .table-item {
+        .element-table {
             padding: 0.75rem;
             border: 1px solid var(--border);
             border-radius: 8px;
@@ -356,13 +389,13 @@
             font-size: 0.85rem;
         }
 
-        .table-item:hover {
+        .element-table:hover {
             background: #f1f5f9;
             border-color: var(--primary);
             color: var(--primary);
         }
 
-        .modal-actions {
+        .actions-modale {
             display: flex;
             justify-content: flex-end;
             gap: 1rem;
@@ -380,90 +413,90 @@
 </head>
 
 <body>
-    <div class="container">
+    <div class="Conteneur">
         <header>
-            <div class="title-section">
-                <div class="university-logo-container">
-                    <img src="{{ url_for('static', filename='logo_upl.png') }}" alt="UPL Logo" class="university-logo">
+            <div class="section-titre">
+                <div class="conteneur-logo-universite">
+                    <img src="{{ url_for('static', filename='logo_upl.png') }}" alt="UPL Logo" class="logo-universitaire">
                 </div>
-                <div class="title-text">
+                <div class="titre-texte">
                     <h1 id="pageTitle">Étudiants Enregistrés</h1>
                     <p id="pageSubtitle">Gestion et suivi des inscriptions UPL</p>
                 </div>
             </div>
             <div class="actions">
                 <!-- Lien vers la saisie de présence (pour les étudiants) -->
-                <a href="/attendance" class="btn btn-outline">
+                <!--  <a href="/#" class="bouton bouton-contour">
                     <i class="fas fa-barcode mr-2"></i> Pointer Présence
                 </a>
-                <!-- Lien vers le registre des présences (pour l'administration) -->
-                <a href="/presences" class="btn btn-outline">
+                Lien vers le registre des présences (pour l'administration) -->
+                <a href="/presences" class="bouton bouton-contour">
                     <i class="fas fa-list-check mr-2"></i> Voir les Présences
                 </a>
-                <a href="/register_student" class="btn btn-outline">
+                <a href="/register_student" class="bouton bouton-contour">
                     <i class="fas fa-plus mr-2"></i> Nouvel Étudiant
                 </a>
-                <button class="btn btn-primary" onclick="window.print()">
+                <button class="bouton bouton-primaire" onclick="window.print()">
                     <i class="fas fa-download mr-2"></i> Exporter
                 </button>
-                <button class="btn btn-danger" onclick="handleReset()">
+                <button class="bouton bouton-danger" onclick="handleReset()">
                     <i class="fas fa-trash-alt mr-2"></i> Réinitialiser
                 </button>
             </div>
         </header>
 
         <!-- Promotion Selector Grouped by Faculty -->
-        <div class="tabs-wrapper" style="margin-bottom: 2rem; display: flex; flex-direction: column; gap: 1.5rem;">
+        <div class="enveloppe-onglets" style="margin-bottom: 2rem; display: flex; flex-direction: column; gap: 1.5rem;">
 
             <!-- IAGE Section -->
-            <div class="faculty-group">
-                <h3 class="group-title">PARCOURS IAGE</h3>
-                <div class="promotion-tabs">
-                    <button class="promo-tab" data-promo="" onclick="switchPromo(this)">Global</button>
-                    <button class="promo-tab" data-promo="bac1_IAGE" onclick="switchPromo(this)">BAC 1</button>
-                    <button class="promo-tab" data-promo="bac2_IAGE" onclick="switchPromo(this)">BAC 2</button>
-                    <button class="promo-tab" data-promo="bac3_IAGE" onclick="switchPromo(this)">BAC 3</button>
+            <div class="groupe-faculte">
+                <h3 class="titre-groupe">PARCOURS IAGE</h3>
+                <div class="onglets-promotion">
+                    <button class="onglet-promo" data-promo="" onclick="switchPromo(this)">Global</button>
+                    <button class="onglet-promo" data-promo="bac1_IAGE" onclick="switchPromo(this)">BAC 1</button>
+                    <button class="onglet-promo" data-promo="bac2_IAGE" onclick="switchPromo(this)">BAC 2</button>
+                    <button class="onglet-promo" data-promo="bac3_IAGE" onclick="switchPromo(this)">BAC 3</button>
                 </div>
             </div>
 
             <!-- TECHNOLOGIE Section -->
-            <div class="faculty-group">
-                <h3 class="group-title">PARCOURS TECHNOLOGIE</h3>
-                <div class="tech-grid">
+            <div class="groupe-faculte">
+                <h3 class="titre-groupe">PARCOURS TECHNOLOGIE</h3>
+                <div class="grille-technique">
                     <!-- Tech BAC 1 -->
-                    <div class="year-row">
-                        <span class="year-label">BAC 1 :</span>
-                        <div class="inner-tabs">
-                            <button class="promo-tab" data-promo="bac1_tech_IA" onclick="switchPromo(this)">IA</button>
-                            <button class="promo-tab" data-promo="bac1_tech_GL" onclick="switchPromo(this)">GL</button>
-                            <button class="promo-tab" data-promo="bac1_tech_SI" onclick="switchPromo(this)">SI</button>
+                    <div class="ligne-annee">
+                        <span class="etiquette-annee">BAC 1 :</span>
+                        <div class="onglets-internes">
+                            <button class="onglet-promo" data-promo="bac1_tech_IA" onclick="switchPromo(this)">IA</button>
+                            <button class="onglet-promo" data-promo="bac1_tech_GL" onclick="switchPromo(this)">GL</button>
+                            <button class="onglet-promo" data-promo="bac1_tech_SI" onclick="switchPromo(this)">SI</button>
                         </div>
                     </div>
                     <!-- Tech BAC 2 -->
-                    <div class="year-row">
-                        <span class="year-label">BAC 2 :</span>
-                        <div class="inner-tabs">
-                            <button class="promo-tab" data-promo="bac2_tech_IA" onclick="switchPromo(this)">IA</button>
-                            <button class="promo-tab" data-promo="bac2_tech_GL" onclick="switchPromo(this)">GL</button>
-                            <button class="promo-tab" data-promo="bac2_tech_SI" onclick="switchPromo(this)">SI</button>
+                    <div class="ligne-annee">
+                        <span class="etiquette-annee">BAC 2 :</span>
+                        <div class="onglets-internes">
+                            <button class="onglet-promo" data-promo="bac2_tech_IA" onclick="switchPromo(this)">IA</button>
+                            <button class="onglet-promo" data-promo="bac2_tech_GL" onclick="switchPromo(this)">GL</button>
+                            <button class="onglet-promo" data-promo="bac2_tech_SI" onclick="switchPromo(this)">SI</button>
                         </div>
                     </div>
                     <!-- Tech BAC 3 -->
-                    <div class="year-row">
-                        <span class="year-label">BAC 3 :</span>
-                        <div class="inner-tabs">
-                            <button class="promo-tab" data-promo="bac3_tech_IA" onclick="switchPromo(this)">IA</button>
-                            <button class="promo-tab" data-promo="bac3_tech_GL" onclick="switchPromo(this)">GL</button>
-                            <button class="promo-tab" data-promo="bac3_tech_SI" onclick="switchPromo(this)">SI</button>
+                    <div class="ligne-annee">
+                        <span class="etiquette-annee">BAC 3 :</span>
+                        <div class="onglets-internes">
+                            <button class="onglet-promo" data-promo="bac3_tech_IA" onclick="switchPromo(this)">IA</button>
+                            <button class="onglet-promo" data-promo="bac3_tech_GL" onclick="switchPromo(this)">GL</button>
+                            <button class="onglet-promo" data-promo="bac3_tech_SI" onclick="switchPromo(this)">SI</button>
                         </div>
                     </div>
                     <!-- Tech BAC 4 -->
-                    <div class="year-row">
-                        <span class="year-label">BAC 4 :</span>
-                        <div class="inner-tabs">
-                            <button class="promo-tab" data-promo="bac4_tech_IA" onclick="switchPromo(this)">IA</button>
-                            <button class="promo-tab" data-promo="bac4_tech_GL" onclick="switchPromo(this)">GL</button>
-                            <button class="promo-tab" data-promo="bac4_tech_SI" onclick="switchPromo(this)">SI</button>
+                    <div class="ligne-annee">
+                        <span class="etiquette-annee">BAC 4 :</span>
+                        <div class="onglets-internes">
+                            <button class="onglet-promo" data-promo="bac4_tech_IA" onclick="switchPromo(this)">IA</button>
+                            <button class="onglet-promo" data-promo="bac4_tech_GL" onclick="switchPromo(this)">GL</button>
+                            <button class="onglet-promo" data-promo="bac4_tech_SI" onclick="switchPromo(this)">SI</button>
                         </div>
                     </div>
                 </div>
@@ -484,7 +517,8 @@
                 display: flex;
                 gap: 0.4rem;
                 background: #e2e8f0;
-                padding: 0.3rem; /* Réduit de 0.4rem */
+                padding: 0.3rem;
+                /* Réduit de 0.4rem */
                 border-radius: 12px;
                 overflow-x: auto;
             }
@@ -500,7 +534,8 @@
                 align-items: center;
                 gap: 0.6rem;
                 background: white;
-                padding: 0.3rem 0.6rem; /* Réduit de 0.4rem 0.75rem */
+                padding: 0.3rem 0.6rem;
+                /* Réduit de 0.4rem 0.75rem */
                 border-radius: 12px;
                 border: 1px solid var(--border);
                 box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
@@ -521,13 +556,15 @@
 
             .promo-tab {
                 flex: 1;
-                padding: 0.45rem 0.4rem; /* Réduit de 0.6rem */
+                padding: 0.45rem 0.4rem;
+                /* Réduit de 0.6rem */
                 border: none;
                 border-radius: 8px;
                 background: transparent;
                 font-weight: 600;
                 font-family: inherit;
-                font-size: 0.8rem; /* Réduit de 0.85rem */
+                font-size: 0.8rem;
+                /* Réduit de 0.85rem */
                 cursor: pointer;
                 white-space: nowrap;
                 transition: all 0.2s;
@@ -546,24 +583,24 @@
             }
         </style>
 
-        <div class="stats-grid">
-            <div class="stat-card">
-                <span class="label">Total Étudiants</span>
-                <span id="totalStudents" class="value">...</span>
+        <div class="grille-stats">
+            <div class="carte-stat">
+                <span class="etiquette">Total Étudiants</span>
+                <span id="totalStudents" class="valeur">...</span>
             </div>
-            <div class="stat-card">
-                <span class="label">Hommes</span>
-                <span id="maleCount" class="value">...</span>
+            <div class="carte-stat">
+                <span class="etiquette">Hommes</span>
+                <span id="maleCount" class="valeur">...</span>
             </div>
-            <div class="stat-card">
-                <span class="label">Femmes</span>
-                <span id="femaleCount" class="value">...</span>
+            <div class="carte-stat">
+                <span class="etiquette">Femmes</span>
+                <span id="femaleCount" class="valeur">...</span>
             </div>
         </div>
 
-        <div class="table-container">
-            <div class="table-header">
-                <div class="search-box">
+        <div class="conteneur-table">
+            <div class="entete-table">
+                <div class="boite-recherche">
                     <i class="fas fa-search"></i>
                     <input type="text" id="searchInput" placeholder="Rechercher un étudiant, matricule, promotion..."
                         onkeyup="filterTable()">
@@ -598,11 +635,11 @@
         async function loadData(promo = currentPromo) {
             try {
                 // Update UI for active tab
-                document.querySelectorAll('.promo-tab').forEach(tab => {
+                document.querySelectorAll('.onglet-promo').forEach(tab => {
                     if (tab.dataset.promo === promo) {
-                        tab.classList.add('active');
+                        tab.classList.add('actif');
                     } else {
-                        tab.classList.remove('active');
+                        tab.classList.remove('actif');
                     }
                 });
 
@@ -659,7 +696,7 @@
                 tbody.innerHTML = students.map(student => `
                     <tr>
                         <td>
-                            <div class="student-info">
+                            <div class="info-etudiant">
                                 <div class="avatar">${student.nom[0]}${student.prenom[0]}</div>
                                 <div>
                                     <div style="font-weight: 600;">${student.nom} ${student.postnom}</div>
@@ -669,11 +706,11 @@
                         </td>
                         <td><span class="matricule">${student.matricule}</span></td>
                         <td>
-                            <span class="badge ${student.sexe === 'F' ? 'badge-warning' : 'badge-info'}">
+                            <span class="badge ${student.sexe === 'F' ? 'badge-avertissement' : 'badge-info'}">
                                 ${student.sexe}
                             </span>
                         </td>
-                        <td><span class="badge badge-success">${student.promotion}</span></td>
+                        <td><span class="badge badge-succes">${student.promotion}</span></td>
                         <td>
                             <div style="font-weight: 500;">${student.parcours}</div>
                             <div style="font-size: 0.75rem; color: var(--text-muted);">${student.filiere || '-'}</div>
@@ -776,60 +813,60 @@
         window.onload = () => loadData();
     </script>
     <!-- Reset Modal -->
-    <div id="resetModal" class="modal-overlay">
-        <div class="modal-card">
+    <div id="resetModal" class="superposition-modale">
+        <div class="carte-modale">
             <h2>Choisir la table à réinitialiser</h2>
             <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">
                 Sélectionnez la promotion ou la liste de présence que vous souhaitez vider complètement.
             </p>
 
-            <div class="table-groups">
+            <div class="groupes-tables">
                 <div class="group">
-                    <div class="group-h">Inscriptions</div>
-                    <div class="table-list">
-                        <div class="table-item" onclick="confirmReset('bac1_IAGE')">BAC 1 IAGE</div>
-                        <div class="table-item" onclick="confirmReset('bac2_IAGE')">BAC 2 IAGE</div>
-                        <div class="table-item" onclick="confirmReset('bac3_IAGE')">BAC 3 IAGE</div>
-                        <div class="table-item" onclick="confirmReset('bac1_tech_IA')">BAC 1 TECH IA</div>
-                        <div class="table-item" onclick="confirmReset('bac1_tech_GL')">BAC 1 TECH GL</div>
-                        <div class="table-item" onclick="confirmReset('bac1_tech_SI')">BAC 1 TECH SI</div>
-                        <div class="table-item" onclick="confirmReset('bac2_tech_IA')">BAC 2 TECH IA</div>
-                        <div class="table-item" onclick="confirmReset('bac2_tech_GL')">BAC 2 TECH GL</div>
-                        <div class="table-item" onclick="confirmReset('bac2_tech_SI')">BAC 2 TECH SI</div>
-                        <div class="table-item" onclick="confirmReset('bac3_tech_IA')">BAC 3 TECH IA</div>
-                        <div class="table-item" onclick="confirmReset('bac3_tech_GL')">BAC 3 TECH GL</div>
-                        <div class="table-item" onclick="confirmReset('bac3_tech_SI')">BAC 3 TECH SI</div>
-                        <div class="table-item" onclick="confirmReset('bac4_tech_IA')">BAC 4 TECH IA</div>
-                        <div class="table-item" onclick="confirmReset('bac4_tech_GL')">BAC 4 TECH GL</div>
-                        <div class="table-item" onclick="confirmReset('bac4_tech_SI')">BAC 4 TECH SI</div>
+                    <div class="entete-groupe">Inscriptions</div>
+                    <div class="liste-tables">
+                        <div class="element-table" onclick="confirmReset('bac1_IAGE')">BAC 1 IAGE</div>
+                        <div class="element-table" onclick="confirmReset('bac2_IAGE')">BAC 2 IAGE</div>
+                        <div class="element-table" onclick="confirmReset('bac3_IAGE')">BAC 3 IAGE</div>
+                        <div class="element-table" onclick="confirmReset('bac1_tech_IA')">BAC 1 TECH IA</div>
+                        <div class="element-table" onclick="confirmReset('bac1_tech_GL')">BAC 1 TECH GL</div>
+                        <div class="element-table" onclick="confirmReset('bac1_tech_SI')">BAC 1 TECH SI</div>
+                        <div class="element-table" onclick="confirmReset('bac2_tech_IA')">BAC 2 TECH IA</div>
+                        <div class="element-table" onclick="confirmReset('bac2_tech_GL')">BAC 2 TECH GL</div>
+                        <div class="element-table" onclick="confirmReset('bac2_tech_SI')">BAC 2 TECH SI</div>
+                        <div class="element-table" onclick="confirmReset('bac3_tech_IA')">BAC 3 TECH IA</div>
+                        <div class="element-table" onclick="confirmReset('bac3_tech_GL')">BAC 3 TECH GL</div>
+                        <div class="element-table" onclick="confirmReset('bac3_tech_SI')">BAC 3 TECH SI</div>
+                        <div class="element-table" onclick="confirmReset('bac4_tech_IA')">BAC 4 TECH IA</div>
+                        <div class="element-table" onclick="confirmReset('bac4_tech_GL')">BAC 4 TECH GL</div>
+                        <div class="element-table" onclick="confirmReset('bac4_tech_SI')">BAC 4 TECH SI</div>
                     </div>
                 </div>
                 <div class="group">
-                    <div class="group-h">Présences</div>
-                    <div class="table-list">
-                        <div class="table-item" onclick="confirmReset('presence_bac1_IAGE')">PRES BAC 1 IAGE</div>
-                        <div class="table-item" onclick="confirmReset('presence_bac2_IAGE')">PRES BAC 2 IAGE</div>
-                        <div class="table-item" onclick="confirmReset('presence_bac3_IAGE')">PRES BAC 3 IAGE</div>
-                        <div class="table-item" onclick="confirmReset('presence_bac1_tech_IA')">PRES BAC 1 TECH IA</div>
-                        <div class="table-item" onclick="confirmReset('presence_bac1_tech_GL')">PRES BAC 1 TECH GL</div>
-                        <div class="table-item" onclick="confirmReset('presence_bac1_tech_SI')">PRES BAC 1 TECH SI</div>
-                        <div class="table-item" onclick="confirmReset('presence_bac2_tech_IA')">PRES BAC 2 TECH IA</div>
-                        <div class="table-item" onclick="confirmReset('presence_bac2_tech_GL')">PRES BAC 2 TECH GL</div>
-                        <div class="table-item" onclick="confirmReset('presence_bac2_tech_SI')">PRES BAC 2 TECH SI</div>
-                        <div class="table-item" onclick="confirmReset('presence_bac3_tech_IA')">PRES BAC 3 TECH IA</div>
-                        <div class="table-item" onclick="confirmReset('presence_bac3_tech_GL')">PRES BAC 3 TECH GL</div>
-                        <div class="table-item" onclick="confirmReset('presence_bac3_tech_SI')">PRES BAC 3 TECH SI</div>
-                        <div class="table-item" onclick="confirmReset('presence_bac4_tech_IA')">PRES BAC 4 TECH IA</div>
-                        <div class="table-item" onclick="confirmReset('presence_bac4_tech_GL')">PRES BAC 4 TECH GL</div>
-                        <div class="table-item" onclick="confirmReset('presence_bac4_tech_SI')">PRES BAC 4 TECH SI</div>
-                        <div class="table-item" style="background: #fee2e2; border-color: #fca5a5;"
+                    <div class="entete-groupe">Présences</div>
+                    <div class="liste-tables">
+                        <div class="element-table" onclick="confirmReset('presence_bac1_IAGE')">PRES BAC 1 IAGE</div>
+                        <div class="element-table" onclick="confirmReset('presence_bac2_IAGE')">PRES BAC 2 IAGE</div>
+                        <div class="element-table" onclick="confirmReset('presence_bac3_IAGE')">PRES BAC 3 IAGE</div>
+                        <div class="element-table" onclick="confirmReset('presence_bac1_tech_IA')">PRES BAC 1 TECH IA</div>
+                        <div class="element-table" onclick="confirmReset('presence_bac1_tech_GL')">PRES BAC 1 TECH GL</div>
+                        <div class="element-table" onclick="confirmReset('presence_bac1_tech_SI')">PRES BAC 1 TECH SI</div>
+                        <div class="element-table" onclick="confirmReset('presence_bac2_tech_IA')">PRES BAC 2 TECH IA</div>
+                        <div class="element-table" onclick="confirmReset('presence_bac2_tech_GL')">PRES BAC 2 TECH GL</div>
+                        <div class="element-table" onclick="confirmReset('presence_bac2_tech_SI')">PRES BAC 2 TECH SI</div>
+                        <div class="element-table" onclick="confirmReset('presence_bac3_tech_IA')">PRES BAC 3 TECH IA</div>
+                        <div class="element-table" onclick="confirmReset('presence_bac3_tech_GL')">PRES BAC 3 TECH GL</div>
+                        <div class="element-table" onclick="confirmReset('presence_bac3_tech_SI')">PRES BAC 3 TECH SI</div>
+                        <div class="element-table" onclick="confirmReset('presence_bac4_tech_IA')">PRES BAC 4 TECH IA</div>
+                        <div class="element-table" onclick="confirmReset('presence_bac4_tech_GL')">PRES BAC 4 TECH GL</div>
+                        <div class="element-table" onclick="confirmReset('presence_bac4_tech_SI')">PRES BAC 4 TECH SI</div>
+                        <div class="element-table" style="background: #fee2e2; border-color: #fca5a5;"
                             onclick="confirmReset('presence')">PRÉSENCE GÉNÉRALE</div>
                     </div>
                 </div>
             </div>
 
-            <div class="modal-actions">
-                <button class="btn btn-outline" onclick="closeModal()">Annuler</button>
+            <div class="actions-modale">
+                <button class="bouton bouton-contour" onclick="closeModal()">Annuler</button>
             </div>
         </div>
     </div>

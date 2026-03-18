@@ -23,7 +23,7 @@
             padding: 20px;
         }
 
-        .poster {
+        .affiche {
             width: 210mm;
             /* A4 width */
             background: white;
@@ -34,7 +34,7 @@
             text-align: center;
         }
 
-        .header {
+        .entete {
             display: flex;
             align-items: center;
             justify-content: flex-start;
@@ -49,11 +49,11 @@
             margin-right: 30px;
         }
 
-        .title-container {
+        .conteneur-titre {
             text-align: left;
         }
 
-        .univ-title {
+        .titre-univ {
             color: navy;
             font-size: 1.8rem;
             font-weight: 800;
@@ -61,18 +61,18 @@
             text-transform: uppercase;
         }
 
-        .univ-subtitle {
+        .sous-titre-univ {
             color: red;
             font-size: 1.2rem;
             font-weight: 700;
             margin-top: 5px;
         }
 
-        .qr-section {
+        .section-qr {
             margin: 60px 0;
         }
 
-        .qr-code-img {
+        .image-qr-code {
             width: 350px;
             height: 350px;
             padding: 15px;
@@ -87,7 +87,7 @@
             margin-top: 30px;
         }
 
-        .footer {
+        .pied-de-page {
             margin-top: 60px;
             font-size: 0.9rem;
             color: #64748b;
@@ -95,13 +95,13 @@
             padding-top: 20px;
         }
 
-        .no-print {
+        .sans-impression {
             position: fixed;
             top: 20px;
             right: 20px;
         }
 
-        .btn-print {
+        .bouton-imprimer {
             background: navy;
             color: white;
             padding: 12px 24px;
@@ -113,7 +113,7 @@
         }
 
         @media print {
-            .no-print {
+            .sans-impression {
                 display: none;
             }
 
@@ -122,7 +122,7 @@
                 padding: 0;
             }
 
-            .poster {
+            .affiche {
                 box-shadow: none;
                 width: 100%;
                 border: none;
@@ -132,21 +132,21 @@
 </head>
 
 <body>
-    <div class="no-print">
-        <button class="btn-print" onclick="window.print()">🖨️ Imprimer le QR Code</button>
+    <div class="sans-impression">
+        <button class="bouton-imprimer" onclick="window.print()">🖨️ Imprimer le QR Code</button>
     </div>
 
-    <div class="poster">
-        <header class="header">
+    <div class="affiche">
+        <header class="entete">
             <img src="{{ url_for('static', filename='logo_upl.png') }}" alt="Logo UPL" class="logo">
-            <div class="title-container">
-                <h1 class="univ-title">UNIVERSITE PROTESTANTE <br>DE LUBUMBASHI (UPL)</h1>
-                <p class="univ-subtitle">Vous connetrez la verite, et la verite vous affranchira</p>
+            <div class="conteneur-titre">
+                <h1 class="titre-univ">UNIVERSITE PROTESTANTE <br>DE LUBUMBASHI (UPL)</h1>
+                <p class="sous-titre-univ">Vous connetrez la verite, et la verite vous affranchira</p>
             </div>
         </header>
 
-        <section class="qr-section">
-            <img src="{{ url_for('generate_qr') }}" alt="QR Code" class="qr-code-img">
+        <section class="section-qr">
+            <img src="{{ url_for('generate_qr') }}" alt="QR Code" class="image-qr-code">
             <p class="instructions">Scannez pour valider votre présence</p>
             {% if target_url %}
             <p style="margin-top: 20px; color: #64748b; font-size: 0.8rem; border: 1px dashed #cbd5e1; padding: 10px; border-radius: 5px; background: #f8fafc;">
@@ -156,7 +156,7 @@
         </section>
 
 
-        <footer class="footer">
+        <footer class="pied-de-page">
             <p>© 2026 Université Protestante de Lubumbashi - Système de Gestion des Présences</p>
             <a href="/admin" style="display: inline-block; margin-top: 10px; color: #e2e8f0; text-decoration: none; font-size: 0.7rem;">Accès Admin</a>
         </footer>
