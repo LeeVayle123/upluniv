@@ -308,19 +308,34 @@ def check_attendance():
                         conn.close()
                         return jsonify({"status": "error", "message": "Ce matricule est déjà utilisé sur un autre appareil (Used)"}), 403
 
-                # 2. Limite de 2 scans par type (Entrée/Sortie) par jour
-                count_query = "SELECT COUNT(*) FROM presences WHERE matricule = %s AND type_presence = %s AND date(date_inscription) = %s"
-                execute_sql(cursor, count_query, (matricule, type_presence, today_date))
-                count_res = cursor.fetchone()
-                count = count_res[0] if isinstance(count_res, tuple) else count_res[0] if not isinstance(count_res, (dict, sqlite3.Row)) else list(count_res)[0]
+                # 2. Logique de séquence (Entrée -> Sortie) et Limite 2x par jour
+                # On récupère l'historique d'aujourd'hui pour ce matricule
+                check_sequence_query = "SELECT type_presence FROM presences WHERE matricule = %s AND date(date_inscription) = %s ORDER BY date_inscription DESC"
+                execute_sql(cursor, check_sequence_query, (matricule, today_date))
+                history = cursor.fetchall()
                 
-                if count >= 2:
+                # Conversion en liste de types (Compatible MySQL dict et SQLite Row)
+                today_types = [row['type_presence'] if isinstance(row, (dict, sqlite3.Row)) else row[0] for row in history]
+                last_type = today_types[0] if today_types else None
+                count_type = today_types.count(type_presence)
+
+                # Règle A : Limite de 2 scans par type
+                if count_type >= 2:
                     cursor.close()
                     conn.close()
-                    return jsonify({
-                        "status": "error", 
-                        "message": "Nombre de présence atteint"
-                    }), 403
+                    return jsonify({"status": "error", "message": f"Limite de 2 {type_presence}s atteint pour aujourd'hui"}), 403
+
+                # Règle B : Ordre strict (On ne peut pas faire 2 Entrées de suite, ni 2 Sorties)
+                if type_presence == 'Entrée':
+                    if last_type == 'Entrée':
+                        cursor.close()
+                        conn.close()
+                        return jsonify({"status": "error", "message": "Vous avez déjà une Entrée active. Signalez votre Sortie d'abord"}), 403
+                else: # type_presence == 'Sortie'
+                    if last_type != 'Entrée':
+                        cursor.close()
+                        conn.close()
+                        return jsonify({"status": "error", "message": "Aucune Entrée correspondante trouvée. Signalez d'abord votre Entrée"}), 403
 
                 # 5. SYSTÈME ANTI-FRAUDE : Géolocalisation UPL
                 UPL_LAT = -11.65238
@@ -385,7 +400,6 @@ def get_student_info(matricule):
     
     try:
         conn = get_db_connection()
-        # On utilise un dictionnaire pour que le JS reçoive des clés (nom, prenom...)
         if isinstance(conn, sqlite3.Connection):
             conn.row_factory = sqlite3.Row
             cursor = conn.cursor()
@@ -398,8 +412,22 @@ def get_student_info(matricule):
             result = cursor.fetchone()
             
             if result:
-                # Conversion en dictionnaire pour SQLite
+                # Conversion en dictionnaire
                 student_dict = dict(result) if isinstance(conn, sqlite3.Connection) else result
+                
+                # Récupération du statut actuel des présences d'aujourd'hui
+                now_lubumbashi = datetime.now(timezone(timedelta(hours=2))).replace(tzinfo=None)
+                today_date = now_lubumbashi.strftime('%Y-%m-%d')
+                
+                query_status = "SELECT type_presence FROM presences WHERE matricule = %s AND date(date_inscription) = %s ORDER BY date_inscription DESC"
+                execute_sql(cursor, query_status, (matricule, today_date))
+                history = cursor.fetchall()
+                
+                today_types = [row['type_presence'] if isinstance(row, (dict, sqlite3.Row)) else row[0] for row in history]
+                
+                student_dict['last_type'] = today_types[0] if today_types else None
+                student_dict['count_today'] = len(today_types)
+                
                 cursor.close()
                 conn.close()
                 return jsonify(student_dict)

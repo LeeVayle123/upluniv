@@ -299,15 +299,38 @@
                         .then(data => {
                             loading.style.display = 'none';
                             if (data.error) throw new Error();
+                            
+                            // Mise à jour des informations
                             infoName.textContent = `${data.nom} ${data.prenom}`;
-                            infoPromo.textContent = `${data.promotion} | ${data.faculte}`;
+                            
+                            // Logique de suggestion de type de pointage
+                            const typeSelect = document.getElementById('type_presence');
+                            let statusText = `${data.promotion} | ${data.faculte}`;
+                            
+                            if (data.count_today >= 4) {
+                                statusText += " | ✅ Terminé pour aujourd'hui";
+                                submitBtn.disabled = true;
+                                submitBtn.innerHTML = "Limite atteinte";
+                            } else {
+                                if (data.last_type === 'Entrée') {
+                                    typeSelect.value = 'Sortie';
+                                    statusText += " | 🟢 Actuellement en classe";
+                                } else {
+                                    typeSelect.value = 'Entrée';
+                                    statusText += " | ⚪ Hors classe";
+                                }
+                                submitBtn.disabled = false;
+                                submitBtn.innerHTML = "Validate my attendance";
+                            }
+                            
+                            infoPromo.textContent = statusText;
                             badge.style.display = 'block';
-                            submitBtn.disabled = false;
                         })
                         .catch(() => {
                             loading.style.display = 'none';
                             badge.style.display = 'none';
                             submitBtn.disabled = true;
+                            submitBtn.innerHTML = "Validate my attendance";
                         });
                 }, 500);
             });
@@ -330,10 +353,11 @@
                             form.style.display = 'none';
                             badge.style.display = 'none';
                             ticket.style.display = 'block';
-                            ticketDetails.innerHTML = `<strong>${infoName.textContent}</strong><br>Pointage effectué le ${new Date().toLocaleTimeString()}`;
+                            const typeMsg = formData.get('type_presence') === 'Entrée' ? "Entrée confirmée" : "Sortie confirmée";
+                            ticketDetails.innerHTML = `<strong>${infoName.textContent}</strong><br>${typeMsg} à ${new Date().toLocaleTimeString()}<br><br><em>Votre session est enregistrée.</em>`;
 
-                            // Lancement du cooldown de 30 secondes
-                            let timeLeft = 30;
+                            // Lancement du cooldown de 20 secondes avant de permettre un nouveau scan
+                            let timeLeft = 20;
                             const interval = setInterval(() => {
                                 timeLeft--;
                                 timerSpan.textContent = timeLeft;
@@ -342,9 +366,9 @@
                                     ticket.style.display = 'none';
                                     form.style.display = 'flex';
                                     form.reset();
-                                    submitBtn.innerHTML = "Valider ma présence";
-                                    submitBtn.disabled = true; // Reste désactivé jusqu'au prochain matricule valide
-                                    timerSpan.textContent = "30";
+                                    submitBtn.innerHTML = "Validate my attendance";
+                                    submitBtn.disabled = true;
+                                    timerSpan.textContent = "20";
                                     badge.style.display = 'none';
                                 }
                             }, 1000);
