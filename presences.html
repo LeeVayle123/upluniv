@@ -650,7 +650,7 @@
             <div class="entete-gauche">
                 <!-- Logo situé dans static/logo_upl.png -->
                 <img src="{{ url_for('static', filename='logo_upl.png') }}" alt="Logo UPL" class="image-logo"
-                    onerror="this.style.display='none'">
+                    onerror="this.src.endsWith('.png') ? this.src=this.src.replace('.png','.jpg') : (this.src.endsWith('.jpg') ? this.src='{{ url_for('static', filename='hh.jpeg') }}' : this.style.display='none')">
                 <div>
                     <div class="titre-entete">Protestant University of Lubumbashi</div>
                     <div class="sous-titre-entete" id="pageSubtitle">Attendance Management System</div>

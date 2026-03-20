@@ -184,7 +184,8 @@
     <div class="Conteneur">
         <aside class="panneau-lateral">
             <div class="conteneur-logo">
-                <img src="{{ url_for('static', filename='logo_upl.png') }}" alt="UPL Logo" class="logo-universitaire">
+                <img src="{{ url_for('static', filename='logo_upl.png') }}" alt="UPL Logo" class="logo-universitaire"
+                    onerror="this.src.endsWith('.png') ? this.src=this.src.replace('.png','.jpg') : (this.src.endsWith('.jpg') ? this.src='{{ url_for('static', filename='hh.jpeg') }}' : this.style.display='none')">
             </div>
             <h1 class="titre-marque">UPL</h1>
             <p class="description-marque">Scan or enter your matricule for attendance.</p>
@@ -221,14 +222,14 @@
                 <div class="groupe-formulaire">
                     <label class="etiquette-formulaire" for="matricule">Matricule</label>
                     <input type="text" id="matricule" name="matricule" class="champ-formulaire" required
-                        placeholder="Ex: 24-1234" autofocus autocomplete="off">
+                        placeholder="Ex: 2024000000" autofocus autocomplete="off">
                 </div>
 
                 <div class="groupe-formulaire">
                     <label class="etiquette-formulaire" for="type_presence">Type de pointage</label>
                     <select id="type_presence" name="type_presence" class="champ-formulaire">
-                        <option value="Entrée">✅ Entry (Start of class)</option>
-                        <option value="Sortie">🚪 Exit (End of class)</option>
+                        <option value="Entrée">Entrée</option>
+                        <option value="Sortie">Sortie</option>
                     </select>
                 </div>
 
