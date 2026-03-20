@@ -728,56 +728,6 @@ def api_presences():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@app.route('/admin/reset_table', methods=['POST'])
-def reset_table():
-    """
-    Route administrative pour vider une table spécifique.
-    Utilisée par le bouton 'Reset' dans la liste des étudiants.
-    """
-    table_name = request.form.get('table_name')
-    if not table_name:
-        return "Table non spécifiée", 400
-        
-    # Liste blanche des tables autorisées pour la sécurité
-    allowed_tables = [
-        'bac1_IAGE', 'bac2_IAGE', 'bac3_IAGE',
-        'bac1_tech_IA', 'bac1_tech_GL', 'bac1_tech_SI',
-        'bac2_tech_IA', 'bac2_tech_GL', 'bac2_tech_SI',
-        'bac3_tech_IA', 'bac3_tech_GL', 'bac3_tech_SI',
-        'bac4_tech_IA', 'bac4_tech_GL', 'bac4_tech_SI',
-        'presences', 'presence' # 'presence' est utilisé comme alias global
-    ]
-    
-    # Tables de présence spécifiques
-    allowed_tables += [f"presence_{t}" for t in allowed_tables if not t.startswith('presence')]
-
-    if table_name not in allowed_tables:
-        return "Table non autorisée", 403
-
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        
-        # Cas spécial pour la table globale
-        target = 'presences' if table_name == 'presence' else table_name
-        
-        # On vide la table (Syntaxe différente selon la DB)
-        if isinstance(conn, sqlite3.Connection):
-            execute_sql(cursor, f"DELETE FROM {target}")
-            # Reset auto-increment en SQLite
-            execute_sql(cursor, f"DELETE FROM sqlite_sequence WHERE name='{target}'")
-        else:
-            execute_sql(cursor, f"TRUNCATE TABLE {target}")
-            
-        conn.commit()
-        cursor.close()
-        conn.close()
-        
-        # Redirection vers la liste
-        return redirect(url_for('view_students'))
-    except Exception as e:
-        return f"Erreur lors du reset : {e}", 500
-
 @app.route('/api/presence_stats')
 def api_presence_stats():
     """
