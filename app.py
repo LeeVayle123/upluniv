@@ -340,7 +340,7 @@ def check_attendance():
                 # 5. SYSTÈME ANTI-FRAUDE : Géolocalisation UPL
                 UPL_LAT = -11.65238
                 UPL_LON = 27.48261
-                ALLOWED_RADIUS = 150  # 150 mètres pour l'enceinte de la parcelle
+                ALLOWED_RADIUS = 500  # 500 mètres pour plus de tolérance GPS et taille campus
                 
                 distance = calculate_distance(lat, lon, UPL_LAT, UPL_LON)
                 

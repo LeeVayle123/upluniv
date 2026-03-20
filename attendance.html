@@ -245,6 +245,12 @@
         <script>
             // 1. Géolocalisation
             if ("geolocation" in navigator) {
+                const options = {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0
+                };
+                
                 navigator.geolocation.getCurrentPosition(function (position) {
                     document.getElementById('latitude').value = position.coords.latitude;
                     document.getElementById('longitude').value = position.coords.longitude;
@@ -253,7 +259,7 @@
                 }, function (error) {
                     document.getElementById('gps-status').innerHTML = "⚠️ GPS not activated (recommended)";
                     document.getElementById('gps-status').style.color = "#dc2626";
-                });
+                }, options);
             }
 
             // 2. Signature de l'appareil
