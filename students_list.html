@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Liste des Étudiants - UPL</title>
+    <title>SEVED STUDENTS - UPL</title>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Font Awesome for Icons -->
@@ -417,11 +417,11 @@
         <header>
             <div class="section-titre">
                 <div class="conteneur-logo-universite">
-                    <img src="{{ url_for('static', filename='logo_upl.png') }}" alt="UPL Logo" class="logo-universitaire">
+                    <img src="{{ url_for('static', filename='hh.png') }}" alt="UPL Logo" class="logo-universitaire">
                 </div>
                 <div class="titre-texte">
-                    <h1 id="pageTitle">Étudiants Enregistrés</h1>
-                    <p id="pageSubtitle">Gestion et suivi des inscriptions UPL</p>
+                    <h1 id="pageTitle">SEVED STUDENTS</h1>
+                    <p id="pageSubtitle">Management and monitoring of UPL registrations</p>
                 </div>
             </div>
             <div class="actions">
@@ -431,16 +431,16 @@
                 </a>
                 Lien vers le registre des présences (pour l'administration) -->
                 <a href="/presences" class="bouton bouton-contour">
-                    <i class="fas fa-list-check mr-2"></i> Voir les Présences
+                    <i class="fas fa-list-check mr-2"></i> See Attendance
                 </a>
                 <a href="/register_student" class="bouton bouton-contour">
-                    <i class="fas fa-plus mr-2"></i> Nouvel Étudiant
+                    <i class="fas fa-plus mr-2"></i> New Student
                 </a>
                 <button class="bouton bouton-primaire" onclick="window.print()">
-                    <i class="fas fa-download mr-2"></i> Exporter
+                    <i class="fas fa-download mr-2"></i> Export
                 </button>
                 <button class="bouton bouton-danger" onclick="handleReset()">
-                    <i class="fas fa-trash-alt mr-2"></i> Réinitialiser
+                    <i class="fas fa-trash-alt mr-2"></i> Reset
                 </button>
             </div>
         </header>
@@ -450,9 +450,9 @@
 
             <!-- IAGE Section -->
             <div class="groupe-faculte">
-                <h3 class="titre-groupe">PARCOURS IAGE</h3>
+                <h3 class="titre-groupe">IAGE PATH </h3>
                 <div class="onglets-promotion">
-                    <button class="onglet-promo" data-promo="" onclick="switchPromo(this)">Global</button>
+                    <button class="onglet-promo" data-promo="" onclick="switchPromo(this)">GENERAL</button>
                     <button class="onglet-promo" data-promo="bac1_IAGE" onclick="switchPromo(this)">BAC 1</button>
                     <button class="onglet-promo" data-promo="bac2_IAGE" onclick="switchPromo(this)">BAC 2</button>
                     <button class="onglet-promo" data-promo="bac3_IAGE" onclick="switchPromo(this)">BAC 3</button>
@@ -461,42 +461,54 @@
 
             <!-- TECHNOLOGIE Section -->
             <div class="groupe-faculte">
-                <h3 class="titre-groupe">PARCOURS TECHNOLOGIE</h3>
+                <h3 class="titre-groupe">TECHNOLOGIE PATH</h3>
                 <div class="grille-technique">
                     <!-- Tech BAC 1 -->
                     <div class="ligne-annee">
                         <span class="etiquette-annee">BAC 1 :</span>
                         <div class="onglets-internes">
-                            <button class="onglet-promo" data-promo="bac1_tech_IA" onclick="switchPromo(this)">IA</button>
-                            <button class="onglet-promo" data-promo="bac1_tech_GL" onclick="switchPromo(this)">GL</button>
-                            <button class="onglet-promo" data-promo="bac1_tech_SI" onclick="switchPromo(this)">SI</button>
+                            <button class="onglet-promo" data-promo="bac1_tech_IA"
+                                onclick="switchPromo(this)">IA</button>
+                            <button class="onglet-promo" data-promo="bac1_tech_GL"
+                                onclick="switchPromo(this)">GL</button>
+                            <button class="onglet-promo" data-promo="bac1_tech_SI"
+                                onclick="switchPromo(this)">SI</button>
                         </div>
                     </div>
                     <!-- Tech BAC 2 -->
                     <div class="ligne-annee">
                         <span class="etiquette-annee">BAC 2 :</span>
                         <div class="onglets-internes">
-                            <button class="onglet-promo" data-promo="bac2_tech_IA" onclick="switchPromo(this)">IA</button>
-                            <button class="onglet-promo" data-promo="bac2_tech_GL" onclick="switchPromo(this)">GL</button>
-                            <button class="onglet-promo" data-promo="bac2_tech_SI" onclick="switchPromo(this)">SI</button>
+                            <button class="onglet-promo" data-promo="bac2_tech_IA"
+                                onclick="switchPromo(this)">IA</button>
+                            <button class="onglet-promo" data-promo="bac2_tech_GL"
+                                onclick="switchPromo(this)">GL</button>
+                            <button class="onglet-promo" data-promo="bac2_tech_SI"
+                                onclick="switchPromo(this)">SI</button>
                         </div>
                     </div>
                     <!-- Tech BAC 3 -->
                     <div class="ligne-annee">
                         <span class="etiquette-annee">BAC 3 :</span>
                         <div class="onglets-internes">
-                            <button class="onglet-promo" data-promo="bac3_tech_IA" onclick="switchPromo(this)">IA</button>
-                            <button class="onglet-promo" data-promo="bac3_tech_GL" onclick="switchPromo(this)">GL</button>
-                            <button class="onglet-promo" data-promo="bac3_tech_SI" onclick="switchPromo(this)">SI</button>
+                            <button class="onglet-promo" data-promo="bac3_tech_IA"
+                                onclick="switchPromo(this)">IA</button>
+                            <button class="onglet-promo" data-promo="bac3_tech_GL"
+                                onclick="switchPromo(this)">GL</button>
+                            <button class="onglet-promo" data-promo="bac3_tech_SI"
+                                onclick="switchPromo(this)">SI</button>
                         </div>
                     </div>
                     <!-- Tech BAC 4 -->
                     <div class="ligne-annee">
                         <span class="etiquette-annee">BAC 4 :</span>
                         <div class="onglets-internes">
-                            <button class="onglet-promo" data-promo="bac4_tech_IA" onclick="switchPromo(this)">IA</button>
-                            <button class="onglet-promo" data-promo="bac4_tech_GL" onclick="switchPromo(this)">GL</button>
-                            <button class="onglet-promo" data-promo="bac4_tech_SI" onclick="switchPromo(this)">SI</button>
+                            <button class="onglet-promo" data-promo="bac4_tech_IA"
+                                onclick="switchPromo(this)">IA</button>
+                            <button class="onglet-promo" data-promo="bac4_tech_GL"
+                                onclick="switchPromo(this)">GL</button>
+                            <button class="onglet-promo" data-promo="bac4_tech_SI"
+                                onclick="switchPromo(this)">SI</button>
                         </div>
                     </div>
                 </div>
@@ -585,15 +597,15 @@
 
         <div class="grille-stats">
             <div class="carte-stat">
-                <span class="etiquette">Total Étudiants</span>
+                <span class="etiquette">STUDENTS</span>
                 <span id="totalStudents" class="valeur">...</span>
             </div>
             <div class="carte-stat">
-                <span class="etiquette">Hommes</span>
+                <span class="etiquette">MALE</span>
                 <span id="maleCount" class="valeur">...</span>
             </div>
             <div class="carte-stat">
-                <span class="etiquette">Femmes</span>
+                <span class="etiquette">FEMALE</span>
                 <span id="femaleCount" class="valeur">...</span>
             </div>
         </div>
@@ -609,19 +621,19 @@
             <table id="studentsTable">
                 <thead>
                     <tr>
-                        <th>Étudiant</th>
-                        <th>Matricule</th>
-                        <th>Sexe</th>
-                        <th>Promotion</th>
-                        <th>Parcours / Filière</th>
-                        <th>Date d'inscription</th>
+                        <th>STUDENT</th>
+                        <th>MATRICULE</th>
+                        <th>SEX</th>
+                        <th>PROMOTION</th>
+                        <th>PATH / OPTION</th>
+                        <th>DATE</th>
                     </tr>
                 </thead>
                 <tbody id="studentsBody">
                     <tr>
                         <td colspan="6" style="text-align: center; padding: 3rem; color: var(--text-muted);">
                             <i class="fas fa-spinner fa-spin fa-2x" style="margin-bottom: 1rem; display: block;"></i>
-                            Chargement des données...
+                            Loading data...
                         </td>
                     </tr>
                 </tbody>
@@ -650,11 +662,11 @@
                     let promoName = promo.replace(/_/g, ' ').toUpperCase();
                     // Clean up: BAC1_TECH_IA -> BAC 1 - TECHNOLOGIE IA
                     promoName = promoName.replace('TECH', '- TECHNOLOGIE');
-                    title.textContent = `Étudiants ${promoName}`;
-                    subtitle.textContent = `Liste spécifique pour la promotion ${promoName}`;
+                    title.textContent = `STUDENTS ${promoName}`;
+                    subtitle.textContent = `Specific list for the promotion ${promoName}`;
                 } else {
-                    title.textContent = "Tous les Étudiants";
-                    subtitle.textContent = "Gestion et suivi global des inscriptions UPL";
+                    title.textContent = "All Students";
+                    subtitle.textContent = "Global management and tracking of UPL registrations";
                 }
 
                 // Show loading state
@@ -782,10 +794,10 @@
         function confirmReset(tableName) {
             const promoName = tableName.replace(/_/g, ' ').toUpperCase().replace('TECH', '- TECHNOLOGIE');
 
-            const firstConfirm = confirm(`ATTENTION : Vous êtes sur le point de supprimer TOUS les enregistrements de la table [${promoName}].\n\nCette action est irréversible et remettra l'auto-incrément à zéro.\n\nSouhaitez-vous continuer ?`);
+            const firstConfirm = confirm(`WARNING: You are about to delete ALL records from the table [${promoName}].\n\nThis action is irreversible and will reset the auto-increment.\n\nDo you want to continue ?`);
 
             if (firstConfirm) {
-                const secondConfirm = confirm("CONFIRMATION FINALE : Êtes-vous ABSOLUMENT certain ? Toutes les données seront DEFINITIVEMENT perdues.");
+                const secondConfirm = confirm("FINAL CONFIRMATION: Are you ABSOLUTELY sure? All data will be DEFINITELY lost.");
 
                 if (secondConfirm) {
                     try {
@@ -802,7 +814,7 @@
                         document.body.appendChild(form);
                         form.submit();
                     } catch (error) {
-                        alert("Une erreur est survenue lors de la tentative de réinitialisation.");
+                        alert("An error occurred while trying to reset.");
                         console.error(error);
                     }
                 }
@@ -815,9 +827,9 @@
     <!-- Reset Modal -->
     <div id="resetModal" class="superposition-modale">
         <div class="carte-modale">
-            <h2>Choisir la table à réinitialiser</h2>
+            <h2>Choose the table to reset</h2>
             <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">
-                Sélectionnez la promotion ou la liste de présence que vous souhaitez vider complètement.
+                Select the promotion or attendance list you want to completely empty.
             </p>
 
             <div class="groupes-tables">
@@ -847,26 +859,38 @@
                         <div class="element-table" onclick="confirmReset('presence_bac1_IAGE')">PRES BAC 1 IAGE</div>
                         <div class="element-table" onclick="confirmReset('presence_bac2_IAGE')">PRES BAC 2 IAGE</div>
                         <div class="element-table" onclick="confirmReset('presence_bac3_IAGE')">PRES BAC 3 IAGE</div>
-                        <div class="element-table" onclick="confirmReset('presence_bac1_tech_IA')">PRES BAC 1 TECH IA</div>
-                        <div class="element-table" onclick="confirmReset('presence_bac1_tech_GL')">PRES BAC 1 TECH GL</div>
-                        <div class="element-table" onclick="confirmReset('presence_bac1_tech_SI')">PRES BAC 1 TECH SI</div>
-                        <div class="element-table" onclick="confirmReset('presence_bac2_tech_IA')">PRES BAC 2 TECH IA</div>
-                        <div class="element-table" onclick="confirmReset('presence_bac2_tech_GL')">PRES BAC 2 TECH GL</div>
-                        <div class="element-table" onclick="confirmReset('presence_bac2_tech_SI')">PRES BAC 2 TECH SI</div>
-                        <div class="element-table" onclick="confirmReset('presence_bac3_tech_IA')">PRES BAC 3 TECH IA</div>
-                        <div class="element-table" onclick="confirmReset('presence_bac3_tech_GL')">PRES BAC 3 TECH GL</div>
-                        <div class="element-table" onclick="confirmReset('presence_bac3_tech_SI')">PRES BAC 3 TECH SI</div>
-                        <div class="element-table" onclick="confirmReset('presence_bac4_tech_IA')">PRES BAC 4 TECH IA</div>
-                        <div class="element-table" onclick="confirmReset('presence_bac4_tech_GL')">PRES BAC 4 TECH GL</div>
-                        <div class="element-table" onclick="confirmReset('presence_bac4_tech_SI')">PRES BAC 4 TECH SI</div>
+                        <div class="element-table" onclick="confirmReset('presence_bac1_tech_IA')">PRES BAC 1 TECH IA
+                        </div>
+                        <div class="element-table" onclick="confirmReset('presence_bac1_tech_GL')">PRES BAC 1 TECH GL
+                        </div>
+                        <div class="element-table" onclick="confirmReset('presence_bac1_tech_SI')">PRES BAC 1 TECH SI
+                        </div>
+                        <div class="element-table" onclick="confirmReset('presence_bac2_tech_IA')">PRES BAC 2 TECH IA
+                        </div>
+                        <div class="element-table" onclick="confirmReset('presence_bac2_tech_GL')">PRES BAC 2 TECH GL
+                        </div>
+                        <div class="element-table" onclick="confirmReset('presence_bac2_tech_SI')">PRES BAC 2 TECH SI
+                        </div>
+                        <div class="element-table" onclick="confirmReset('presence_bac3_tech_IA')">PRES BAC 3 TECH IA
+                        </div>
+                        <div class="element-table" onclick="confirmReset('presence_bac3_tech_GL')">PRES BAC 3 TECH GL
+                        </div>
+                        <div class="element-table" onclick="confirmReset('presence_bac3_tech_SI')">PRES BAC 3 TECH SI
+                        </div>
+                        <div class="element-table" onclick="confirmReset('presence_bac4_tech_IA')">PRES BAC 4 TECH IA
+                        </div>
+                        <div class="element-table" onclick="confirmReset('presence_bac4_tech_GL')">PRES BAC 4 TECH GL
+                        </div>
+                        <div class="element-table" onclick="confirmReset('presence_bac4_tech_SI')">PRES BAC 4 TECH SI
+                        </div>
                         <div class="element-table" style="background: #fee2e2; border-color: #fca5a5;"
-                            onclick="confirmReset('presence')">PRÉSENCE GÉNÉRALE</div>
+                            onclick="confirmReset('presence')">GENERAL PRESENCE</div>
                     </div>
                 </div>
             </div>
 
             <div class="actions-modale">
-                <button class="bouton bouton-contour" onclick="closeModal()">Annuler</button>
+                <button class="bouton bouton-contour" onclick="closeModal()">Cancel</button>
             </div>
         </div>
     </div>

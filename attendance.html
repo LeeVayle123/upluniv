@@ -184,135 +184,147 @@
     <div class="Conteneur">
         <aside class="panneau-lateral">
             <div class="conteneur-logo">
-                <img src="{{ url_for('static', filename='logo_upl.png') }}" alt="UPL Logo" class="logo-universitaire">
+                <img src="{{ url_for('static', filename='hh.jpeg') }}" alt="UPL Logo" class="logo-universitaire">
             </div>
             <h1 class="titre-marque">UPL</h1>
-            <p class="description-marque">Scanner ou saisir votre matricule pour la présence.</p>
+            <p class="description-marque">Scan or enter your matricule for attendance.</p>
         </aside>
 
         <main class="panneau-formulaire">
-            <h2 class="titre-formulaire">Présence</h2>
-            
+            <h2 class="titre-formulaire">Attendance</h2>
+
             <!-- Zone d'affichage des infos de l'étudiant trouvées via AJAX -->
-                <div id="student-info-badge" style="display: none; background: #f1f5f9; padding: 12px; border-radius: 12px; margin-bottom: 15px; border-left: 4px solid navy;">
-                    <p id="info-name" style="font-weight: 700; font-size: 0.9rem; color: navy;"></p>
-                    <p id="info-promo" style="font-size: 0.75rem; color: #64748b;"></p>
+            <div id="student-info-badge"
+                style="display: none; background: #f1f5f9; padding: 12px; border-radius: 12px; margin-bottom: 15px; border-left: 4px solid navy;">
+                <p id="info-name" style="font-weight: 700; font-size: 0.9rem; color: navy;"></p>
+                <p id="info-promo" style="font-size: 0.75rem; color: #64748b;"></p>
+            </div>
+
+            <!-- Message de succès (Ticket) -->
+            <div id="success-ticket"
+                style="display: none; background: #dcfce7; padding: 20px; border-radius: 16px; border: 2px solid #16a34a; text-align: center; margin-bottom: 15px; animation: slideDown 0.4s ease-out;">
+                <div style="font-size: 2.5rem; margin-bottom: 10px;">✅</div>
+                <h3 style="color: #15803d; margin-bottom: 5px;">Attendance Recorded!</h3>
+                <p id="ticket-details" style="font-size: 0.85rem; color: #166534;"></p>
+                <div style="margin-top: 15px; font-size: 0.75rem; color: #15803d; font-weight: 600;">
+                    Next scan possible in : <span id="cooldown-timer">30</span>s
+                    <!-- par ici j'ai definit le temps d'unn nouveau scan -->
+                </div>
+            </div>
+
+            <form action="/check_attendance" method="post" id="attendance-form"
+                style="display: flex; flex-direction: column; gap: 10px;">
+                <input type="hidden" name="device_signature" id="device_signature">
+                <input type="hidden" name="latitude" id="latitude">
+                <input type="hidden" name="longitude" id="longitude">
+
+                <div class="groupe-formulaire">
+                    <label class="etiquette-formulaire" for="matricule">Matricule</label>
+                    <input type="text" id="matricule" name="matricule" class="champ-formulaire" required
+                        placeholder="Ex: 24-1234" autofocus autocomplete="off">
                 </div>
 
-                <!-- Message de succès (Ticket) -->
-                <div id="success-ticket" style="display: none; background: #dcfce7; padding: 20px; border-radius: 16px; border: 2px solid #16a34a; text-align: center; margin-bottom: 15px; animation: slideDown 0.4s ease-out;">
-                    <div style="font-size: 2.5rem; margin-bottom: 10px;">✅</div>
-                    <h3 style="color: #15803d; margin-bottom: 5px;">Présence Enregistrée !</h3>
-                    <p id="ticket-details" style="font-size: 0.85rem; color: #166534;"></p>
-                    <div style="margin-top: 15px; font-size: 0.75rem; color: #15803d; font-weight: 600;">
-                        Prochain scan possible dans : <span id="cooldown-timer">30</span>s
-                    </div>
+                <div class="groupe-formulaire">
+                    <label class="etiquette-formulaire" for="type_presence">Type de pointage</label>
+                    <select id="type_presence" name="type_presence" class="champ-formulaire">
+                        <option value="Entrée">✅ Entrée (Début de cours)</option>
+                        <option value="Sortie">🚪 Sortie (Fin de cours)</option>
+                    </select>
                 </div>
 
-                <form action="/check_attendance" method="post" id="attendance-form" style="display: flex; flex-direction: column; gap: 10px;">
-                    <input type="hidden" name="device_signature" id="device_signature">
-                    <input type="hidden" name="latitude" id="latitude">
-                    <input type="hidden" name="longitude" id="longitude">
-                    
-                    <div class="groupe-formulaire">
-                        <label class="etiquette-formulaire" for="matricule">Matricule</label>
-                        <input type="text" id="matricule" name="matricule" class="champ-formulaire" required
-                            placeholder="Ex: 24-1234" autofocus autocomplete="off">
-                    </div>
+                <div id="gps-status" style="font-size: 0.7rem; color: #64748b; margin-bottom: 5px;">
+                    📍 Location in progress...
+                </div>
 
-                    <div class="groupe-formulaire">
-                        <label class="etiquette-formulaire" for="type_presence">Type de pointage</label>
-                        <select id="type_presence" name="type_presence" class="champ-formulaire">
-                            <option value="Entrée">✅ Entrée (Début de cours)</option>
-                            <option value="Sortie">🚪 Sortie (Fin de cours)</option>
-                        </select>
-                    </div>
+                <div id="form-loading" style="display: none; text-align: center; font-size: 0.75rem; color: navy;">
+                    <span>🔍 Checking...</span>
+                </div>
 
-                    <div id="gps-status" style="font-size: 0.7rem; color: #64748b; margin-bottom: 5px;">
-                        📍 Localisation en cours...
-                    </div>
+                <button type="submit" class="bouton-validation" id="submit-btn" disabled>Validate attendance</button>
+            </form>
+        </main>
 
-                    <div id="form-loading" style="display: none; text-align: center; font-size: 0.75rem; color: navy;">
-                        <span>🔍 Vérification...</span>
-                    </div>
-
-                    <button type="submit" class="bouton-validation" id="submit-btn" disabled>Valider ma présence</button>
-                </form>
-            </main>
-
-            <script>
-                // 1. Géolocalisation
-                if ("geolocation" in navigator) {
-                    navigator.geolocation.getCurrentPosition(function(position) {
-                        document.getElementById('latitude').value = position.coords.latitude;
-                        document.getElementById('longitude').value = position.coords.longitude;
-                        document.getElementById('gps-status').innerHTML = "📍 Position capturée avec succès";
-                        document.getElementById('gps-status').style.color = "#16a34a";
-                    }, function(error) {
-                        document.getElementById('gps-status').innerHTML = "⚠️ GPS non activé (recommandé)";
-                        document.getElementById('gps-status').style.color = "#dc2626";
-                    });
-                }
-
-                // 2. Signature de l'appareil
-                function generateDeviceSignature() {
-                    return "SIG-" + Math.random().toString(16).slice(2, 10).toUpperCase();
-                }
-                document.getElementById('device_signature').value = generateDeviceSignature();
-
-                // 3. Recherche étudiant et Cooldown
-                const matriculeInput = document.getElementById('matricule');
-                const badge = document.getElementById('student-info-badge');
-                const infoName = document.getElementById('info-name');
-                const infoPromo = document.getElementById('info-promo');
-                const submitBtn = document.getElementById('submit-btn');
-                const loading = document.getElementById('form-loading');
-                const form = document.getElementById('attendance-form');
-                const ticket = document.getElementById('success-ticket');
-                const ticketDetails = document.getElementById('ticket-details');
-                const timerSpan = document.getElementById('cooldown-timer');
-
-                let lookupTimeout;
-
-                matriculeInput.addEventListener('input', function() {
-                    const matricule = this.value.trim();
-                    clearTimeout(lookupTimeout);
-                    if (matricule.length < 3) {
-                        badge.style.display = 'none';
-                        submitBtn.disabled = true;
-                        return;
-                    }
-                    lookupTimeout = setTimeout(() => {
-                        loading.style.display = 'block';
-                        fetch(`/api/student/${matricule}`)
-                            .then(res => res.json())
-                            .then(data => {
-                                loading.style.display = 'none';
-                                if (data.error) throw new Error();
-                                infoName.textContent = `${data.nom} ${data.prenom}`;
-                                infoPromo.textContent = `${data.promotion} | ${data.faculte}`;
-                                badge.style.display = 'block';
-                                submitBtn.disabled = false;
-                            })
-                            .catch(() => {
-                                loading.style.display = 'none';
-                                badge.style.display = 'none';
-                                submitBtn.disabled = true;
-                            });
-                    }, 500);
+        <script>
+            // 1. Géolocalisation
+            if ("geolocation" in navigator) {
+                navigator.geolocation.getCurrentPosition(function (position) {
+                    document.getElementById('latitude').value = position.coords.latitude;
+                    document.getElementById('longitude').value = position.coords.longitude;
+                    document.getElementById('gps-status').innerHTML = "📍 Location captured successfully";
+                    document.getElementById('gps-status').style.color = "#16a34a";
+                }, function (error) {
+                    document.getElementById('gps-status').innerHTML = "⚠️ GPS not activated (recommended)";
+                    document.getElementById('gps-status').style.color = "#dc2626";
                 });
+            }
 
-                // 4. Envoi du formulaire en AJAX pour rester sur la page (Ticket + Cooldown)
-                form.addEventListener('submit', function(e) {
-                    e.preventDefault();
+            // 2. Signature de l'appareil
+            function generateDeviceSignature() {
+                return "SIG-" + Math.random().toString(16).slice(2, 10).toUpperCase();
+            }
+            document.getElementById('device_signature').value = generateDeviceSignature();
+
+            // 3. Recherche étudiant et Cooldown
+            const matriculeInput = document.getElementById('matricule');
+            const badge = document.getElementById('student-info-badge');
+            const infoName = document.getElementById('info-name');
+            const infoPromo = document.getElementById('info-promo');
+            const submitBtn = document.getElementById('submit-btn');
+            const loading = document.getElementById('form-loading');
+            const form = document.getElementById('attendance-form');
+            const ticket = document.getElementById('success-ticket');
+            const ticketDetails = document.getElementById('ticket-details');
+            const timerSpan = document.getElementById('cooldown-timer');
+
+            let lookupTimeout;
+
+            matriculeInput.addEventListener('input', function () {
+                const matricule = this.value.trim();
+                clearTimeout(lookupTimeout);
+                if (matricule.length < 3) {
+                    badge.style.display = 'none';
                     submitBtn.disabled = true;
-                    submitBtn.innerHTML = "⌛ Envoi en cours...";
+                    return;
+                }
 
-                    const formData = new FormData(form);
-                    fetch('/check_attendance', {
-                        method: 'POST',
-                        body: formData
-                    })
+                //le code de timeout en bas; 
+                // Attend un délai avant de lancer une recherche.
+                //Affiche un indicateur de chargement.
+                //Récupère les infos d’un étudiant via une API (/api/student/{matricule}).
+                //Met à jour l’interface avec les données reçues (nom, prénom, promotion, faculté).
+                //Active le bouton de soumission une fois les infos disponibles.
+
+                lookupTimeout = setTimeout(() => {
+                    loading.style.display = 'block';
+                    fetch(`/api/student/${matricule}`)
+                        .then(res => res.json())
+                        .then(data => {
+                            loading.style.display = 'none';
+                            if (data.error) throw new Error();
+                            infoName.textContent = `${data.nom} ${data.prenom}`;
+                            infoPromo.textContent = `${data.promotion} | ${data.faculte}`;
+                            badge.style.display = 'block';
+                            submitBtn.disabled = false;
+                        })
+                        .catch(() => {
+                            loading.style.display = 'none';
+                            badge.style.display = 'none';
+                            submitBtn.disabled = true;
+                        });
+                }, 500);
+            });
+
+            // 4. Envoi du formulaire en AJAX pour rester sur la page (Ticket + Cooldown)
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = "⌛ Sending...";
+
+                const formData = new FormData(form);
+                fetch('/check_attendance', {
+                    method: 'POST',
+                    body: formData
+                })
                     .then(res => res.json())
                     .then(data => {
                         if (data.status === 'success') {
@@ -321,7 +333,7 @@
                             badge.style.display = 'none';
                             ticket.style.display = 'block';
                             ticketDetails.innerHTML = `<strong>${infoName.textContent}</strong><br>Pointage effectué le ${new Date().toLocaleTimeString()}`;
-                            
+
                             // Lancement du cooldown de 30 secondes
                             let timeLeft = 30;
                             const interval = setInterval(() => {
@@ -340,33 +352,47 @@
                             }, 1000);
                         } else {
                             // Erreur retournée par le serveur
-                            alert("❌ Erreur : " + data.message);
+                            alert("❌ error : " + data.message);
                             submitBtn.disabled = false;
-                            submitBtn.innerHTML = "Réessayer";
+                            submitBtn.innerHTML = "Retry";
                         }
                     })
                     .catch(err => {
                         console.error(err);
-                        alert("❌ Erreur technique. Vérifiez votre connexion.");
+                        alert("❌ Technical error. Check your connection.");
                         submitBtn.disabled = false;
-                        submitBtn.innerHTML = "Valider ma présence";
+                        submitBtn.innerHTML = "Validate my presence";
                     });
-                });
-            </script>
+            });
+        </script>
 
-            <style>
-                @keyframes slideDown {
-                    from { opacity: 0; transform: translateY(-20px); }
-                    to { opacity: 1; transform: translateY(0); }
+        <style>
+            @keyframes slideDown {
+                from {
+                    opacity: 0;
+                    transform: translateY(-20px);
                 }
-            </style>
 
-            <style>
-                @keyframes fadeIn {
-                    from { opacity: 0; transform: translateY(-10px); }
-                    to { opacity: 1; transform: translateY(0); }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
                 }
-            </style>
+            }
+        </style>
+
+        <style>
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(-10px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+        </style>
         </main>
     </div>
 </body>
