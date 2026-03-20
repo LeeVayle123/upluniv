@@ -559,11 +559,7 @@
     <div class="Conteneur">
         <header>
             <div class="section-titre">
-                <div class="conteneur-logo-universite">
-                    <img src="{{ url_for('static', filename='logo_upl.png') }}" alt="UPL Logo"
-                        class="logo-universitaire"
-                        onerror="this.src.endsWith('.png') ? this.src=this.src.replace('.png','.jpg') : (this.src.endsWith('.jpg') ? this.src='{{ url_for('static', filename='hh.jpeg') }}' : this.style.display='none')">
-                </div>
+                <img src="{{ url_for('static', filename='logo_upl.png') }}" class="logo-universitaire" alt="Logo UPL">
                 <div class="titre-texte">
                     <h1 id="pageTitle">STUDENT MANAGEMENT</h1>
                     <p id="pageSubtitle">Management and monitoring of UPL registrations</p>
