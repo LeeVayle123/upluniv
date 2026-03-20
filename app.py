@@ -704,27 +704,26 @@ def api_presences():
                         if hasattr(dt, 'strftime'):
                             row['formatted_date'] = dt.strftime('%d/%m/%Y')
                             row['formatted_time'] = dt.strftime('%H:%M:%S')
-                            row['date_inscription'] = dt.isoformat()
+                            row['date_inscription_sort'] = dt.isoformat()
                         else:
                             row['formatted_date'] = str(dt)
                             row['formatted_time'] = ""
-                            row['date_inscription'] = str(dt)
+                            row['date_inscription_sort'] = str(dt)
                     else:
                         row['formatted_date'] = "N/A"
                         row['formatted_time'] = "N/A"
-                        row['date_inscription'] = None
+                        row['date_inscription_sort'] = ""
                     all_presences.append(row)
-            except (mysql.connector.Error, sqlite3.Error, Exception):
-                # Si une table de présence n'existe pas encore, on passe à la suivante
+            except:
                 continue
 
         cursor.close()
         conn.close()
 
         # Sort by date descending
-        all_students.sort(key=lambda x: x['date_inscription_sort'] if 'date_inscription_sort' in x else '', reverse=True)
+        all_presences.sort(key=lambda x: x.get('date_inscription_sort', ''), reverse=True)
 
-        return jsonify(all_students)
+        return jsonify(all_presences)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
