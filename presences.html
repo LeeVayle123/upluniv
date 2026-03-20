@@ -410,12 +410,42 @@
         }
 
         /* Ajustement des largeurs de colonnes */
-        thead th:nth-child(1), tbody td:nth-child(1) { width: 25%; } /* Étudiant */
-        thead th:nth-child(2), tbody td:nth-child(2) { width: 12%; } /* Matricule */
-        thead th:nth-child(3), tbody td:nth-child(3) { width: 15%; } /* Promotion */
-        thead th:nth-child(4), tbody td:nth-child(4) { width: 15%; } /* Date/Heure */
-        thead th:nth-child(5), tbody td:nth-child(5) { width: 18%; } /* Statut Géo */
-        thead th:nth-child(6), tbody td:nth-child(6) { width: 15%; } /* Type */
+        thead th:nth-child(1),
+        tbody td:nth-child(1) {
+            width: 25%;
+        }
+
+        /* Étudiant */
+        thead th:nth-child(2),
+        tbody td:nth-child(2) {
+            width: 12%;
+        }
+
+        /* Matricule */
+        thead th:nth-child(3),
+        tbody td:nth-child(3) {
+            width: 15%;
+        }
+
+        /* Promotion */
+        thead th:nth-child(4),
+        tbody td:nth-child(4) {
+            width: 15%;
+        }
+
+        /* Date/Heure */
+        thead th:nth-child(5),
+        tbody td:nth-child(5) {
+            width: 18%;
+        }
+
+        /* Statut Géo */
+        thead th:nth-child(6),
+        tbody td:nth-child(6) {
+            width: 15%;
+        }
+
+        /* Type */
 
         tbody td {
             padding: 13px 18px;
@@ -619,28 +649,28 @@
         <header>
             <div class="entete-gauche">
                 <!-- Logo situé dans static/logo_upl.png -->
-                <img src="{{ url_for('static', filename='logo_upl.png') }}" alt="Logo UPL" class="image-logo"
+                <img src="{{ url_for('static', filename='hh.jpeg') }}" alt="Logo UPL" class="image-logo"
                     onerror="this.style.display='none'">
                 <div>
-                    <div class="titre-entete">Université Protestante de Lubumbashi</div>
-                    <div class="sous-titre-entete" id="pageSubtitle">Registre des présences — Toutes les promotions</div>
+                    <div class="titre-entete">Protestant University of Lubumbashi</div>
+                    <div class="sous-titre-entete" id="pageSubtitle">Attendance Management System</div>
                 </div>
             </div>
 
             <!-- Boutons de navigation vers les autres interfaces -->
             <nav class="boutons-nav">
                 <a href="/attendance" class="bouton bouton-contour">
-                    <i class="fas fa-barcode"></i> Pointer une présence
+                    <i class="fas fa-barcode"></i> Point a presence
                 </a>
                 <a href="/students" class="bouton bouton-contour">
-                    <i class="fas fa-users"></i> Liste des étudiants
+                    <i class="fas fa-users"></i> Student List
                 </a>
                 <!-- Déclencheur de l'export Excel (voir fonction exportExcel() plus bas) -->
                 <button onclick="exportExcel()" class="bouton bouton-vert">
-                    <i class="fas fa-file-excel"></i> Exporter Excel
+                    <i class="fas fa-file-excel"></i> Export Excel
                 </button>
                 <a href="/export_sql" class="bouton bouton-navy">
-                    <i class="fas fa-database"></i> Exporter pour XAMPP (.sql)
+                    <i class="fas fa-database"></i> Export for XAMPP (.sql)
                 </a>
             </nav>
         </header>
@@ -657,7 +687,7 @@
             <!-- Section IAGE -->
             <div class="section-faculte">
                 <div class="etiquette-faculte">
-                    <i class="fas fa-graduation-cap"></i> Parcours IAGE
+                    <i class="fas fa-graduation-cap"></i>IAGE PATH
                 </div>
                 <div class="rangee-onglets">
                     <!-- Onglet Global (lit toutes les tables) -->
@@ -743,7 +773,7 @@
             <div class="carte-stat">
                 <div class="icone-stat entree"><i class="fas fa-arrow-right-to-bracket"></i></div>
                 <div>
-                    <div class="etiquette-stat">Entrées</div>
+                    <div class="etiquette-stat">Entrances</div>
                     <!-- Mis à jour par loadStats() -->
                     <div class="valeur-stat" id="statEntrees">—</div>
                 </div>
@@ -751,7 +781,7 @@
             <div class="carte-stat">
                 <div class="icone-stat sortie"><i class="fas fa-arrow-right-from-bracket"></i></div>
                 <div>
-                    <div class="etiquette-stat">Sorties</div>
+                    <div class="etiquette-stat">Exits</div>
                     <!-- Mis à jour par loadStats() -->
                     <div class="valeur-stat" id="statSorties">—</div>
                 </div>
@@ -764,7 +794,7 @@
             <div class="barre-outils">
                 <div class="titre-barre-outils">
                     <i class="fas fa-table-list"></i>
-                    <span id="tableTitle">Registre Global des Présences</span>
+                    <span id="tableTitle">Global Presence</span>
                     <!-- Badge compteur mis à jour dynamiquement -->
                     <span class="badge-compteur" id="countBadge">—</span>
                 </div>
@@ -789,11 +819,11 @@
                 <table id="presencesTable">
                     <thead>
                         <tr>
-                            <th>Étudiant</th>
-                            <th>Matricule</th>
+                            <th>Student</th>
+                            <th>Id number</th>
                             <th>Promotion / Filière</th>
                             <th>Date &amp; Heure</th>
-                            <th>Statut Géo</th>
+                            <th>Geo Status</th>
                             <th>Type</th>
                         </tr>
                     </thead>
@@ -803,7 +833,7 @@
                             <td colspan="6" style="padding:0; border:none;">
                                 <div class="loading-state">
                                     <i class="fas fa-spinner fa-spin"></i>
-                                    Chargement des présences...
+                                    Loading...
                                 </div>
                             </td>
                         </tr>

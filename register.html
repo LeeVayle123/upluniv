@@ -230,7 +230,7 @@
     <div class="conteneur-principal">
         <aside class="panneau-lateral">
             <div class="conteneur-logo">
-                <img src="{{ url_for('static', filename='logo_upl.png') }}" alt="UPL Logo" class="logo-universitaire">
+                <img src="{{ url_for('static', filename='hh.jpeg') }}" alt="UPL Logo" class="logo-universitaire">
             </div>
             <h1 class="titre-panneau">Hello welcome</h1>
             <p class="description-marque">Don't have Account ?</p>
@@ -244,8 +244,8 @@
         <main class="formulaire-interne">
 
             <div class="formulaire-principal">
-                <h2 class="titre-formulaire">Inscription</h2>
-                <p class="sous-titre-formulaire">Remplissez le formulaire pour créer votre compte.</p>
+                <h2 class="titre-formulaire">Registration</h2>
+                <p class="sous-titre-formulaire">Fill in the form to create your account.</p>
             </div>
 
             <form action="/register" method="post" class="grille-formulaire">
@@ -265,26 +265,26 @@
                 </div>
 
                 <div class="groupe-formulaire">
-                    <label class="etiquette-formulaire" for="nom">Nom</label>
+                    <label class="etiquette-formulaire" for="nom">Name</label>
                     <input type="text" id="nom" name="nom" class="champ-formulaire" required>
                 </div>
 
                 <div class="groupe-formulaire">
-                    <label class="etiquette-formulaire" for="postnom">Postnom</label>
+                    <label class="etiquette-formulaire" for="postnom">Postname</label>
                     <input type="text" id="postnom" name="postnom" class="champ-formulaire" required>
                 </div>
 
                 <div class="groupe-formulaire">
-                    <label class="etiquette-formulaire" for="prenom">Prénom</label>
+                    <label class="etiquette-formulaire" for="prenom">Firstname</label>
                     <input type="text" id="prenom" name="prenom" class="champ-formulaire" required>
                 </div>
 
                 <div class="groupe-formulaire">
-                    <label class="etiquette-formulaire" for="parcours">Parcours</label>
+                    <label class="etiquette-formulaire" for="parcours">Path</label>
                     <select id="parcours" name="parcours" class="champ-formulaire" onchange="updateFields()" required>
-                        <option value="">Sélectionner</option>
+                        <option value="">Select</option>
                         <option value="IAGE">IAGE</option>
-                        <option value="TECHNOLOGIE">TECHNOLOGIE</option>
+                        <option value="TECHNOLOGIE">TECHNOLOGY</option>
                     </select>
                 </div>
 
@@ -315,7 +315,7 @@
             </form>
 
             <div class="pied-de-page-formulaire">
-                <p>&copy; 2026 Université Protestante de Lubumbashi</p>
+                <p>&copy; 2026 Protestante University of Lubumbashi</p>
             </div>
         </main>
     </div>
