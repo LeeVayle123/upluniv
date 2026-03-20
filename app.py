@@ -290,7 +290,38 @@ def check_attendance():
                 # 4.5 Gestion du temps (Lubumbashi UTC+2)
                 # On calcule l'heure actuelle avec un décalage de +2 heures par rapport à UTC
                 now_lubumbashi = datetime.now(timezone(timedelta(hours=2))).replace(tzinfo=None)
+                today_date = now_lubumbashi.strftime('%Y-%m-%d')
                 
+                # --- NOUVELLES RESTRICTIONS (Demandées par l'utilisateur) ---
+                
+                # 1. Protection contre les doublons d'appareils
+                # On vérifie si ce matricule a déjà été utilisé aujourd'hui par un autre appareil
+                check_device_query = "SELECT device_signature FROM presences WHERE matricule = %s AND date(date_inscription) = %s LIMIT 1"
+                execute_sql(cursor, check_device_query, (matricule, today_date))
+                device_res = cursor.fetchone()
+                
+                if device_res:
+                    # Pour SQLite (Row object) et MySQL (dict ou tuple)
+                    existing_sig = device_res['device_signature'] if isinstance(device_res, (dict, sqlite3.Row)) else device_res[0]
+                    if existing_sig != device_signature:
+                        cursor.close()
+                        conn.close()
+                        return jsonify({"status": "error", "message": "Ce matricule est déjà utilisé sur un autre appareil (Used)"}), 403
+
+                # 2. Limite de 2 scans par type (Entrée/Sortie) par jour
+                count_query = "SELECT COUNT(*) FROM presences WHERE matricule = %s AND type_presence = %s AND date(date_inscription) = %s"
+                execute_sql(cursor, count_query, (matricule, type_presence, today_date))
+                count_res = cursor.fetchone()
+                count = count_res[0] if isinstance(count_res, tuple) else count_res[0] if not isinstance(count_res, (dict, sqlite3.Row)) else list(count_res)[0]
+                
+                if count >= 2:
+                    cursor.close()
+                    conn.close()
+                    return jsonify({
+                        "status": "error", 
+                        "message": f"Limite atteinte : Vous avez déjà envoyé 2 fois le formulaire d'{type_presence.lower()} pour aujourd'hui."
+                    }), 403
+
                 # 5. SYSTÈME ANTI-FRAUDE : Géolocalisation UPL
                 UPL_LAT = -11.65238
                 UPL_LON = 27.48261
@@ -305,6 +336,7 @@ def check_attendance():
                 else:
                     status_geoloc = "Fraude Hors-Campus"
 
+                # Enregistrement dans la table globale
                 insert_query = """
                     INSERT INTO presences 
                     (matricule, nom, postnom, prenom, sexe, parcours, promotion, filiere, faculte, type_presence, device_signature, latitude, longitude, status_geoloc, date_inscription) 
@@ -313,7 +345,6 @@ def check_attendance():
                 execute_sql(cursor, insert_query, (matricule, nom, postnom, prenom, sexe, parcours, promotion, filiere, faculte, type_presence, device_signature, lat, lon, status_geoloc, now_lubumbashi))
                 
                 # On enregistre AUSSI dans la table de présence spécifique pour la promotion
-                # car l'API de filtrage lit dans presence_bac1_IAGE, etc.
                 specific_presence_table = f"presence_{table}"
                 execute_sql(cursor, f"""
                     INSERT INTO {specific_presence_table}
