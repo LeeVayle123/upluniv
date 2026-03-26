@@ -21,8 +21,8 @@
 
         .conteneur-logo {
             display: flex;
-            justify-content: center;
-            margin-bottom: 25px;
+            justify-content: flex-start;
+            margin-bottom: 20px;
         }
 
         .logo-universitaire {
@@ -227,14 +227,11 @@
 </head>
 
 <body>
-    <!-- Logo en haut au milieu -->
-    <div class="conteneur-logo">
-        <img src="{{ url_for('static', filename='logo_upl.png') }}" class="logo-universitaire" alt="Logo UPL">
-    </div>
-
     <div class="conteneur-principal">
         <aside class="panneau-lateral">
-
+            <div class="conteneur-logo">
+                <img src="{{ url_for('static', filename='logo_upl.png') }}" class="logo-universitaire" alt="Logo UPL">
+            </div>
             <h1 class="titre-panneau">Hello welcome</h1>
             <p class="description-marque">Don't have Account ?</p>
             <div style="display: flex; flex-direction: column; gap: 10px;">
