@@ -445,7 +445,9 @@ def get_student_info(matricule):
 def generate_qr():
     """
     Génère un QR code pointant vers la page de présence.
+    Supporte l'option de téléchargement via le paramètre ?download=1
     """
+    download = request.args.get('download', '0') == '1'
     # On utilise l'URL publique si elle est définie, sinon l'URL locale
     if PUBLIC_URL:
         # Nettoyage de l'URL pour éviter les doubles slashes
@@ -454,10 +456,6 @@ def generate_qr():
     else:
         target_url = url_for('attendance', _external=True)
     
-    print("-" * 50)
-    print(f"!!! QR CODE GÉNÉRÉ POUR : {target_url} !!!")
-    print("Vérifiez que ce lien commence par https:// et non par http://127.0.0.1")
-    print("-" * 50)
 
     
     qr = qrcode.QRCode(
@@ -476,7 +474,7 @@ def generate_qr():
     img.save(img_io, 'PNG')
     img_io.seek(0)
     
-    return send_file(img_io, mimetype='image/png', as_attachment=True, download_name='qr_presence_upl.png')
+    return send_file(img_io, mimetype='image/png', as_attachment=download, download_name='qr_presence_upl.png')
 
 
 @app.route('/')

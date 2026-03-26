@@ -639,6 +639,7 @@
             color: #475569;
             white-space: nowrap;
         }
+
         /* ===== MODAL D'EXPORT EXCEL ===== */
         .modal-export {
             display: none;
@@ -720,13 +721,25 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
         }
 
         @keyframes slideIn {
-            from { transform: translateY(-20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
         }
     </style>
 </head>
@@ -756,9 +769,9 @@
                 <button onclick="exportExcel()" class="bouton bouton-vert">
                     <i class="fas fa-file-excel"></i> Export Excel
                 </button>
-                <a href="/export_sql" class="bouton bouton-navy">
+                <!--<a href="/export_sql" class="bouton bouton-navy">
                     <i class="fas fa-database"></i> Export for XAMPP (.sql)
-                </a>
+                </a>-->
             </nav>
         </header>
 
@@ -1250,7 +1263,7 @@
             let filteredData = currentData.filter(p => {
                 // Filtre par type (Entrée/Sortie)
                 const matchType = (typeFilter === 'Tous') || (p.type_presence === typeFilter);
-                
+
                 // Filtre par moment (Matin < 12h00 / Après-midi >= 12h00)
                 let matchMoment = true;
                 if (momentFilter !== 'Tout' && p.formatted_time) {
@@ -1261,7 +1274,7 @@
                         matchMoment = (hour >= 12);
                     }
                 }
-                
+
                 return matchType && matchMoment;
             });
 
@@ -1289,7 +1302,7 @@
             const today = new Date();
             const dateStr = today.toLocaleDateString('fr-FR').replace(/\//g, '-');
             const promo = currentPromo ? `_${currentPromo}` : '_Global';
-            
+
             // On ajoute les filtres dans le nom du fichier pour s'y retrouver
             const filterStr = `_${typeFilter}_${momentFilter}`;
             const filename = `Presences_UPL${promo}${filterStr}_${dateStr}.xlsx`;
@@ -1318,7 +1331,7 @@
             <div class="titre-modal">
                 <i class="fas fa-file-excel"></i> Export Settings
             </div>
-            
+
             <div class="groupe-form">
                 <label class="label-modal">Type of attendance</label>
                 <select id="exportType" class="select-modal">

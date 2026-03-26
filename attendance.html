@@ -181,6 +181,11 @@
 </head>
 
 <body>
+    <!-- Logo en haut au milieu -->
+    <div class="conteneur-logo">
+        <img src="{{ url_for('static', filename='logo_upl.png') }}" class="logo-universitaire" alt="Logo UPL">
+    </div>
+
     <div class="Conteneur">
         <aside class="panneau-lateral">
 
@@ -219,7 +224,7 @@
                 <div class="groupe-formulaire">
                     <label class="etiquette-formulaire" for="matricule">Matricule</label>
                     <input type="text" id="matricule" name="matricule" class="champ-formulaire" required
-                        placeholder="Ex: 2024000000" autofocus autocomplete="off">
+                        placeholder="Attente de localisation..." disabled autofocus autocomplete="off">
                 </div>
 
                 <div class="groupe-formulaire">
@@ -244,22 +249,44 @@
 
         <script>
             // 1. Géolocalisation
+            let gpsSuccess = false;
+
             if ("geolocation" in navigator) {
                 const options = {
                     enableHighAccuracy: true,
                     timeout: 10000,
                     maximumAge: 0
                 };
-                
+
                 navigator.geolocation.getCurrentPosition(function (position) {
+                    gpsSuccess = true;
                     document.getElementById('latitude').value = position.coords.latitude;
                     document.getElementById('longitude').value = position.coords.longitude;
-                    document.getElementById('gps-status').innerHTML = "📍 Location captured successfully";
-                    document.getElementById('gps-status').style.color = "#16a34a";
+                    
+                    const status = document.getElementById('gps-status');
+                    status.innerHTML = "📍 Localisation capturée avec succès";
+                    status.style.color = "#16a34a";
+                    status.style.fontWeight = "bold";
+
+                    // Activer le champ matricule une fois localisé
+                    const matInput = document.getElementById('matricule');
+                    matInput.disabled = false;
+                    matInput.placeholder = "Ex: 2024000000";
+                    matInput.focus();
                 }, function (error) {
-                    document.getElementById('gps-status').innerHTML = "⚠️ GPS not activated (recommended)";
-                    document.getElementById('gps-status').style.color = "#dc2626";
+                    gpsSuccess = false;
+                    const status = document.getElementById('gps-status');
+                    status.innerHTML = "❌ ERREUR GPS : Localisation obligatoire pour pointer.";
+                    status.style.color = "#dc2626";
+                    status.style.background = "#fee2e2";
+                    status.style.padding = "10px";
+                    status.style.borderRadius = "8px";
+                    status.style.fontWeight = "bold";
+                    
+                    alert("Attention : Vous devez activer le GPS et autoriser la localisation pour remplir ce formulaire.");
                 }, options);
+            } else {
+                alert("Votre navigateur ne supporte pas la géolocalisation. Impossible de pointer.");
             }
 
             // 2. Signature de l'appareil
@@ -305,30 +332,30 @@
                         .then(data => {
                             loading.style.display = 'none';
                             if (data.error) throw new Error();
-                            
+
                             // Mise à jour des informations
                             infoName.textContent = `${data.nom} ${data.prenom}`;
-                            
+
                             // Logique de suggestion de type de pointage
                             const typeSelect = document.getElementById('type_presence');
                             let statusText = `${data.promotion} | ${data.faculte}`;
-                            
+
                             if (data.count_today >= 4) {
-                                statusText += " | ✅ Terminé pour aujourd'hui";
+                                statusText += " | Done for today";
                                 submitBtn.disabled = true;
                                 submitBtn.innerHTML = "Limite atteinte";
                             } else {
                                 if (data.last_type === 'Entrée') {
                                     typeSelect.value = 'Sortie';
-                                    statusText += " | 🟢 Actuellement en classe";
+                                    statusText += " | Currently in class";
                                 } else {
                                     typeSelect.value = 'Entrée';
-                                    statusText += " | ⚪ Hors classe";
+                                    statusText += " | Outside class";
                                 }
                                 submitBtn.disabled = false;
                                 submitBtn.innerHTML = "Validate my attendance";
                             }
-                            
+
                             infoPromo.textContent = statusText;
                             badge.style.display = 'block';
                         })

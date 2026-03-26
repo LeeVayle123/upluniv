@@ -225,9 +225,9 @@
 
 <body>
     <div class="sans-impression">
-        <button class="bouton-imprimer" onclick="window.print()">
-            <span>🖨️</span> Print QR Code
-        </button>
+        <a href="{{ url_for('generate_qr', download='1') }}" class="bouton-imprimer" style="text-decoration:none;">
+            <span>📥</span> Download QR Code
+        </a>
     </div>
 
     <div class="affiche">
