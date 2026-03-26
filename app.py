@@ -46,13 +46,15 @@ def calculate_distance(lat1, lon1, lat2, lon2):
     return R * c
 
 # Choix intelligent du dossier de ressources (Compatible PC local et Render)
-if os.path.isdir(os.path.join(os.path.dirname(__file__), 'templates')):
-    template_dir = 'templates'
-    static_dir = 'static'
-else:
-    # Fallback pour GitHub/Render si les fichiers sont à la racine
-    template_dir = '.'
-    static_dir = '.'
+basedir = os.path.abspath(os.path.dirname(__file__))
+template_dir = os.path.join(basedir, 'templates')
+static_dir = os.path.join(basedir, 'static')
+
+# Si les dossiers n'existent pas (cas particulier de certains déploiements), on revient à la racine
+if not os.path.isdir(template_dir):
+    template_dir = basedir
+if not os.path.isdir(static_dir):
+    static_dir = basedir
 
 app = Flask(__name__, template_folder=template_dir, static_folder=static_dir)
 
