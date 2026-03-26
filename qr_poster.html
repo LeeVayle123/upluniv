@@ -224,13 +224,13 @@
 </head>
 
 <body>
-    <div class="sans-impression">
-        <a href="{{ url_for('generate_qr', download='1') }}" class="bouton-imprimer" style="text-decoration:none;">
-            <span>📥</span> Download QR Code
-        </a>
+    <div class="sans-impression" data-html2canvas-ignore="true">
+        <button class="bouton-imprimer" onclick="downloadPosterPDF()">
+            <span>📥</span> Download Poster (PDF)
+        </button>
     </div>
 
-    <div class="affiche">
+    <div class="affiche" id="qr-poster-content">
         <header class="entete">
             <img src="{{ url_for('static', filename='logo_upl.png') }}" class="logo" alt="Logo UPL">
             <div class="conteneur-titre">
@@ -248,7 +248,7 @@
             </div>
 
             {% if target_url %}
-            <div class="url-debug">
+            <div class="url-debug" data-html2canvas-ignore="true">
                 Current Link: <strong>{{ target_url }}</strong>
             </div>
             {% endif %}
@@ -258,11 +258,37 @@
         <footer class="pied-de-page">
             <p class="copyright">© 2026 Protestant University of Lubumbashi</p>
             <p>Attendance Management System</p>
-            <a href="/admin"
+            <a href="/admin" data-html2canvas-ignore="true"
                 style="display: inline-block; margin-top: 15px; color: #94a3b8; text-decoration: none; font-size: 0.75rem; font-weight: 600;">Admin
                 Access</a>
         </footer>
     </div>
+
+    <!-- Script pour l'exportation PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script>
+        function downloadPosterPDF() {
+            const element = document.getElementById('qr-poster-content');
+            const options = {
+                margin: 0,
+                filename: 'UPL_QR_OFFICIEL.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { 
+                    scale: 2, 
+                    useCORS: true,
+                    letterRendering: true
+                },
+                jsPDF: { 
+                    unit: 'mm', 
+                    format: 'a4', 
+                    orientation: 'portrait' 
+                }
+            };
+
+            // Lancement de la conversion
+            html2pdf().from(element).set(options).save();
+        }
+    </script>
 </body>
 
 </html>
