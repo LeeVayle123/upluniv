@@ -655,157 +655,157 @@
                 </div>
             </div>
 
-    <!-- Boutons de navigation vers les autres interfaces -->
-    <nav class="boutons-nav">
-        <a href="/attendance" class="bouton bouton-contour">
+            <!-- Boutons de navigation vers les autres interfaces -->
+            <nav class="boutons-nav">
+                <!-- <a href="/attendance" class="bouton bouton-contour">
             <i class="fas fa-barcode"></i> Point a presence
-        </a>
-        <a href="/students" class="bouton bouton-contour">
-            <i class="fas fa-users"></i> Student List
-        </a>
-        <!-- Déclencheur de l'export Excel (voir fonction exportExcel() plus bas) -->
-        <button onclick="exportExcel()" class="bouton bouton-vert">
-            <i class="fas fa-file-excel"></i> Export Excel
-        </button>
-        <a href="/export_sql" class="bouton bouton-navy">
-            <i class="fas fa-database"></i> Export for XAMPP (.sql)
-        </a>
-    </nav>
-    </header>
+        </a> -->
+                <a href="/students" class="bouton bouton-contour">
+                    <i class="fas fa-users"></i> Student List
+                </a>
+                <!-- Déclencheur de l'export Excel (voir fonction exportExcel() plus bas) -->
+                <button onclick="exportExcel()" class="bouton bouton-vert">
+                    <i class="fas fa-file-excel"></i> Export Excel
+                </button>
+                <a href="/export_sql" class="bouton bouton-navy">
+                    <i class="fas fa-database"></i> Export for XAMPP (.sql)
+                </a>
+            </nav>
+        </header>
 
-    <!-- ===== ONGLETS DE FILTRAGE PAR PROMOTION =====
+        <!-- ===== ONGLETS DE FILTRAGE PAR PROMOTION =====
          Chaque bouton correspond à UNE table de présence dans la base de données.
          La structure exactement ici correspond à setup_db.py :
 
          IAGE : bac1_IAGE, bac2_IAGE, bac3_IAGE
          TECHNOLOGIE : bac1/2/3/4 × (IA, GL, SI)
     -->
-    <div class="enveloppe-onglets">
+        <div class="enveloppe-onglets">
 
-        <!-- Section IAGE -->
-        <div class="section-faculte">
-            <div class="etiquette-faculte">
-                <i class="fas fa-graduation-cap"></i>IAGE PATH
+            <!-- Section IAGE -->
+            <div class="section-faculte">
+                <div class="etiquette-faculte">
+                    <i class="fas fa-graduation-cap"></i>IAGE PATH
+                </div>
+                <div class="rangee-onglets">
+                    <!-- Onglet Global (lit toutes les tables) -->
+                    <button class="onglet-promo actif" data-promo="" onclick="switchTab(this)">
+                        <i class="fas fa-globe"></i> Global
+                    </button>
+                    <!-- Onglet BAC 1 IAGE → table presence_bac1_IAGE -->
+                    <button class="onglet-promo" data-promo="bac1_IAGE" onclick="switchTab(this)">BAC 1</button>
+                    <!-- Onglet BAC 2 IAGE → table presence_bac2_IAGE -->
+                    <button class="onglet-promo" data-promo="bac2_IAGE" onclick="switchTab(this)">BAC 2</button>
+                    <!-- Onglet BAC 3 IAGE → table presence_bac3_IAGE -->
+                    <button class="onglet-promo" data-promo="bac3_IAGE" onclick="switchTab(this)">BAC 3</button>
+                </div>
             </div>
-            <div class="rangee-onglets">
-                <!-- Onglet Global (lit toutes les tables) -->
-                <button class="onglet-promo actif" data-promo="" onclick="switchTab(this)">
-                    <i class="fas fa-globe"></i> Global
-                </button>
-                <!-- Onglet BAC 1 IAGE → table presence_bac1_IAGE -->
-                <button class="onglet-promo" data-promo="bac1_IAGE" onclick="switchTab(this)">BAC 1</button>
-                <!-- Onglet BAC 2 IAGE → table presence_bac2_IAGE -->
-                <button class="onglet-promo" data-promo="bac2_IAGE" onclick="switchTab(this)">BAC 2</button>
-                <!-- Onglet BAC 3 IAGE → table presence_bac3_IAGE -->
-                <button class="onglet-promo" data-promo="bac3_IAGE" onclick="switchTab(this)">BAC 3</button>
+
+            <!-- Section TECHNOLOGIE -->
+            <div class="section-faculte">
+                <div class="etiquette-faculte">
+                    <i class="fas fa-microchip"></i> Parcours Technologie
+                </div>
+                <div class="grille-technique">
+
+                    <!-- BAC 1 TECHNOLOGIE : IA / GL / SI -->
+                    <!-- → tables : presence_bac1_tech_IA, presence_bac1_tech_GL, presence_bac1_tech_SI -->
+                    <div class="ligne-annee">
+                        <span class="etiquette-annee">BAC 1 :</span>
+                        <div class="onglets-internes">
+                            <button class="onglet-promo" data-promo="bac1_tech_IA" onclick="switchTab(this)">IA</button>
+                            <button class="onglet-promo" data-promo="bac1_tech_GL" onclick="switchTab(this)">GL</button>
+                            <button class="onglet-promo" data-promo="bac1_tech_SI" onclick="switchTab(this)">SI</button>
+                        </div>
+                    </div>
+
+                    <!-- BAC 2 TECHNOLOGIE -->
+                    <!-- → tables : presence_bac2_tech_IA, presence_bac2_tech_GL, presence_bac2_tech_SI -->
+                    <div class="ligne-annee">
+                        <span class="etiquette-annee">BAC 2 :</span>
+                        <div class="onglets-internes">
+                            <button class="onglet-promo" data-promo="bac2_tech_IA" onclick="switchTab(this)">IA</button>
+                            <button class="onglet-promo" data-promo="bac2_tech_GL" onclick="switchTab(this)">GL</button>
+                            <button class="onglet-promo" data-promo="bac2_tech_SI" onclick="switchTab(this)">SI</button>
+                        </div>
+                    </div>
+
+                    <!-- BAC 3 TECHNOLOGIE -->
+                    <!-- → tables : presence_bac3_tech_IA, presence_bac3_tech_GL, presence_bac3_tech_SI -->
+                    <div class="ligne-annee">
+                        <span class="etiquette-annee">BAC 3 :</span>
+                        <div class="onglets-internes">
+                            <button class="onglet-promo" data-promo="bac3_tech_IA" onclick="switchTab(this)">IA</button>
+                            <button class="onglet-promo" data-promo="bac3_tech_GL" onclick="switchTab(this)">GL</button>
+                            <button class="onglet-promo" data-promo="bac3_tech_SI" onclick="switchTab(this)">SI</button>
+                        </div>
+                    </div>
+
+                    <!-- BAC 4 TECHNOLOGIE -->
+                    <!-- → tables : presence_bac4_tech_IA, presence_bac4_tech_GL, presence_bac4_tech_SI -->
+                    <div class="ligne-annee">
+                        <span class="etiquette-annee">BAC 4 :</span>
+                        <div class="onglets-internes">
+                            <button class="onglet-promo" data-promo="bac4_tech_IA" onclick="switchTab(this)">IA</button>
+                            <button class="onglet-promo" data-promo="bac4_tech_GL" onclick="switchTab(this)">GL</button>
+                            <button class="onglet-promo" data-promo="bac4_tech_SI" onclick="switchTab(this)">SI</button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- Section TECHNOLOGIE -->
-        <div class="section-faculte">
-            <div class="etiquette-faculte">
-                <i class="fas fa-microchip"></i> Parcours Technologie
-            </div>
-            <div class="grille-technique">
-
-                <!-- BAC 1 TECHNOLOGIE : IA / GL / SI -->
-                <!-- → tables : presence_bac1_tech_IA, presence_bac1_tech_GL, presence_bac1_tech_SI -->
-                <div class="ligne-annee">
-                    <span class="etiquette-annee">BAC 1 :</span>
-                    <div class="onglets-internes">
-                        <button class="onglet-promo" data-promo="bac1_tech_IA" onclick="switchTab(this)">IA</button>
-                        <button class="onglet-promo" data-promo="bac1_tech_GL" onclick="switchTab(this)">GL</button>
-                        <button class="onglet-promo" data-promo="bac1_tech_SI" onclick="switchTab(this)">SI</button>
-                    </div>
-                </div>
-
-                <!-- BAC 2 TECHNOLOGIE -->
-                <!-- → tables : presence_bac2_tech_IA, presence_bac2_tech_GL, presence_bac2_tech_SI -->
-                <div class="ligne-annee">
-                    <span class="etiquette-annee">BAC 2 :</span>
-                    <div class="onglets-internes">
-                        <button class="onglet-promo" data-promo="bac2_tech_IA" onclick="switchTab(this)">IA</button>
-                        <button class="onglet-promo" data-promo="bac2_tech_GL" onclick="switchTab(this)">GL</button>
-                        <button class="onglet-promo" data-promo="bac2_tech_SI" onclick="switchTab(this)">SI</button>
-                    </div>
-                </div>
-
-                <!-- BAC 3 TECHNOLOGIE -->
-                <!-- → tables : presence_bac3_tech_IA, presence_bac3_tech_GL, presence_bac3_tech_SI -->
-                <div class="ligne-annee">
-                    <span class="etiquette-annee">BAC 3 :</span>
-                    <div class="onglets-internes">
-                        <button class="onglet-promo" data-promo="bac3_tech_IA" onclick="switchTab(this)">IA</button>
-                        <button class="onglet-promo" data-promo="bac3_tech_GL" onclick="switchTab(this)">GL</button>
-                        <button class="onglet-promo" data-promo="bac3_tech_SI" onclick="switchTab(this)">SI</button>
-                    </div>
-                </div>
-
-                <!-- BAC 4 TECHNOLOGIE -->
-                <!-- → tables : presence_bac4_tech_IA, presence_bac4_tech_GL, presence_bac4_tech_SI -->
-                <div class="ligne-annee">
-                    <span class="etiquette-annee">BAC 4 :</span>
-                    <div class="onglets-internes">
-                        <button class="onglet-promo" data-promo="bac4_tech_IA" onclick="switchTab(this)">IA</button>
-                        <button class="onglet-promo" data-promo="bac4_tech_GL" onclick="switchTab(this)">GL</button>
-                        <button class="onglet-promo" data-promo="bac4_tech_SI" onclick="switchTab(this)">SI</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ===== STATISTIQUES DYNAMIQUES =====
+        <!-- ===== STATISTIQUES DYNAMIQUES =====
          Mises à jour à chaque changement d'onglet
          via l'API /api/presence_stats?promotion=xxx
     -->
-    <div class="grille-stats">
-        <div class="carte-stat">
-            <div class="icone-stat total"><i class="fas fa-list-check"></i></div>
-            <div>
-                <div class="etiquette-stat">Total pointages</div>
-                <!-- Mis à jour par loadStats() -->
-                <div class="valeur-stat" id="statTotal">—</div>
+        <div class="grille-stats">
+            <div class="carte-stat">
+                <div class="icone-stat total"><i class="fas fa-list-check"></i></div>
+                <div>
+                    <div class="etiquette-stat">Total pointages</div>
+                    <!-- Mis à jour par loadStats() -->
+                    <div class="valeur-stat" id="statTotal">—</div>
+                </div>
             </div>
-        </div>
-        <div class="carte-stat">
-            <div class="icone-stat entree"><i class="fas fa-arrow-right-to-bracket"></i></div>
-            <div>
-                <div class="etiquette-stat">Entrances</div>
-                <!-- Mis à jour par loadStats() -->
-                <div class="valeur-stat" id="statEntrees">—</div>
+            <div class="carte-stat">
+                <div class="icone-stat entree"><i class="fas fa-arrow-right-to-bracket"></i></div>
+                <div>
+                    <div class="etiquette-stat">Entrances</div>
+                    <!-- Mis à jour par loadStats() -->
+                    <div class="valeur-stat" id="statEntrees">—</div>
+                </div>
             </div>
-        </div>
-        <div class="carte-stat">
-            <div class="icone-stat sortie"><i class="fas fa-arrow-right-from-bracket"></i></div>
-            <div>
-                <div class="etiquette-stat">Exits</div>
-                <!-- Mis à jour par loadStats() -->
-                <div class="valeur-stat" id="statSorties">—</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ===== TABLEAU DES PRÉSENCES ===== -->
-    <div class="carte-table">
-        <!-- Barre d'outils : titre + compteur + barre de recherche -->
-        <div class="barre-outils">
-            <div class="titre-barre-outils">
-                <i class="fas fa-table-list"></i>
-                <span id="tableTitle">Global Presence</span>
-                <!-- Badge compteur mis à jour dynamiquement -->
-                <span class="badge-compteur" id="countBadge">—</span>
-            </div>
-            <!-- Champ de recherche qui filtre les lignes visibles en temps réel -->
-            <div class="enveloppe-recherche">
-                <i class="fas fa-search"></i>
-                <input type="text" class="champ-recherche" id="searchInput" placeholder="Rechercher..."
-                    oninput="filterTable()">
+            <div class="carte-stat">
+                <div class="icone-stat sortie"><i class="fas fa-arrow-right-from-bracket"></i></div>
+                <div>
+                    <div class="etiquette-stat">Exits</div>
+                    <!-- Mis à jour par loadStats() -->
+                    <div class="valeur-stat" id="statSorties">—</div>
+                </div>
             </div>
         </div>
 
-        <div class="table-responsive">
-            <!--
+        <!-- ===== TABLEAU DES PRÉSENCES ===== -->
+        <div class="carte-table">
+            <!-- Barre d'outils : titre + compteur + barre de recherche -->
+            <div class="barre-outils">
+                <div class="titre-barre-outils">
+                    <i class="fas fa-table-list"></i>
+                    <span id="tableTitle">Global Presence</span>
+                    <!-- Badge compteur mis à jour dynamiquement -->
+                    <span class="badge-compteur" id="countBadge">—</span>
+                </div>
+                <!-- Champ de recherche qui filtre les lignes visibles en temps réel -->
+                <div class="enveloppe-recherche">
+                    <i class="fas fa-search"></i>
+                    <input type="text" class="champ-recherche" id="searchInput" placeholder="Rechercher..."
+                        oninput="filterTable()">
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <!--
                 TABLE PRINCIPALE
                 Colonnes :
                   1. Étudiant   → Nom complet + avatar avec initiales
@@ -814,31 +814,31 @@
                   4. Date/Heure → Horodatage exact du pointage (colonne date_inscription)
                   5. Type       → Badge Entrée (vert) ou Sortie (rouge)
             -->
-            <table id="presencesTable">
-                <thead>
-                    <tr>
-                        <th>Student</th>
-                        <th>Id number</th>
-                        <th>Cohort / Field</th>
-                        <th>Date &amp; Time</th>
-                        <th>Geo Status</th>
-                        <th>Type</th>
-                    </tr>
-                </thead>
-                <!-- Le corps du tableau est rempli dynamiquement par renderRows() -->
-                <tbody id="presencesBody">
-                    <tr>
-                        <td colspan="6" style="padding:0; border:none;">
-                            <div class="loading-state">
-                                <i class="fas fa-spinner fa-spin"></i>
-                                Loading...
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+                <table id="presencesTable">
+                    <thead>
+                        <tr>
+                            <th>Student</th>
+                            <th>Id number</th>
+                            <th>Cohort / Field</th>
+                            <th>Date &amp; Time</th>
+                            <th>Geo Status</th>
+                            <th>Type</th>
+                        </tr>
+                    </thead>
+                    <!-- Le corps du tableau est rempli dynamiquement par renderRows() -->
+                    <tbody id="presencesBody">
+                        <tr>
+                            <td colspan="6" style="padding:0; border:none;">
+                                <div class="loading-state">
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                    Loading...
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
-    </div>
 
     </div><!-- /container -->
 
@@ -1131,27 +1131,39 @@
          *   4. Génération du fichier avec la date du jour dans le nom
          */
         function exportExcel() {
-            const table = document.getElementById('presencesTable');
-
-            if (!table || currentData.length === 0) {
-                alert('no data to export.');
+            // Vérification si des données sont disponibles
+            if (!currentData || currentData.length === 0) {
+                alert('Aucune donnée à exporter.');
                 return;
             }
 
-            // Conversion du tableau HTML en feuille SheetJS
-            const ws = XLSX.utils.table_to_sheet(table);
+            // Transformation des données pour correspondre exactement à l'image demandée
+            // On mappe chaque objet de currentData (issu de l'API) vers un nouvel objet avec les bonnes colonnes
+            const dataToExport = currentData.map(p => ({
+                'MATRICULE': p.matricule || '',
+                'NOM': (p.nom || '').toUpperCase(),        // Souvent en majuscules dans les listes
+                'POSTNOM': (p.postnom || '').toUpperCase(),
+                'PRENOM': p.prenom || '',
+                'SEXE': p.sexe || '',
+                'FACULTÉ': p.faculte || p.filiere || '',     // Priorité à faculte, sinon filiere
+                'PROMOTION': p.promotion || ''
+            }));
 
-            // Création du classeur Excel
+            // Conversion des données JSON en feuille de calcul (Sheet)
+            const ws = XLSX.utils.json_to_sheet(dataToExport);
+
+            // Création d'un nouveau classeur (Workbook)
             const wb = XLSX.utils.book_new();
+            // Ajout de la feuille au classeur sous le nom "Présences"
             XLSX.utils.book_append_sheet(wb, ws, 'Présences');
 
-            // Nom de fichier avec la date : Presences_UPL_16-03-2026.xlsx
+            // Préparation du nom du fichier : Presences_UPL_PROMO_DATE.xlsx
             const today = new Date();
             const dateStr = today.toLocaleDateString('fr-FR').replace(/\//g, '-');
             const promo = currentPromo ? `_${currentPromo}` : '_Global';
             const filename = `Presences_UPL${promo}_${dateStr}.xlsx`;
 
-            // Déclenchement du téléchargement automatique
+            // Déclenchement du téléchargement automatique du fichier Excel
             XLSX.writeFile(wb, filename);
         }
 
