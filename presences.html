@@ -639,6 +639,95 @@
             color: #475569;
             white-space: nowrap;
         }
+        /* ===== MODAL D'EXPORT EXCEL ===== */
+        .modal-export {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-export.visible {
+            display: flex;
+        }
+
+        .contenu-modal {
+            background: white;
+            padding: 30px;
+            border-radius: var(--radius-lg);
+            width: 90%;
+            max-width: 450px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            position: relative;
+            animation: slideIn 0.3s ease;
+        }
+
+        .titre-modal {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--navy);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .groupe-form {
+            margin-bottom: 20px;
+        }
+
+        .label-modal {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+
+        .select-modal {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-md);
+            font-family: inherit;
+            font-size: 0.9rem;
+            outline: none;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .select-modal:focus {
+            border-color: var(--navy);
+        }
+
+        .actions-modal {
+            display: flex;
+            gap: 12px;
+            margin-top: 30px;
+        }
+
+        .actions-modal .bouton {
+            flex: 1;
+            justify-content: center;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
     </style>
 </head>
 
@@ -1130,41 +1219,85 @@
          *   3. Création d'un classeur et ajout de la feuille
          *   4. Génération du fichier avec la date du jour dans le nom
          */
+        /**
+         * 6. EXPORT EXCEL (SheetJS)
+         * ==========================
+         * Affiche d'abord un modal pour filtrer les données (Entrée/Sortie, Matin/Après-midi)
+         * puis déclenche l'exportation.
+         */
         function exportExcel() {
-            // Vérification si des données sont disponibles
             if (!currentData || currentData.length === 0) {
                 alert('Aucune donnée à exporter.');
                 return;
             }
+            // Affiche la fenêtre d'options
+            document.getElementById('exportModal').classList.add('visible');
+        }
 
-            // Transformation des données pour correspondre exactement à l'image demandée
-            // On mappe chaque objet de currentData (issu de l'API) vers un nouvel objet avec les bonnes colonnes
-            const dataToExport = currentData.map(p => ({
+        function closeExportModal() {
+            document.getElementById('exportModal').classList.remove('visible');
+        }
+
+        /**
+         * CONFIRMATION DE L'EXPORTATION
+         * Applique les filtres choisis dans le modal et génère le fichier.
+         */
+        function confirmExport() {
+            const typeFilter = document.getElementById('exportType').value;
+            const momentFilter = document.getElementById('exportMoment').value;
+
+            // 1. Filtrage des données selon les choix de l'utilisateur
+            let filteredData = currentData.filter(p => {
+                // Filtre par type (Entrée/Sortie)
+                const matchType = (typeFilter === 'Tous') || (p.type_presence === typeFilter);
+                
+                // Filtre par moment (Matin < 12h00 / Après-midi >= 12h00)
+                let matchMoment = true;
+                if (momentFilter !== 'Tout' && p.formatted_time) {
+                    const hour = parseInt(p.formatted_time.split(':')[0]);
+                    if (momentFilter === 'Matin') {
+                        matchMoment = (hour < 12);
+                    } else if (momentFilter === 'ApresMidi') {
+                        matchMoment = (hour >= 12);
+                    }
+                }
+                
+                return matchType && matchMoment;
+            });
+
+            if (filteredData.length === 0) {
+                alert('Aucun enregistrement ne correspond à ces critères.');
+                return;
+            }
+
+            // 2. Transformation pour l'export (Colonnes demandées)
+            const dataToExport = filteredData.map(p => ({
                 'MATRICULE': p.matricule || '',
-                'NOM': (p.nom || '').toUpperCase(),        // Souvent en majuscules dans les listes
+                'NOM': (p.nom || '').toUpperCase(),
                 'POSTNOM': (p.postnom || '').toUpperCase(),
                 'PRENOM': p.prenom || '',
                 'SEXE': p.sexe || '',
-                'FACULTÉ': p.faculte || p.filiere || '',     // Priorité à faculte, sinon filiere
+                'FACULTÉ': p.faculte || p.filiere || '',
                 'PROMOTION': p.promotion || ''
             }));
 
-            // Conversion des données JSON en feuille de calcul (Sheet)
+            // 3. Génération du fichier Excel via SheetJS
             const ws = XLSX.utils.json_to_sheet(dataToExport);
-
-            // Création d'un nouveau classeur (Workbook)
             const wb = XLSX.utils.book_new();
-            // Ajout de la feuille au classeur sous le nom "Présences"
             XLSX.utils.book_append_sheet(wb, ws, 'Présences');
 
-            // Préparation du nom du fichier : Presences_UPL_PROMO_DATE.xlsx
             const today = new Date();
             const dateStr = today.toLocaleDateString('fr-FR').replace(/\//g, '-');
             const promo = currentPromo ? `_${currentPromo}` : '_Global';
-            const filename = `Presences_UPL${promo}_${dateStr}.xlsx`;
+            
+            // On ajoute les filtres dans le nom du fichier pour s'y retrouver
+            const filterStr = `_${typeFilter}_${momentFilter}`;
+            const filename = `Presences_UPL${promo}${filterStr}_${dateStr}.xlsx`;
 
-            // Déclenchement du téléchargement automatique du fichier Excel
             XLSX.writeFile(wb, filename);
+
+            // Fermer le modal après l'export
+            closeExportModal();
         }
 
         /**
@@ -1178,6 +1311,38 @@
             loadStats('');
         });
     </script>
+
+    <!-- ===== MODAL EXPORT EXCEL ===== -->
+    <div id="exportModal" class="modal-export">
+        <div class="contenu-modal">
+            <div class="titre-modal">
+                <i class="fas fa-file-excel"></i> Export Settings
+            </div>
+            
+            <div class="groupe-form">
+                <label class="label-modal">Type of attendance</label>
+                <select id="exportType" class="select-modal">
+                    <option value="Tous">All (In & Out)</option>
+                    <option value="Entrée">Arrivals (Entrées) only</option>
+                    <option value="Sortie">Departures (Sorties) only</option>
+                </select>
+            </div>
+
+            <div class="groupe-form">
+                <label class="label-modal">Time period</label>
+                <select id="exportMoment" class="select-modal">
+                    <option value="Tout">All day</option>
+                    <option value="Matin">Morning (Before 12:00)</option>
+                    <option value="ApresMidi">Afternoon (After 12:00)</option>
+                </select>
+            </div>
+
+            <div class="actions-modal">
+                <button onclick="closeExportModal()" class="bouton bouton-contour">Cancel</button>
+                <button onclick="confirmExport()" class="bouton bouton-vert">Export now</button>
+            </div>
+        </div>
+    </div>
 
 </body>
 
