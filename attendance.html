@@ -25,12 +25,12 @@
         }
 
         .logo-universitaire {
-            width: 100px;
-            height: 100px;
+            width: 60px;
+            height: 60px;
             border-radius: 50%;
             object-fit: cover;
-            border: 3px solid white;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+            border: 2px solid white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
             background: white;
         }
 
@@ -53,7 +53,7 @@
 
         .Conteneur {
             width: 100%;
-            max-width: 650px;
+            max-width: 550px;
             display: flex;
             border-radius: var(--radius-lg);
             overflow: hidden;
@@ -63,9 +63,9 @@
         }
 
         .panneau-lateral {
-            flex: 0.7;
+            flex: 0.6;
             background: navy;
-            padding: 24px;
+            padding: 20px;
             color: white;
             display: flex;
             flex-direction: column;
@@ -103,19 +103,19 @@
         }
 
         .panneau-formulaire {
-            flex: 1.3;
-            padding: 24px 28px;
+            flex: 1.4;
+            padding: 20px 24px;
             background: white;
         }
 
         .titre-formulaire {
-            font-size: 1.25rem;
+            font-size: 1.1rem;
             font-weight: 700;
-            margin-bottom: 16px;
+            margin-bottom: 12px;
         }
 
         .groupe-formulaire {
-            margin-bottom: 12px;
+            margin-bottom: 8px;
         }
 
         .etiquette-formulaire {
@@ -127,11 +127,11 @@
 
         .champ-formulaire {
             width: 100%;
-            padding: 10px 14px;
+            padding: 8px 12px;
             background: #f8fafc;
             border: 1px solid #e2e8f0;
             border-radius: var(--radius-md);
-            font-size: 12px;
+            font-size: 11px;
             font-family: inherit;
             transition: var(--transition);
         }
@@ -186,8 +186,8 @@
             <div class="conteneur-logo">
                 <img src="{{ url_for('static', filename='logo_upl.png') }}" class="logo-universitaire" alt="Logo UPL">
             </div>
-            <h1 class="titre-marque">UPL</h1>
-            <p class="description-marque">Scan or enter your matricule for attendance.</p>
+            <h1 class="titre-marque" style="font-size: 1.2rem; margin-bottom: 4px;">UPL</h1>
+            <p class="description-marque" style="font-size: 0.75rem;">Scan or enter your matricule.</p>
         </aside>
 
         <main class="panneau-formulaire">
@@ -195,32 +195,31 @@
 
             <!-- Zone d'affichage des infos de l'étudiant trouvées via AJAX -->
             <div id="student-info-badge"
-                style="display: none; background: #f1f5f9; padding: 12px; border-radius: 12px; margin-bottom: 15px; border-left: 4px solid navy;">
-                <p id="info-name" style="font-weight: 700; font-size: 0.9rem; color: navy;"></p>
-                <p id="info-promo" style="font-size: 0.75rem; color: #64748b;"></p>
+                style="display: none; background: #f1f5f9; padding: 8px 12px; border-radius: 10px; margin-bottom: 10px; border-left: 4px solid navy;">
+                <p id="info-name" style="font-weight: 700; font-size: 0.82rem; color: navy;"></p>
+                <p id="info-promo" style="font-size: 0.7rem; color: #64748b;"></p>
             </div>
 
             <!-- Message de succès (Ticket) -->
             <div id="success-ticket"
-                style="display: none; background: #dcfce7; padding: 20px; border-radius: 16px; border: 2px solid #16a34a; text-align: center; margin-bottom: 15px; animation: slideDown 0.4s ease-out;">
-                <div style="font-size: 2.5rem; margin-bottom: 10px;">✅</div>
-                <h3 style="color: #15803d; margin-bottom: 5px;">Attendance Recorded!</h3>
-                <p id="ticket-details" style="font-size: 0.85rem; color: #166534;"></p>
-                <div style="margin-top: 15px; font-size: 0.75rem; color: #15803d; font-weight: 600;">
-                    Next scan possible in : <span id="cooldown-timer">30</span>s
-                    <!-- par ici j'ai definit le temps d'unn nouveau scan -->
+                style="display: none; background: #dcfce7; padding: 15px; border-radius: 12px; border: 2px solid #16a34a; text-align: center; margin-bottom: 15px; animation: slideDown 0.4s ease-out;">
+                <div style="font-size: 1.8rem; margin-bottom: 6px;">✅</div>
+                <h3 style="color: #15803d; margin-bottom: 4px; font-size: 1rem;">Success!</h3>
+                <p id="ticket-details" style="font-size: 0.75rem; color: #166534;"></p>
+                <div style="margin-top: 10px; font-size: 0.7rem; color: #15803d; font-weight: 600;">
+                    Next scan in : <span id="cooldown-timer">30</span>s
                 </div>
             </div>
 
             <!-- Section Contrôle Aléatoire (PIN) -->
-            <div id="random-check-zone" style="display: none; background: #fff7ed; padding: 20px; border-radius: 16px; border: 2px solid #ea580c; text-align: center; margin-bottom: 15px;">
-                <h3 style="color: #9a3412; margin-bottom: 10px;">Verification Requise 🛡️</h3>
-                <p style="font-size: 0.85rem; color: #c2410c; margin-bottom: 15px;">Veuillez saisir le code PIN affiché par le professeur.</p>
-                <div style="display: flex; gap: 10px; justify-content: center;">
-                    <input type="text" id="pin_value" maxlength="4" placeholder="0000" style="width: 80px; text-align: center; padding: 10px; border: 2px solid #fdba74; border-radius: 8px; font-size: 1.2rem; font-weight: bold;">
-                    <button type="button" id="verify-pin-btn" class="bouton-validation" style="width: auto; padding: 10px 20px; background: #ea580c;">Vérifier</button>
+            <div id="random-check-zone" style="display: none; background: #fff7ed; padding: 15px; border-radius: 12px; border: 2px solid #ea580c; text-align: center; margin-bottom: 12px;">
+                <h3 style="color: #9a3412; margin-bottom: 6px; font-size: 0.95rem;">Vérification 🛡️</h3>
+                <p style="font-size: 0.75rem; color: #c2410c; margin-bottom: 10px;">Saisissez le code PIN du professeur.</p>
+                <div style="display: flex; gap: 8px; justify-content: center;">
+                    <input type="text" id="pin_value" maxlength="4" placeholder="0000" style="width: 70px; text-align: center; padding: 8px; border: 2px solid #fdba74; border-radius: 8px; font-size: 1rem; font-weight: bold;">
+                    <button type="button" id="verify-pin-btn" class="bouton-validation" style="width: auto; padding: 8px 16px; background: #ea580c; font-size: 0.8rem;">OK</button>
                 </div>
-                <p id="pin-status" style="margin-top: 10px; font-size: 0.75rem; font-weight: 600;"></p>
+                <p id="pin-status" style="margin-top: 8px; font-size: 0.7rem; font-weight: 600;"></p>
             </div>
 
             <form action="/check_attendance" method="post" id="attendance-form"

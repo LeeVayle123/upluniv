@@ -244,7 +244,8 @@ def add_student_form():
 def attendance():
     return render_template('attendance.html')
 
-# --- LOGIQUE DE RÉCUPÉRATION ET @app.route('/check_attendance', methods=['POST'])
+# --- LOGIQUE DE RÉCUPÉRATION ET TRAITEMENT DES DONNÉES ---
+@app.route('/check_attendance', methods=['POST'])
 def check_attendance():
     """
     SYSTÈME DE VALIDATION DE PRÉSENCE EN AUDITOIRE.
@@ -403,19 +404,21 @@ def check_attendance():
 
 @app.route('/api/student/<matricule>')
 def get_student_info(matricule):
+    print(f"DEBUG: get_student_info called for {matricule}")
     """
-    Recherche un étudiant par son matricule dans toutes les tables de promotions.
-    Retourne les informations au format JSON (Objet avec clés nom, prenom, etc.)
+    Recherche un étudiant par son matricule dans toutes les promotions.
     """
     matricule = matricule.strip()
+    # On utilise des noms de tables en minuscules pour la compatibilité MySQL
     tables = [
-        'bac1_IAGE', 'bac2_IAGE', 'bac3_IAGE',
-        'bac1_tech_IA', 'bac1_tech_GL', 'bac1_tech_SI',
-        'bac2_tech_IA', 'bac2_tech_GL', 'bac2_tech_SI',
-        'bac3_tech_IA', 'bac3_tech_GL', 'bac3_tech_SI',
-        'bac4_tech_IA', 'bac4_tech_GL', 'bac4_tech_SI'
+        'bac1_iage', 'bac2_iage', 'bac3_iage',
+        'bac1_tech_ia', 'bac1_tech_gl', 'bac1_tech_si',
+        'bac2_tech_ia', 'bac2_tech_gl', 'bac2_tech_si',
+        'bac3_tech_ia', 'bac3_tech_gl', 'bac3_tech_si',
+        'bac4_tech_ia', 'bac4_tech_gl', 'bac4_tech_si'
     ]
     
+    conn = None
     try:
         conn = get_db_connection()
         if isinstance(conn, sqlite3.Connection):
@@ -424,53 +427,55 @@ def get_student_info(matricule):
         else:
             cursor = conn.cursor(dictionary=True)
         
+        found_data = None
         for table in tables:
             query = f"SELECT * FROM {table} WHERE matricule = %s"
             execute_sql(cursor, query, (matricule,))
             result = cursor.fetchone()
-            
             if result:
-                # Conversion en dictionnaire
-                student_dict = dict(result) if isinstance(conn, sqlite3.Connection) else result
-                
-                # Récupération du statut actuel des présences d'aujourd'hui
-                now_lubumbashi = datetime.now(timezone(timedelta(hours=2))).replace(tzinfo=None)
-                today_date = now_lubumbashi.strftime('%Y-%m-%d')
-                
-                query_status = "SELECT type_presence FROM presences WHERE matricule = %s AND date(date_inscription) = %s ORDER BY date_inscription DESC"
-                execute_sql(cursor, query_status, (matricule, today_date))
-                history = cursor.fetchall()
-                
-                today_types = [row['type_presence'] if isinstance(row, (dict, sqlite3.Row)) else row[0] for row in history]
-                
-                student_dict['last_type'] = today_types[0] if today_types else None
-                student_dict['count_today'] = len(today_types)
-                
-                # Vérification s'il y a un contrôle aléatoire en attente
-                query_check = """
-                    SELECT c.id, c.check_type, c.status 
-                    FROM attendance_checks c
-                    JOIN attendance_attempts a ON c.attempt_id = a.id
-                    WHERE a.student_external_id = %s AND c.status = 'PENDING'
-                    ORDER BY c.sent_at DESC LIMIT 1
-                """
-                execute_sql(cursor, query_check, (matricule,))
-                check = cursor.fetchone()
-                if check:
-                    student_dict['pending_check'] = dict(check) if not isinstance(check, tuple) else {'id': check[0], 'type': check[1]}
-                else:
-                    student_dict['pending_check'] = None
+                found_data = dict(result) if not isinstance(result, dict) else result
+                break
+        
+        if found_data:
+            # Stats de présence pour aujourd'hui
+            now_lub = datetime.now(timezone(timedelta(hours=2))).replace(tzinfo=None)
+            today = now_lub.strftime('%Y-%m-%d')
+            
+            query_stats = "SELECT type_presence FROM presences WHERE matricule = %s AND date(date_inscription) = %s ORDER BY date_inscription DESC"
+            execute_sql(cursor, query_stats, (matricule, today))
+            history = cursor.fetchall()
+            
+            types = [row['type_presence'] if isinstance(row, dict) else row[0] for row in history]
+            found_data['last_type'] = types[0] if types else None
+            found_data['count_today'] = len(types)
+            
+            # Vérification de contrôle aléatoire en attente
+            q_check = """
+                SELECT c.id, c.check_type 
+                FROM attendance_checks c
+                JOIN attendance_attempts a ON c.attempt_id = a.id
+                WHERE a.student_external_id = %s AND c.status = 'PENDING'
+                ORDER BY c.sent_at DESC LIMIT 1
+            """
+            execute_sql(cursor, q_check, (matricule,))
+            check_res = cursor.fetchone()
+            if check_res:
+                found_data['pending_check'] = dict(check_res) if not isinstance(check_res, dict) else check_res
+            else:
+                found_data['pending_check'] = None
 
-                cursor.close()
-                conn.close()
-                return jsonify(student_dict)
+            cursor.close()
+            conn.close()
+            return jsonify(found_data)
         
         cursor.close()
         conn.close()
         return jsonify({"error": "Étudiant non trouvé"}), 404
         
-    except (mysql.connector.Error, sqlite3.Error, Exception) as err:
-        return jsonify({"error": str(err)}), 500
+    except Exception as e:
+        traceback.print_exc()
+        if conn: conn.close()
+        return jsonify({"error": str(e)}), 500
 
 @app.route('/generate_qr')
 def generate_qr():
@@ -1286,6 +1291,6 @@ def reset_table():
 
 # Lancement du serveur
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='127.0.0.1', port=5000, debug=False, threaded=True)
 
 #deuxième système antifraude avec GPS pour chaque zone deja definit. 
