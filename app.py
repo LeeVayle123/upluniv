@@ -404,8 +404,10 @@ def check_attendance():
         return jsonify({"status": "error", "message": str(e)}), 500
 
 
-@app.route('/api/student/<matricule>')
+@app.route('/api/student/<path:matricule>')
 def get_student_info(matricule):
+    # Log pour debug
+    print(f"API: Recherche de l'étudiant {matricule}")
     print(f"DEBUG: get_student_info called for {matricule}")
     """
     Recherche un étudiant par son matricule dans toutes les promotions.
@@ -443,11 +445,15 @@ def get_student_info(matricule):
             now_lub = datetime.now(timezone(timedelta(hours=2))).replace(tzinfo=None)
             today = now_lub.strftime('%Y-%m-%d')
             
-            query_stats = "SELECT type_presence FROM presences WHERE matricule = %s AND date(date_inscription) = %s ORDER BY date_inscription DESC"
-            execute_sql(cursor, query_stats, (matricule, today))
-            history = cursor.fetchall()
+            try:
+                query_stats = "SELECT type_presence FROM presences WHERE matricule = %s AND date(date_inscription) = %s ORDER BY date_inscription DESC"
+                execute_sql(cursor, query_stats, (matricule, today))
+                history = cursor.fetchall()
+                types = [row['type_presence'] if isinstance(row, dict) else row[0] for row in history]
+            except Exception as e_stats:
+                print(f"Erreur stats: {e_stats}")
+                types = []
             
-            types = [row['type_presence'] if isinstance(row, dict) else row[0] for row in history]
             found_data['last_type'] = types[0] if types else None
             found_data['count_today'] = len(types)
             

@@ -351,11 +351,17 @@
 
                 lookupTimeout = setTimeout(() => {
                     loading.style.display = 'block';
-                    fetch(`/api/student/${matricule}`)
-                        .then(res => res.json())
+                    fetch(`/api/student/${encodeURIComponent(matricule)}`)
+                        .then(res => {
+                            if (!res.ok) {
+                                if (res.status === 404) throw new Error("Étudiant non trouvé");
+                                throw new Error("Erreur serveur (HTTP " + res.status + ")");
+                            }
+                            return res.json();
+                        })
                         .then(data => {
                             loading.style.display = 'none';
-                            if (data.error) throw new Error();
+                            if (data.error) throw new Error(data.error);
 
                             // Mise à jour des informations
                             infoName.textContent = `${data.nom} ${data.prenom}`;
@@ -418,11 +424,20 @@
                                 };
                             }
                         })
-                        .catch(() => {
+                        .catch((error) => {
                             loading.style.display = 'none';
                             badge.style.display = 'none';
                             submitBtn.disabled = true;
                             submitBtn.innerHTML = "Validate my attendance";
+                            
+                            // Affichage de l'erreur dans la zone de statut
+                            const status = document.getElementById('gps-status');
+                            status.innerHTML = "❌ Recherche échouée : " + (error.message || "Erreur inconnue");
+                            status.style.color = "#dc2626";
+                            status.style.background = "#fee2e2";
+                            status.style.padding = "10px";
+                            status.style.borderRadius = "8px";
+                            status.style.display = 'block';
                         });
                 }, 500);
             });
