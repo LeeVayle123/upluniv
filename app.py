@@ -73,13 +73,18 @@ if PUBLIC_URL and not PUBLIC_URL.startswith(('http://', 'https://')):
 
 # --- CONFIGURATION DE LA CONNEXION À LA BASE DE DONNÉES ---
 def get_db_connection():
-    # Détection de l'environnement : Si on est sur Render, on utilise SQLite
-    if os.environ.get('RENDER') or not host:
+    # Détection de l'environnement : Si host n'est pas configuré, on utilise SQLite
+    # Si on est sur Render et que host est configuré (ex: MySQL externe), on utilise MySQL
+    is_render = os.environ.get('RENDER') is not None
+    if not host or (is_render and not host):
+        if is_render: print("BD: Utilisation de SQLite (Environnement Render)")
+        else: print("BD: Utilisation de SQLite (Défaut local)")
         conn = sqlite3.connect('database.db')
-        conn.row_factory = sqlite3.Row  # Pour avoir des résultats sous forme de dictionnaire comme avec MySQL
+        conn.row_factory = sqlite3.Row
         return conn
     
-    # Sinon on utilise MySQL (XAMPP local)
+    # Sinon on utilise MySQL
+    print(f"BD: Connexion à MySQL ({host})")
     return mysql.connector.connect(
         host=host,
         user=user,
@@ -411,11 +416,11 @@ def get_student_info(matricule):
     matricule = matricule.strip()
     # On utilise des noms de tables en minuscules pour la compatibilité MySQL
     tables = [
-        'bac1_iage', 'bac2_iage', 'bac3_iage',
-        'bac1_tech_ia', 'bac1_tech_gl', 'bac1_tech_si',
-        'bac2_tech_ia', 'bac2_tech_gl', 'bac2_tech_si',
-        'bac3_tech_ia', 'bac3_tech_gl', 'bac3_tech_si',
-        'bac4_tech_ia', 'bac4_tech_gl', 'bac4_tech_si'
+        'bac1_IAGE', 'bac2_IAGE', 'bac3_IAGE',
+        'bac1_tech_IA', 'bac1_tech_GL', 'bac1_tech_SI',
+        'bac2_tech_IA', 'bac2_tech_GL', 'bac2_tech_SI',
+        'bac3_tech_IA', 'bac3_tech_GL', 'bac3_tech_SI',
+        'bac4_tech_IA', 'bac4_tech_GL', 'bac4_tech_SI'
     ]
     
     conn = None
