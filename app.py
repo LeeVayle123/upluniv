@@ -167,6 +167,70 @@ def init_sqlite_db():
                 date_inscription DATETIME DEFAULT CURRENT_TIMESTAMP
             )
         ''')
+
+        # Table des auditoriums
+        execute_sql(cursor, '''
+            CREATE TABLE IF NOT EXISTS auditoriums (
+                code TEXT PRIMARY KEY,
+                nom TEXT,
+                latitude REAL,
+                longitude REAL,
+                radius_m REAL DEFAULT 30,
+                floor INTEGER DEFAULT 0,
+                tolerance_m REAL DEFAULT 10,
+                version INTEGER DEFAULT 1
+            )
+        ''')
+
+        # Table des tentatives de présence (Immuable)
+        execute_sql(cursor, '''
+            CREATE TABLE IF NOT EXISTS attendance_attempts (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                student_external_id TEXT,
+                auditorium_code TEXT,
+                latitude REAL,
+                longitude REAL,
+                accuracy_meters REAL,
+                timestamp DATETIME,
+                device_id TEXT,
+                ip TEXT,
+                device_info TEXT,
+                distance REAL,
+                result TEXT,
+                reason TEXT,
+                auditorium_version INTEGER
+            )
+        ''')
+
+        # Table des contrôles aléatoires (PIN)
+        execute_sql(cursor, '''
+            CREATE TABLE IF NOT EXISTS attendance_checks (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                attempt_id INTEGER,
+                check_type TEXT DEFAULT 'PIN',
+                pin TEXT,
+                status TEXT DEFAULT 'PENDING',
+                sent_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                responded_at DATETIME,
+                FOREIGN KEY (attempt_id) REFERENCES attendance_attempts(id)
+            )
+        ''')
+        
+        # Insertion des données de base pour les auditoires si vide
+        execute_sql(cursor, "SELECT COUNT(*) FROM auditoriums")
+        if cursor.fetchone()[0] == 0:
+            auds = [
+                ('EC-101', 'Eco-A', -11.667, 27.483, 30, 1, 10, 1),
+                ('D-101', 'Droit-1', -11.668, 27.484, 25, 0, 10, 1),
+                ('B-101', 'Biblio', -11.669, 27.485, 40, 0, 15, 1),
+                ('IF-301', 'Info-301', -11.670, 27.486, 30, 3, 10, 1),
+                ('IF-101', 'Info-101', -11.671, 27.487, 30, 1, 10, 1),
+                ('IF-302', 'Info-302', -11.672, 27.488, 30, 3, 10, 1),
+                ('IF-102', 'Info-102', -11.673, 27.489, 30, 1, 10, 1),
+                ('IF-304', 'Info-304', -11.674, 27.490, 30, 3, 10, 1)
+            ]
+            for aud in auds:
+                execute_sql(cursor, "INSERT INTO auditoriums (code, nom, latitude, longitude, radius_m, floor, tolerance_m, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", aud)
         
         conn.commit()
         conn.close()
@@ -181,8 +245,12 @@ def upgrade_db():
         conn = get_db_connection()
         cursor = conn.cursor()
         
-        # 0. Création de 'presences' si elle n'existe pas (Sécurité pour Render)
-        if not isinstance(conn, sqlite3.Connection):
+        # 0. Création des tables de base si absentes
+        # Table 'presences'
+        if isinstance(conn, sqlite3.Connection):
+            # SQLite est géré par init_sqlite_db, mais on peut doubler ici par sécurité
+            pass
+        else:
              # MySQL version
              execute_sql(cursor, '''
                 CREATE TABLE IF NOT EXISTS presences (
@@ -200,7 +268,56 @@ def upgrade_db():
                     device_signature VARCHAR(100),
                     latitude DOUBLE,
                     longitude DOUBLE,
+                    status_geoloc VARCHAR(100) DEFAULT 'Inconnu',
                     date_inscription TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            ''')
+             
+             # Table 'auditoriums'
+             execute_sql(cursor, '''
+                CREATE TABLE IF NOT EXISTS auditoriums (
+                    code VARCHAR(50) PRIMARY KEY,
+                    nom VARCHAR(100),
+                    latitude DOUBLE,
+                    longitude DOUBLE,
+                    radius_m DOUBLE DEFAULT 30,
+                    floor INT DEFAULT 0,
+                    tolerance_m DOUBLE DEFAULT 10,
+                    version INT DEFAULT 1
+                )
+            ''')
+             
+             # Table 'attendance_attempts'
+             execute_sql(cursor, '''
+                CREATE TABLE IF NOT EXISTS attendance_attempts (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    student_external_id VARCHAR(50),
+                    auditorium_code VARCHAR(50),
+                    latitude DOUBLE,
+                    longitude DOUBLE,
+                    accuracy_meters DOUBLE,
+                    timestamp DATETIME,
+                    device_id VARCHAR(100),
+                    ip VARCHAR(45),
+                    device_info TEXT,
+                    distance DOUBLE,
+                    result VARCHAR(50),
+                    reason TEXT,
+                    auditorium_version INT
+                )
+            ''')
+             
+             # Table 'attendance_checks'
+             execute_sql(cursor, '''
+                CREATE TABLE IF NOT EXISTS attendance_checks (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    attempt_id INT,
+                    check_type VARCHAR(20) DEFAULT 'PIN',
+                    pin VARCHAR(10),
+                    status VARCHAR(20) DEFAULT 'PENDING',
+                    sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    responded_at DATETIME,
+                    FOREIGN KEY (attempt_id) REFERENCES attendance_attempts(id)
                 )
             ''')
         
