@@ -323,13 +323,17 @@ def check_attendance():
         
         student_data = None
         for table in tables:
-            query = f"SELECT nom, postnom, prenom, filiere, promotion, sexe, faculte, parcours FROM {table} WHERE matricule = %s"
-            execute_sql(cursor, query, (matricule,))
-            res = cursor.fetchone()
-            if res:
-                student_data = res
-                found = True
-                break
+            try:
+                # On utilise des MAJUSCULES pour correspondre à init_sqlite_db
+                query = f"SELECT nom, postnom, prenom, filiere, promotion, sexe, faculte, parcours FROM {table} WHERE matricule = %s"
+                execute_sql(cursor, query, (matricule,))
+                res = cursor.fetchone()
+                if res:
+                    student_data = res
+                    found = True
+                    break
+            except:
+                continue
         
         if not found:
             reason = "Matricule inconnu"
@@ -342,10 +346,15 @@ def check_attendance():
             device_res = cursor.fetchone()
             
             if device_res:
-                existing_sig = device_res['device_signature'] if not isinstance(device_res, tuple) else device_res[0]
-                if existing_sig != device_signature:
-                    reason = "Appareil différent utilisé"
-                    result = "Rejeté"
+                try:
+                    existing_sig = device_res['device_signature'] if not isinstance(device_res, dict) else device_res.get('device_signature')
+                    if not existing_sig and isinstance(device_res, (list, tuple)): existing_sig = device_res[0]
+                    
+                    if existing_sig and existing_sig != device_signature:
+                        reason = "Appareil différent utilisé"
+                        result = "Rejeté"
+                except:
+                    pass
 
             if result == "Accepté":
                 # Logique de séquence (Entrée -> Sortie)
@@ -353,8 +362,10 @@ def check_attendance():
                 execute_sql(cursor, check_sequence_query, (matricule, today_date))
                 history = cursor.fetchall()
                 
-                today_types = [row['type_presence'] if not isinstance(row, tuple) else row[0] for row in history]
-                last_type = today_types[0] if today_types else None
+                today_types = [row['type_presence'] if not isinstance(row, dict) else row.get('type_presence') for row in history]
+                # Fallback pour tuple
+                today_types = [t if t else (row[0] if isinstance(row, (list, tuple)) else None) for t, row in zip(today_types, history)]
+                last_type = today_types[0] if today_types and today_types[0] else None
                 
                 if type_presence == 'Entrée' and last_type == 'Entrée':
                     reason = "Déjà une entrée active"

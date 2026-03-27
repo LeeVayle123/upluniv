@@ -351,6 +351,14 @@
 
                 lookupTimeout = setTimeout(() => {
                     loading.style.display = 'block';
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = "🔍 Searching...";
+                    
+                    // Reset status to avoid confusion
+                    const status = document.getElementById('gps-status');
+                    if (status.innerHTML.includes("❌")) {
+                        status.style.display = 'none';
+                    }
                     fetch(`/api/student/${encodeURIComponent(matricule)}`)
                         .then(res => {
                             if (!res.ok) {
