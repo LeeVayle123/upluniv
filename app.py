@@ -16,14 +16,17 @@ import math
 
 # Aide pour la compatibilité MySQL/SQLite
 def execute_sql(cursor, query, params=None):
+    # On remplace par ? si on détecte SQLite ou si on n'est pas sûr
+    cursor_type = str(type(cursor)).lower()
+    is_mysql = 'mysql' in cursor_type
+    
+    actual_query = query
+    if not is_mysql:
+        actual_query = query.replace('%s', '?')
+        
     if params is None:
-        # On remplace %s par ? même sans paramètres car SQLite est strict
-        query = query.replace('%s', '?')
-        return cursor.execute(query)
-    # Si on utilise SQLite, on remplace %s par ?
-    if 'sqlite' in str(type(cursor)).lower():
-        query = query.replace('%s', '?')
-    return cursor.execute(query, params)
+        return cursor.execute(actual_query)
+    return cursor.execute(actual_query, params)
 
 def calculate_distance(lat1, lon1, lat2, lon2):
     """
@@ -411,8 +414,10 @@ def check_attendance():
 
     except Exception as e:
         traceback.print_exc()
-        if 'conn' in locals() and conn: conn.close()
-        return jsonify({"status": "error", "message": str(e)}), 500
+        if 'conn' in locals() and conn: 
+            try: conn.close()
+            except: pass
+        return jsonify({"error": f"Erreur Interne: {str(e)}"}), 500
 
 
 @app.route('/api/student/<path:matricule>')
