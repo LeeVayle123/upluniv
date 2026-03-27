@@ -73,12 +73,9 @@ if PUBLIC_URL and not PUBLIC_URL.startswith(('http://', 'https://')):
 
 # --- CONFIGURATION DE LA CONNEXION À LA BASE DE DONNÉES ---
 def get_db_connection():
-    # Détection de l'environnement : Si host n'est pas configuré, on utilise SQLite
-    # Si on est sur Render et que host est configuré (ex: MySQL externe), on utilise MySQL
-    is_render = os.environ.get('RENDER') is not None
-    if not host or (is_render and not host):
-        if is_render: print("BD: Utilisation de SQLite (Environnement Render)")
-        else: print("BD: Utilisation de SQLite (Défaut local)")
+    # Détection de l'environnement : Si on est sur Render, on utilise SQLite par défaut
+    if os.environ.get('RENDER') or not host:
+        print("BD: Utilisation de SQLite")
         conn = sqlite3.connect('database.db')
         conn.row_factory = sqlite3.Row
         return conn
