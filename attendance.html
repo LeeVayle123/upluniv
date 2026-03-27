@@ -212,11 +212,38 @@
                 </div>
             </div>
 
+            <!-- Section Contrôle Aléatoire (PIN) -->
+            <div id="random-check-zone" style="display: none; background: #fff7ed; padding: 20px; border-radius: 16px; border: 2px solid #ea580c; text-align: center; margin-bottom: 15px;">
+                <h3 style="color: #9a3412; margin-bottom: 10px;">Verification Requise 🛡️</h3>
+                <p style="font-size: 0.85rem; color: #c2410c; margin-bottom: 15px;">Veuillez saisir le code PIN affiché par le professeur.</p>
+                <div style="display: flex; gap: 10px; justify-content: center;">
+                    <input type="text" id="pin_value" maxlength="4" placeholder="0000" style="width: 80px; text-align: center; padding: 10px; border: 2px solid #fdba74; border-radius: 8px; font-size: 1.2rem; font-weight: bold;">
+                    <button type="button" id="verify-pin-btn" class="bouton-validation" style="width: auto; padding: 10px 20px; background: #ea580c;">Vérifier</button>
+                </div>
+                <p id="pin-status" style="margin-top: 10px; font-size: 0.75rem; font-weight: 600;"></p>
+            </div>
+
             <form action="/check_attendance" method="post" id="attendance-form"
                 style="display: flex; flex-direction: column; gap: 10px;">
                 <input type="hidden" name="device_signature" id="device_signature">
                 <input type="hidden" name="latitude" id="latitude">
                 <input type="hidden" name="longitude" id="longitude">
+                <input type="hidden" name="accuracy_meters" id="accuracy_meters">
+
+                <div class="groupe-formulaire">
+                    <label class="etiquette-formulaire" for="auditorium_code">Auditoire / Salle</label>
+                    <select id="auditorium_code" name="auditorium_code" class="champ-formulaire" required>
+                        <option value="" disabled selected>Choisir l'auditoire...</option>
+                        <option value="EC-101">EC-101</option>
+                        <option value="D-101">D-101</option>
+                        <option value="B-101">B-101</option>
+                        <option value="IF-301">IF-301</option>
+                        <option value="IF-101">IF-101</option>
+                        <option value="IF-302">IF-302</option>
+                        <option value="IF-102">IF-102</option>
+                        <option value="IF-304">IF-304</option>
+                    </select>
+                </div>
 
                 <div class="groupe-formulaire">
                     <label class="etiquette-formulaire" for="matricule">Matricule</label>
@@ -259,6 +286,7 @@
                     gpsSuccess = true;
                     document.getElementById('latitude').value = position.coords.latitude;
                     document.getElementById('longitude').value = position.coords.longitude;
+                    document.getElementById('accuracy_meters').value = position.coords.accuracy;
                     
                     const status = document.getElementById('gps-status');
                     status.innerHTML = "📍 Localisation capturée avec succès";
@@ -355,6 +383,41 @@
 
                             infoPromo.textContent = statusText;
                             badge.style.display = 'block';
+
+                            // GESTION DU CONTRÔLE ALÉATOIRE
+                            if (data.pending_check) {
+                                document.getElementById('random-check-zone').style.display = 'block';
+                                document.getElementById('attendance-form').style.display = 'none';
+                                
+                                // Action de vérification du PIN
+                                document.getElementById('verify-pin-btn').onclick = function() {
+                                    const pin = document.getElementById('pin_value').value;
+                                    const statusMsg = document.getElementById('pin-status');
+                                    
+                                    fetch('/api/attendance/check/respond', {
+                                        method: 'POST',
+                                        headers: {'Content-Type': 'application/json'},
+                                        body: JSON.stringify({
+                                            check_id: data.pending_check.id,
+                                            value: pin
+                                        })
+                                    })
+                                    .then(r => r.json())
+                                    .then(res => {
+                                        if (res.result === 'SUCCESS') {
+                                            statusMsg.innerHTML = "✅ Vérification réussie !";
+                                            statusMsg.style.color = "green";
+                                            setTimeout(() => {
+                                                document.getElementById('random-check-zone').style.display = 'none';
+                                                document.getElementById('attendance-form').style.display = 'flex';
+                                            }, 1500);
+                                        } else {
+                                            statusMsg.innerHTML = "❌ Code incorrect. Réessayez.";
+                                            statusMsg.style.color = "red";
+                                        }
+                                    });
+                                };
+                            }
                         })
                         .catch(() => {
                             loading.style.display = 'none';
