@@ -1126,33 +1126,7 @@ def view_students(promo=None):
 
 @app.route('/api/presences')
 def api_presences():
-    """
-    API endpoint qui retourne les présences au format JSON.
-    Permet de filtrer par promotion via le paramètre ?promotion=bac1_IAGE.
-    Utilisé par le frontend presences.html pour le filtrage par onglets
-    sans rechargement complet de la page.
-    """
     promo = request.args.get('promotion')
-
-    # Liste de toutes les tables autorisées (sécurité : on n'accepte que les tables connues)
-    allowed_tables = [
-        'bac1_IAGE', 'bac2_IAGE', 'bac3_IAGE',
-        'bac1_tech_IA', 'bac1_tech_GL', 'bac1_tech_SI',
-        'bac2_tech_IA', 'bac2_tech_GL', 'bac2_tech_SI',
-        'bac3_tech_IA', 'bac3_tech_GL', 'bac3_tech_SI',
-        'bac4_tech_IA', 'bac4_tech_GL', 'bac4_tech_SI'
-    ]
-
-    # Si une promotion spécifique est demandée, on ne lit qu'une table
-    if promo:
-        if promo not in allowed_tables:
-            return jsonify({"error": "Promotion invalide"}), 400
-        tables = [promo]
-    else:
-        # Sinon, on lit toutes les tables de présence
-        tables = allowed_tables
-
-    all_presences = []
 
     try:
         conn = get_db_connection()
@@ -1161,44 +1135,49 @@ def api_presences():
         else:
             cursor = conn.cursor(dictionary=True)
 
-        for table in tables:
-            presence_table = f"presence_{table}"
-            try:
-                execute_sql(cursor, f"SELECT * FROM {presence_table} ORDER BY date_inscription DESC")
-                rows_raw = cursor.fetchall()
-                for row_raw in rows_raw:
-                    # On convertit en dictionnaire pour permettre l'assignation (SQLite)
-                    row = dict(row_raw) if isinstance(row_raw, sqlite3.Row) else row_raw
-                    # Formatage de la date pour l'affichage (Gère MySQL et SQLite)
-                    dt = row['date_inscription']
-                    if dt:
-                        if isinstance(dt, str):
-                            try: dt = datetime.strptime(dt.split('.')[0], '%Y-%m-%d %H:%M:%S')
-                            except: pass
-                        
-                        if hasattr(dt, 'strftime'):
-                            row['formatted_date'] = dt.strftime('%d/%m/%Y')
-                            row['formatted_time'] = dt.strftime('%H:%M:%S')
-                            row['date_inscription_sort'] = dt.isoformat()
-                        else:
-                            row['formatted_date'] = str(dt)
-                            row['formatted_time'] = ""
-                            row['date_inscription_sort'] = str(dt)
-                    else:
-                        row['formatted_date'] = "N/A"
-                        row['formatted_time'] = "N/A"
-                        row['date_inscription_sort'] = ""
-                    all_presences.append(row)
-            except:
-                continue
+        # On interroge la table UNIQUE 'presences' (plus fiable)
+        if promo:
+            # On cherche par promotion (insensible à la casse si possible)
+            # Note: promo dans l'onglet est 'bac1_iage', dans la DB c'est 'BAC 1 IAGE' ?
+            # On va essayer de faire matcher.
+            query = "SELECT * FROM presences WHERE promotion LIKE %s ORDER BY date_inscription DESC"
+            search_promo = f"%{promo.replace('_', ' ')}%"
+            execute_sql(cursor, query, (search_promo,))
+        else:
+            execute_sql(cursor, "SELECT * FROM presences ORDER BY date_inscription DESC")
+            
+        rows_raw = cursor.fetchall()
+        all_presences = []
+
+        for row_raw in rows_raw:
+            row = dict(row_raw) if not isinstance(row_raw, dict) else row_raw
+            dt = row['date_inscription']
+            if dt:
+                if isinstance(dt, str):
+                    try: dt = datetime.strptime(dt.split('.')[0], '%Y-%m-%d %H:%M:%S')
+                    except: pass
+                
+                if hasattr(dt, 'strftime'):
+                    row['formatted_date'] = dt.strftime('%d/%m/%Y')
+                    row['formatted_time'] = dt.strftime('%H:%M:%S')
+                    row['date_inscription_sort'] = dt.isoformat()
+                else:
+                    row['formatted_date'] = str(dt)
+                    row['formatted_time'] = ""
+                    row['date_inscription_sort'] = str(dt)
+            else:
+                row['formatted_date'] = "N/A"
+                row['formatted_time'] = "N/A"
+                row['date_inscription_sort'] = ""
+            all_presences.append(row)
 
         cursor.close()
         conn.close()
-
-        # Sort by date descending
-        all_presences.sort(key=lambda x: x.get('date_inscription_sort', ''), reverse=True)
-
         return jsonify(all_presences)
+    except Exception as e:
+        traceback.print_exc()
+        if 'conn' in locals() and conn: conn.close()
+        return jsonify({"error": str(e)}), 500
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -1280,21 +1259,6 @@ def api_presence_stats():
     """
     promo = request.args.get('promotion')
 
-    allowed_tables = [
-        'bac1_IAGE', 'bac2_IAGE', 'bac3_IAGE',
-        'bac1_tech_IA', 'bac1_tech_GL', 'bac1_tech_SI',
-        'bac2_tech_IA', 'bac2_tech_GL', 'bac2_tech_SI',
-        'bac3_tech_IA', 'bac3_tech_GL', 'bac3_tech_SI',
-        'bac4_tech_IA', 'bac4_tech_GL', 'bac4_tech_SI'
-    ]
-
-    if promo:
-        if promo not in allowed_tables:
-            return jsonify({"error": "Promotion invalide"}), 400
-        tables = [promo]
-    else:
-        tables = allowed_tables
-
     total = 0
     entrees = 0
     sorties = 0
@@ -1306,20 +1270,21 @@ def api_presence_stats():
         else:
             cursor = conn.cursor(dictionary=True)
 
-        for table in tables:
-            presence_table = f"presence_{table}"
-            try:
-                # Compte le total et répartit par type_presence
-                execute_sql(cursor, f"SELECT type_presence FROM {presence_table}")
-                rows = cursor.fetchall()
-                for row in rows:
-                    total += 1
-                    if row['type_presence'] == 'Entrée':
-                        entrees += 1
-                    elif row['type_presence'] == 'Sortie':
-                        sorties += 1
-            except (mysql.connector.Error, sqlite3.Error, Exception):
-                continue
+        if promo:
+            search_promo = f"%{promo.replace('_', ' ')}%"
+            execute_sql(cursor, "SELECT type_presence FROM presences WHERE promotion LIKE %s", (search_promo,))
+        else:
+            execute_sql(cursor, "SELECT type_presence FROM presences")
+            
+        rows = cursor.fetchall()
+        for row in rows:
+            total += 1
+            # Handle both row dict and tuple
+            tp = row['type_presence'] if isinstance(row, dict) else row[0]
+            if tp == 'Entrée':
+                entrees += 1
+            elif tp == 'Sortie':
+                sorties += 1
 
         cursor.close()
         conn.close()

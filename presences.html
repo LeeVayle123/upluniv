@@ -765,6 +765,9 @@
                 <a href="/students" class="bouton bouton-contour">
                     <i class="fas fa-users"></i> Student List
                 </a>
+                <a href="/admin/timeline" class="bouton bouton-navy">
+                    <i class="fas fa-clock-rotate-left"></i> Timeline Suivi
+                </a>
                 <!-- Déclencheur de l'export Excel (voir fonction exportExcel() plus bas) -->
                 <button onclick="exportExcel()" class="bouton bouton-vert">
                     <i class="fas fa-file-excel"></i> Export Excel
@@ -1086,12 +1089,19 @@
 
                 // Badge de géolocalisation
                 let geoBadge = '';
-                if (p.status_geoloc === 'Validé') {
-                    geoBadge = `<span class="badge-valide"><i class="fas fa-map-marker-alt"></i> Validé</span>`;
-                } else if (p.status_geoloc === 'Fraude Hors-Campus') {
+                const sGeo = p.status_geoloc || 'Inconnu';
+                
+                if (sGeo.includes('Validé')) {
+                    geoBadge = `<span class="badge-valide"><i class="fas fa-map-marker-alt"></i> ${sGeo}</span>`;
+                } else if (sGeo.includes('Hors Zone')) {
+                    geoBadge = `<span class="badge-fraude"><i class="fas fa-triangle-exclamation"></i> ${sGeo}</span>`;
+                } else if (sGeo === 'Fraude Hors-Campus') {
                     geoBadge = `<span class="badge-fraude"><i class="fas fa-user-secret"></i> Fraude</span>`;
-                } else {
+                } else if (sGeo === 'Inconnu') {
                     geoBadge = `<span class="badge-gps-desactive"><i class="fas fa-location-arrow"></i> Inconnu</span>`;
+                } else {
+                    // Pour les autres cas (ex: 'confirmé', 'breaktime' du suivi)
+                    geoBadge = `<span class="badge-gps-desactive"><i class="fas fa-info-circle"></i> ${sGeo}</span>`;
                 }
 
                 return `
