@@ -480,19 +480,28 @@
                             const typeMsg = formData.get('type_presence') === 'Entrée' ? "Entrée confirmée" : "Sortie confirmée";
                             ticketDetails.innerHTML = `<strong>${infoName.textContent}</strong><br>${typeMsg} à ${new Date().toLocaleTimeString()}<br><br><em>Votre session est enregistrée.</em>`;
 
-                            // Lancement du cooldown de 20 secondes avant de permettre un nouveau scan
-                            let timeLeft = 20;
+                            // DÉMARRAGE DU SUIVI SI C'EST UNE ENTRÉE
+                            if (formData.get('type_presence') === 'Entrée') {
+                                TrackingEngine.start(formData.get('matricule'), formData.get('auditorium_code'));
+                            } else {
+                                TrackingEngine.stop();
+                            }
+
+                            // Lancement du cooldown de 30 secondes
+                            let timeLeft = 30;
                             const interval = setInterval(() => {
                                 timeLeft--;
                                 timerSpan.textContent = timeLeft;
                                 if (timeLeft <= 0) {
                                     clearInterval(interval);
                                     ticket.style.display = 'none';
+                                    
+                                    // Retour au formulaire
                                     form.style.display = 'flex';
                                     form.reset();
                                     submitBtn.innerHTML = '<i class="fa-solid fa-circle-check"></i> valider votre présance!';
                                     submitBtn.disabled = true;
-                                    timerSpan.textContent = "20";
+                                    timerSpan.textContent = "30";
                                     badge.style.display = 'none';
                                 }
                             }, 1000);
@@ -510,6 +519,152 @@
                         submitBtn.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> Erreur technique';
                     });
             });
+
+            // ==========================================
+            // MOTEUR DE SUIVI GPS (Commentaires Français)
+            // ==========================================
+            const TrackingEngine = {
+                config: null,
+                active: false,
+                matricule: null,
+                auditorium_code: null,
+                lastCheckedTime: null,
+                pendingReports: JSON.parse(localStorage.getItem('pending_reports') || '[]'),
+
+                init: function() {
+                    this.loadConfig();
+                    this.restoreSession();
+                    // Vérification toutes les 30 secondes
+                    setInterval(() => this.tick(), 30000);
+                    // Tentative de synchro toutes les minutes
+                    setInterval(() => this.syncOffline(), 60000);
+                },
+
+                loadConfig: function() {
+                    fetch('/api/tracking/config')
+                        .then(res => res.json())
+                        .then(data => {
+                            this.config = data;
+                            console.log("Tracking Config Loaded:", data);
+                        });
+                },
+
+                restoreSession: function() {
+                    const session = JSON.parse(localStorage.getItem('tracking_session'));
+                    if (session) {
+                        this.matricule = session.matricule;
+                        this.auditorium_code = session.auditorium_code;
+                        this.active = true;
+                        console.log("Tracking session restored for:", this.matricule);
+                    }
+                },
+
+                start: function(matricule, audCode) {
+                    this.matricule = matricule;
+                    this.auditorium_code = audCode;
+                    this.active = true;
+                    localStorage.setItem('tracking_session', JSON.stringify({
+                        matricule: matricule,
+                        auditorium_code: audCode,
+                        startTime: new Date().toISOString()
+                    }));
+                    console.log("Tracking started.");
+                },
+
+                stop: function() {
+                    this.active = false;
+                    this.matricule = null;
+                    this.auditorium_code = null;
+                    localStorage.removeItem('tracking_session');
+                    console.log("Tracking stopped.");
+                },
+
+                tick: function() {
+                    if (!this.active || !this.config) return;
+
+                    const now = new Date();
+                    const currentTime = now.getHours().toString().padStart(2, '0') + ":" + 
+                                      now.getMinutes().toString().padStart(2, '0');
+                    
+                    if (this.lastCheckedTime === currentTime) return;
+
+                    // On vérifie si l'heure actuelle est dans le planning
+                    const allChecks = [...this.config.morning_checks, ...this.config.afternoon_checks];
+                    
+                    if (allChecks.includes(currentTime)) {
+                        console.log("Scheduled check triggered at:", currentTime);
+                        this.lastCheckedTime = currentTime;
+                        this.captureAndReport(currentTime);
+                    }
+                    
+                    // Gestion de l'ouverture du formulaire de sortie
+                    this.updateUIForExit(currentTime);
+                },
+
+                updateUIForExit: function(currentTime) {
+                    // Si on est dans les heures de sortie, on force le select sur 'Sortie'
+                    const typeSelect = document.getElementById('type_presence');
+                    if (!typeSelect) return;
+
+                    if (currentTime >= this.config.morning_exit_open && currentTime < "13:00") {
+                        typeSelect.value = 'Sortie';
+                    } else if (currentTime >= this.config.afternoon_exit_open) {
+                        typeSelect.value = 'Sortie';
+                    }
+                },
+
+                captureAndReport: function(scheduledTime) {
+                    if (!navigator.geolocation) return;
+
+                    navigator.geolocation.getCurrentPosition((pos) => {
+                        const report = {
+                            matricule: this.matricule,
+                            auditorium_code: this.auditorium_code,
+                            latitude: pos.coords.latitude,
+                            longitude: pos.coords.longitude,
+                            accuracy_meters: pos.coords.accuracy,
+                            scheduled_time: scheduledTime,
+                            device_signature: document.getElementById('device_signature').value,
+                            timestamp: new Date().toISOString()
+                        };
+                        this.sendReport(report);
+                    }, (err) => {
+                        console.error("GPS Error during scheduled check:", err);
+                    }, { enableHighAccuracy: true });
+                },
+
+                sendReport: function(report) {
+                    fetch('/attendance/check/report', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(report)
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        console.log("Report sent successfully:", data);
+                    })
+                    .catch(err => {
+                        console.warn("Offline: Report buffered locally");
+                        this.pendingReports.push(report);
+                        localStorage.setItem('pending_reports', JSON.stringify(this.pendingReports));
+                    });
+                },
+
+                syncOffline: function() {
+                    if (this.pendingReports.length === 0) return;
+                    
+                    const reportsToSync = [...this.pendingReports];
+                    this.pendingReports = [];
+                    localStorage.setItem('pending_reports', '[]');
+
+                    reportsToSync.forEach(report => {
+                        this.sendReport(report);
+                    });
+                }
+            };
+
+            // Démarrage du moteur
+            TrackingEngine.init();
         </script>
 
         <style>

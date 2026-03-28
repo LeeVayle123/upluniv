@@ -74,6 +74,22 @@ PUBLIC_URL = os.environ.get('PUBLIC_URL', '')
 if PUBLIC_URL and not PUBLIC_URL.startswith(('http://', 'https://')):
     PUBLIC_URL = f"https://{PUBLIC_URL}"
 
+# --- CONFIGURATION DES HORAIRES DE SUIVI (Commentaires en Français) ---
+# Vous pouvez modifier ces heures ici. Format "HH:MM"
+# Heures de vérification pour la session du MATIN (Entrée possible dès 07:00)
+MORNING_CHECK_TIMES = ["09:00", "10:00", "10:30", "10:40", "11:00", "11:30", "11:55"]
+
+# Heures de vérification pour la session de l'APRÈS-MIDI (Entrée possible dès 12:36)
+AFTERNOON_CHECK_TIMES = ["14:00", "14:55", "15:00", "15:45", "16:30", "16:50"]
+
+# Heure d'ouverture globale du formulaire de sortie (le matin et l'après-midi)
+MORNING_EXIT_OPEN_TIME = "11:50"
+AFTERNOON_EXIT_OPEN_TIME = "16:50"
+
+# Délai de désactivation temporaire du formulaire après une sortie (en secondes)
+# Mis à 30 secondes pour vos tests selon votre demande.
+EXIT_COOLDOWN_SECONDS = 30 
+
 # --- CONFIGURATION DE LA CONNEXION À LA BASE DE DONNÉES ---
 def get_db_connection():
     # Détection de l'environnement : Si on est sur Render, on utilise SQLite par défaut
@@ -215,6 +231,55 @@ def init_sqlite_db():
                 FOREIGN KEY (attempt_id) REFERENCES attendance_attempts(id)
             )
         ''')
+
+        # Table auditoriums_versions
+        execute_sql(cursor, '''
+            CREATE TABLE IF NOT EXISTS auditoriums_versions (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                auditorium_code TEXT,
+                latitude REAL,
+                longitude REAL,
+                radius_m REAL,
+                tolerance_m REAL,
+                version INTEGER,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+
+        # Table random_checks (Vérifications programmées)
+        execute_sql(cursor, '''
+            CREATE TABLE IF NOT EXISTS random_checks (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                matricule TEXT,
+                auditorium_code TEXT,
+                type TEXT, -- 'SCHEDULED', 'PIN'
+                scheduled_time TEXT, -- HH:MM
+                status TEXT DEFAULT 'PENDING', -- 'PENDING', 'COMPLETED', 'MISSED'
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+
+        # Table random_check_responses (Rapports de suivi)
+        execute_sql(cursor, '''
+            CREATE TABLE IF NOT EXISTS random_check_responses (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                check_id INTEGER,
+                matricule TEXT,
+                auditorium_code TEXT,
+                auditorium_version_id INTEGER,
+                latitude REAL,
+                longitude REAL,
+                accuracy_meters REAL,
+                distance REAL,
+                timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+                device_id TEXT,
+                ip TEXT,
+                device_info TEXT,
+                result TEXT, -- 'confirmé', 'hors zone', 'breaktime', 'fraude', 'non vérifié'
+                reason TEXT,
+                FOREIGN KEY (check_id) REFERENCES random_checks(id)
+            )
+        ''')
         
         # Insertion des données de base pour les auditoires si vide
         execute_sql(cursor, "SELECT COUNT(*) FROM auditoriums")
@@ -320,6 +385,55 @@ def upgrade_db():
                     FOREIGN KEY (attempt_id) REFERENCES attendance_attempts(id)
                 )
             ''')
+
+             # Table 'auditoriums_versions'
+             execute_sql(cursor, '''
+                CREATE TABLE IF NOT EXISTS auditoriums_versions (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    auditorium_code VARCHAR(50),
+                    latitude DOUBLE,
+                    longitude DOUBLE,
+                    radius_m DOUBLE,
+                    tolerance_m DOUBLE,
+                    version INT,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            ''')
+
+             # Table 'random_checks'
+             execute_sql(cursor, '''
+                CREATE TABLE IF NOT EXISTS random_checks (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    matricule VARCHAR(50),
+                    auditorium_code VARCHAR(50),
+                    type VARCHAR(20),
+                    scheduled_time VARCHAR(10),
+                    status VARCHAR(20) DEFAULT 'PENDING',
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            ''')
+
+             # Table 'random_check_responses'
+             execute_sql(cursor, '''
+                CREATE TABLE IF NOT EXISTS random_check_responses (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    check_id INT,
+                    matricule VARCHAR(50),
+                    auditorium_code VARCHAR(50),
+                    auditorium_version_id INT,
+                    latitude DOUBLE,
+                    longitude DOUBLE,
+                    accuracy_meters DOUBLE,
+                    distance DOUBLE,
+                    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+                    device_id VARCHAR(100),
+                    ip VARCHAR(45),
+                    device_info TEXT,
+                    result VARCHAR(50),
+                    reason TEXT,
+                    FOREIGN KEY (check_id) REFERENCES random_checks(id)
+                )
+            ''')
         
         # 1. Vérification des colonnes pour la table 'presences'
         columns_to_add = [
@@ -419,17 +533,16 @@ def check_attendance():
         distance = calculate_distance(lat, lon, aud['latitude'], aud['longitude'])
         max_allowed_distance = aud['radius_m'] + aud['tolerance_m']
         
-        result = "Rejeté"
-        reason = ""
-        
         if lat is None or lon is None:
             reason = "GPS manquant"
+            result = "Rejeté"
         elif accuracy > ACCURACY_MAX:
             reason = f"Précision GPS insuffisante ({accuracy}m > {ACCURACY_MAX}m)"
-        elif distance > max_allowed_distance:
-            reason = f"Hors zone ({int(distance)}m de l'auditoire)"
+            result = "Rejeté"
         else:
             result = "Accepté"
+            if distance > max_allowed_distance:
+                reason = f"Hors zone ({int(distance)}m)"
 
         # 4. Vérification de l'étudiant dans les listes
         found = False
@@ -505,7 +618,11 @@ def check_attendance():
         # 6. Si validé, enregistrement final
         if result == "Accepté":
             nom, postnom, prenom, filiere, promotion, sexe, faculte, parcours = student_data
+            
+            # Status personnalisé pour l'admin si hors zone
             status_geoloc = f"Validé ({auditorium_code})"
+            if distance > max_allowed_distance:
+                status_geoloc = f"Hors Zone ({int(distance)}m)"
             
             # Table globale
             insert_query = """
@@ -536,6 +653,106 @@ def check_attendance():
             except: pass
         return jsonify({"error": f"Erreur Interne: {str(e)}"}), 500
 
+
+@app.route('/api/tracking/config')
+def get_tracking_config():
+    """
+    Renvoie les horaires et paramètres de suivi pour le client.
+    """
+    return jsonify({
+        "morning_checks": MORNING_CHECK_TIMES,
+        "afternoon_checks": AFTERNOON_CHECK_TIMES,
+        "exit_cooldown": EXIT_COOLDOWN_SECONDS,
+        "morning_exit_open": MORNING_EXIT_OPEN_TIME,
+        "afternoon_exit_open": AFTERNOON_EXIT_OPEN_TIME
+    })
+
+@app.route('/attendance/check/report', methods=['POST'])
+def check_report():
+    """
+    Point de terminaison pour recevoir les rapports de position programmés.
+    """
+    data = request.json
+    matricule = data.get('matricule')
+    auditorium_code = data.get('auditorium_code')
+    lat = data.get('latitude')
+    lon = data.get('longitude')
+    accuracy = data.get('accuracy_meters', 0)
+    scheduled_time = data.get('scheduled_time')
+    device_signature = data.get('device_signature')
+    
+    user_ip = request.remote_addr
+    device_info = request.headers.get('User-Agent', '')
+    now_lub = datetime.now(timezone(timedelta(hours=2))).replace(tzinfo=None)
+
+    if not all([matricule, auditorium_code, lat, lon]):
+        return jsonify({"status": "error", "message": "Données incomplètes"}), 400
+
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        # 1. Infos auditoire
+        query_aud = "SELECT * FROM auditoriums WHERE code = %s"
+        execute_sql(cursor, query_aud, (auditorium_code,))
+        aud_res = cursor.fetchone()
+        
+        if not aud_res:
+            return jsonify({"status": "error", "message": "Auditoire invalide"}), 404
+        
+        aud = dict(aud_res) if not isinstance(aud_res, tuple) else {
+            'code': aud_res[0], 'nom': aud_res[1], 'latitude': aud_res[2], 
+            'longitude': aud_res[3], 'radius_m': aud_res[4], 'floor': aud_res[5], 
+            'tolerance_m': aud_res[6], 'version': aud_res[7]
+        }
+
+        # 2. Calcul distance
+        distance = calculate_distance(lat, lon, aud['latitude'], aud['longitude'])
+        max_allowed = aud['radius_m'] + aud['tolerance_m']
+        
+        # 3. Logique de statut (selon les horaires définis)
+        result = "confirmé"
+        reason = ""
+        
+        if distance > max_allowed:
+            if scheduled_time == "10:30":
+                result = "breaktime"
+                reason = "Hors zone pendant le break"
+            elif scheduled_time == "10:40":
+                result = "fraude"
+                reason = "Signal fraude : toujours hors zone après le break"
+            elif scheduled_time == "15:00":
+                result = "pause" # ou hors zone (pause)
+                reason = "Signal hors zone pendant la pause"
+            else:
+                result = "hors zone"
+                reason = f"Distance excessive: {int(distance)}m"
+        elif accuracy > ACCURACY_MAX:
+             result = "non vérifié"
+             reason = f"Précision GPS insuffisante ({int(accuracy)}m)"
+
+        # 4. Enregistrement de la vérification (si pas déjà faite pour cette heure)
+        # On crée le 'random_check' s'il n'existe pas pour ce matricule/heure
+        q_check = "INSERT INTO random_checks (matricule, auditorium_code, type, scheduled_time, status) VALUES (%s, %s, %s, %s, %s)"
+        execute_sql(cursor, q_check, (matricule, auditorium_code, 'SCHEDULED', scheduled_time, 'COMPLETED'))
+        check_id = cursor.lastrowid
+        
+        # 5. Enregistrement du rapport détaillé
+        q_resp = """
+            INSERT INTO random_check_responses 
+            (check_id, matricule, auditorium_code, auditorium_version_id, latitude, longitude, accuracy_meters, distance, timestamp, device_id, ip, device_info, result, reason)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+        execute_sql(cursor, q_resp, (check_id, matricule, auditorium_code, aud['version'], lat, lon, accuracy, distance, now_lub, device_signature, user_ip, device_info, result, reason))
+        
+        conn.commit()
+        conn.close()
+        return jsonify({"status": "success", "result": result, "reason": reason})
+
+    except Exception as e:
+        traceback.print_exc()
+        if 'conn' in locals() and conn: conn.close()
+        return jsonify({"error": str(e)}), 500
 
 @app.route('/api/student/<path:matricule>')
 def get_student_info(matricule):
@@ -772,6 +989,59 @@ def view_presences():
         return render_template('presences.html', presences=all_presences)
     except (mysql.connector.Error, sqlite3.Error, Exception) as err:
         return f"Erreur lors de la récupération des présences : {err}"
+
+@app.route('/admin/timeline')
+def admin_timeline():
+    """
+    Affiche l'interface du tableau de bord temps réel (Timeline).
+    """
+    return render_template('admin_timeline.html')
+
+@app.route('/api/admin/timeline')
+def api_admin_timeline():
+    """
+    Renvoie les données consolidées pour la timeline (entrées + vérifications).
+    """
+    try:
+        conn = get_db_connection()
+        if isinstance(conn, sqlite3.Connection):
+            cursor = conn.cursor()
+        else:
+            cursor = conn.cursor(dictionary=True)
+
+        now_lub = datetime.now(timezone(timedelta(hours=2))).replace(tzinfo=None)
+        today = now_lub.strftime('%Y-%m-%d')
+
+        # 1. On récupère toutes les entrées/sorties de 'presences' pour aujourd'hui
+        q_presences = "SELECT * FROM presences WHERE date(date_inscription) = %s ORDER BY date_inscription DESC"
+        execute_sql(cursor, q_presences, (today,))
+        presences = cursor.fetchall()
+        presences_list = [dict(r) if not isinstance(r, dict) else r for r in presences]
+
+        # 2. On récupère les rapports de suivi (random_check_responses) pour aujourd'hui
+        q_reports = """
+            SELECT r.*, c.scheduled_time, c.type as check_type 
+            FROM random_check_responses r
+            JOIN random_checks c ON r.check_id = c.id
+            WHERE date(r.timestamp) = %s
+            ORDER BY r.timestamp DESC
+        """
+        execute_sql(cursor, q_reports, (today,))
+        reports = cursor.fetchall()
+        reports_list = [dict(r) if not isinstance(r, dict) else r for r in reports]
+
+        cursor.close()
+        conn.close()
+
+        return jsonify({
+            "presences": presences_list,
+            "reports": reports_list
+        })
+
+    except Exception as e:
+        traceback.print_exc()
+        if 'conn' in locals() and conn: conn.close()
+        return jsonify({"error": str(e)}), 500
 
 @app.route('/export_sql')
 def export_sql():
