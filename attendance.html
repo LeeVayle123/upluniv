@@ -488,23 +488,10 @@
                             }
 
                             // Lancement du cooldown de 30 secondes
-                            let timeLeft = 30;
-                            const interval = setInterval(() => {
-                                timeLeft--;
-                                timerSpan.textContent = timeLeft;
-                                if (timeLeft <= 0) {
-                                    clearInterval(interval);
-                                    ticket.style.display = 'none';
-                                    
-                                    // Retour au formulaire
-                                    form.style.display = 'flex';
-                                    form.reset();
-                                    submitBtn.innerHTML = '<i class="fa-solid fa-circle-check"></i> valider votre présance!';
-                                    submitBtn.disabled = true;
-                                    timerSpan.textContent = "30";
-                                    badge.style.display = 'none';
-                                }
-                            }, 1000);
+                            const endDate = Date.now() + 30000;
+                            localStorage.setItem('cooldown_end', endDate);
+                            localStorage.setItem('ticket_details', ticketDetails.innerHTML);
+                            startCooldownTimer(endDate);
                         } else {
                             // Erreur retournée par le serveur
                             alert("Error: " + data.message);
@@ -519,6 +506,42 @@
                         submitBtn.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> Erreur technique';
                     });
             });
+
+            // GESTION DU COOLDOWN PERSISTANT
+            function startCooldownTimer(endDate) {
+                form.style.display = 'none';
+                badge.style.display = 'none';
+                ticket.style.display = 'block';
+                ticketDetails.innerHTML = localStorage.getItem('ticket_details') || 'Session enregistrée.';
+                
+                const interval = setInterval(() => {
+                    const remaining = Math.ceil((endDate - Date.now()) / 1000);
+                    if (remaining > 0) {
+                        timerSpan.textContent = remaining;
+                    } else {
+                        clearInterval(interval);
+                        localStorage.removeItem('cooldown_end');
+                        localStorage.removeItem('ticket_details');
+                        
+                        ticket.style.display = 'none';
+                        form.style.display = 'flex';
+                        form.reset();
+                        submitBtn.innerHTML = '<i class="fa-solid fa-circle-check"></i> valider votre présance!';
+                        submitBtn.disabled = true;
+                        timerSpan.textContent = "30";
+                        badge.style.display = 'none';
+                    }
+                }, 1000);
+            }
+
+            // Vérifier au chargement si un cooldown est en cours
+            const savedCooldownEnd = localStorage.getItem('cooldown_end');
+            if (savedCooldownEnd && Date.now() < parseInt(savedCooldownEnd)) {
+                startCooldownTimer(parseInt(savedCooldownEnd));
+            } else {
+                localStorage.removeItem('cooldown_end');
+                localStorage.removeItem('ticket_details');
+            }
 
             // ==========================================
             // MOTEUR DE SUIVI GPS (Commentaires Français)

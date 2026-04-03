@@ -420,11 +420,24 @@
                             pointBorderColor: 'white',
                             pointBorderWidth: 2,
                             pointRadius: 5
+                        },
+                        {
+                            label: 'Taux de Fraudes',
+                            data: data.history.map(h => h.fraudes),
+                            borderColor: '#ff0000',
+                            backgroundColor: 'rgba(255, 0, 0, 0.1)',
+                            fill: true,
+                            tension: 0.4,
+                            borderWidth: 3,
+                            pointBackgroundColor: '#ff0000',
+                            pointBorderColor: 'white',
+                            pointBorderWidth: 2,
+                            pointRadius: 5
                         }]
                     },
                     options: {
                         responsive: true,
-                        plugins: { legend: { display: false } },
+                        plugins: { legend: { display: true, position: 'top', labels: { usePointStyle: true } } },
                         scales: {
                             y: { beginAtZero: true, grid: { display: false } },
                             x: { grid: { display: false } }
@@ -483,16 +496,24 @@
             }
         }
 
-        // Logic for cyclic countdown
-        let timeLeft = 15;
+        // Logic for progressive countdown (matches the test schedule: 15s, 60s, 120s...)
         const timerDisplay = document.getElementById('refresh-timer');
+        let currentDelay = 15;
+        let timeLeft = currentDelay;
+
+        function getNextDelay(delay) {
+            if (delay === 15) return 60;
+            if (delay >= 3600) return 15; // Boucle de test
+            return delay + 60; // Incrément de 1 minute
+        }
 
         function startCountdown() {
             setInterval(() => {
                 timeLeft--;
                 if (timeLeft < 0) {
-                    timeLeft = 15;
                     updateStats();
+                    currentDelay = getNextDelay(currentDelay);
+                    timeLeft = currentDelay;
                 }
                 timerDisplay.textContent = timeLeft + "s";
             }, 1000);

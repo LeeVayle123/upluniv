@@ -1737,10 +1737,18 @@ def api_admin_stats_summary():
             day_dt = now_lub - timedelta(days=i)
             day_str = day_dt.strftime('%Y-%m-%d')
             day_label = day_dt.strftime('%d/%m')
+            
+            # Pointages totaux
             execute_sql(cursor, "SELECT COUNT(*) FROM presences WHERE date(date_inscription) = %s", (day_str,))
             count_res = cursor.fetchone()
             count = count_res[0] if isinstance(count_res, (list, tuple)) else (count_res['COUNT(*)'] if 'COUNT(*)' in count_res else count_res[0])
-            history_points.append({"label": day_label, "count": count})
+            
+            # Fraudes
+            execute_sql(cursor, "SELECT COUNT(*) FROM random_check_responses WHERE date(timestamp) = %s AND result = 'fraude'", (day_str,))
+            fraude_res = cursor.fetchone()
+            fraudes_count = fraude_res[0] if isinstance(fraude_res, (list, tuple)) else (fraude_res['COUNT(*)'] if 'COUNT(*)' in fraude_res else fraude_res[0])
+            
+            history_points.append({"label": day_label, "count": count, "fraudes": fraudes_count})
 
         cursor.close()
         conn.close()
