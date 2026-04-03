@@ -597,9 +597,22 @@ def check_attendance():
                 if type_presence == 'Entrée' and last_type == 'Entrée':
                     reason = "Déjà une entrée active"
                     result = "Rejeté"
-                elif type_presence == 'Sortie' and last_type != 'Entrée':
-                    reason = "Pas d'entrée correspondante"
-                    result = "Rejeté"
+                elif type_presence == 'Sortie':
+                    if last_type != 'Entrée':
+                        reason = "Pas d'entrée correspondante"
+                        result = "Rejeté"
+                    else:
+                        # 4.3 Si c'est une sortie, vérifier qu'elle se fait dans le même auditoire que l'entrée
+                        get_last_aud_query = "SELECT auditorium_code FROM attendance_attempts WHERE student_external_id = %s AND date(timestamp) = %s AND result = 'Accepté' ORDER BY timestamp DESC LIMIT 1"
+                        execute_sql(cursor, get_last_aud_query, (matricule, today_date))
+                        last_aud_res = cursor.fetchone()
+                        
+                        if last_aud_res:
+                            last_aud_code = last_aud_res[0] if isinstance(last_aud_res, (list, tuple)) else (last_aud_res['auditorium_code'] if 'auditorium_code' in last_aud_res else last_aud_res[0])
+                            
+                            if last_aud_code != auditorium_code:
+                                reason = f"Sortie rejetée : L'entrée a été faite dans l'auditoire '{last_aud_code}'."
+                                result = "Rejeté"
 
         # 5. JOURNALISATION IMMUABLE (attendance_attempts)
         insert_attempt = """
@@ -712,8 +725,9 @@ def check_report():
         reason = ""
         
         if distance > max_allowed:
-            if scheduled_time == "15S_CHECK":
+            if scheduled_time == "15S_CHECK" or scheduled_time.startswith("TEST_SUIVI"):
                 result = "fraude"
+                reason = f"Signal fraude : le matricule {matricule} est toujours hors zone"
                 reason = f"Signal fraude : le matricule {matricule} est toujours hors zone"
             elif scheduled_time == "10:30":
                 result = "breaktime"
@@ -1727,9 +1741,11 @@ def api_admin_stats_summary():
         execute_sql(cursor, "SELECT result FROM random_check_responses WHERE date(timestamp) = %s", (today,))
         today_reports = cursor.fetchall()
         fraudes_today = 0
+        suivis_ok_today = 0
         for r in today_reports:
             res = r['result'] if isinstance(r, dict) else r[0]
             if res == 'fraude': fraudes_today += 1
+            elif res == 'confirmé': suivis_ok_today += 1
 
         # 4. Historique des 7 derniers jours (pour le graphique)
         history_points = []
@@ -1759,6 +1775,7 @@ def api_admin_stats_summary():
             "sorties_today": sorties_today,
             "hors_zone_today": hors_zone_today,
             "fraudes_today": fraudes_today,
+            "suivis_ok_today": suivis_ok_today,
             "history": history_points
         })
 

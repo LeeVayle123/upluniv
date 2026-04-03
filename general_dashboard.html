@@ -451,10 +451,10 @@
                 statusPieChart = new Chart(ctxPie, {
                     type: 'doughnut',
                     data: {
-                        labels: ['Entrées', 'Sorties', 'Fraudes'],
+                        labels: ['Entrées', 'Sorties', 'Fraudes', 'Suivis OK'],
                         datasets: [{
-                            data: [data.entrees_today, data.sorties_today, data.fraudes_today],
-                            backgroundColor: ['#000080', '#0ea5e9', '#ff0000'],
+                            data: [data.entrees_today, data.sorties_today, data.fraudes_today, data.suivis_ok_today || 0],
+                            backgroundColor: ['#000080', '#0ea5e9', '#ff0000', '#22c55e'],
                             borderWidth: 0,
                             cutout: '70%'
                         }]
@@ -496,10 +496,16 @@
             }
         }
 
-        // Logic for progressive countdown (matches the test schedule: 15s, 60s, 120s...)
+        // Logic for progressive countdown (persisted on refresh)
         const timerDisplay = document.getElementById('refresh-timer');
-        let currentDelay = 15;
-        let timeLeft = currentDelay;
+        
+        let currentDelay = sessionStorage.getItem('dashboard_current_delay') 
+            ? parseInt(sessionStorage.getItem('dashboard_current_delay')) 
+            : 15;
+            
+        let timeLeft = sessionStorage.getItem('dashboard_time_left')
+            ? parseInt(sessionStorage.getItem('dashboard_time_left'))
+            : currentDelay;
 
         function getNextDelay(delay) {
             if (delay === 15) return 60;
@@ -514,12 +520,15 @@
                     updateStats();
                     currentDelay = getNextDelay(currentDelay);
                     timeLeft = currentDelay;
+                    sessionStorage.setItem('dashboard_current_delay', currentDelay);
                 }
+                sessionStorage.setItem('dashboard_time_left', timeLeft);
                 timerDisplay.textContent = timeLeft + "s";
             }, 1000);
         }
 
-        // Auto-refresh initially and start countdown
+        // Initialiser
+        timerDisplay.textContent = timeLeft + "s";
         updateStats();
         startCountdown();
     </script>
