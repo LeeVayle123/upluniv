@@ -1031,11 +1031,24 @@ def api_admin_timeline():
         now_lub = datetime.now(timezone(timedelta(hours=2))).replace(tzinfo=None)
         today = now_lub.strftime('%Y-%m-%d')
 
+        promo = request.args.get('promotion')
+        search_promo = f"%{promo.replace('_', ' ')}%" if promo else None
+
         # 1. On récupère toutes les entrées/sorties de 'presences' pour aujourd'hui
-        q_presences = "SELECT * FROM presences WHERE date(date_inscription) = %s ORDER BY date_inscription DESC"
-        execute_sql(cursor, q_presences, (today,))
+        if promo:
+            q_presences = "SELECT * FROM presences WHERE date(date_inscription) = %s AND promotion LIKE %s ORDER BY date_inscription DESC"
+            execute_sql(cursor, q_presences, (today, search_promo))
+        else:
+            q_presences = "SELECT * FROM presences WHERE date(date_inscription) = %s ORDER BY date_inscription DESC"
+            execute_sql(cursor, q_presences, (today,))
+        
         presences = cursor.fetchall()
         presences_list = [dict(r) if not isinstance(r, dict) else r for r in presences]
+
+        # On prépare la liste des matricules valides pour filtrer les rapports de suivi
+        # car la table random_check ne contient pas de colonne promotion
+        valid_matricules = [p.get('matricule', p[1] if isinstance(p, tuple) else '') for p in presences_list]
+        valid_matricules = list(set(valid_matricules))
 
         # 2. On récupère les rapports de suivi (random_check_responses) pour aujourd'hui
         q_reports = """
@@ -1047,7 +1060,11 @@ def api_admin_timeline():
         """
         execute_sql(cursor, q_reports, (today,))
         reports = cursor.fetchall()
-        reports_list = [dict(r) if not isinstance(r, dict) else r for r in reports]
+        # Filtrer par promotion (seuls les matricules du jour de la vue courante)
+        if promo:
+            reports_list = [dict(r) if not isinstance(r, dict) else r for r in reports if (dict(r)['matricule'] if not isinstance(r, dict) else r['matricule']) in valid_matricules]
+        else:
+            reports_list = [dict(r) if not isinstance(r, dict) else r for r in reports]
 
         cursor.close()
         conn.close()

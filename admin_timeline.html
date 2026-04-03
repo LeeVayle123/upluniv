@@ -88,25 +88,61 @@
     </div>
 
     <div class="main-container">
-        <!-- Tableau des alertes fraudes -->
-        <div class="fraud-table-container" id="fraud-zone" style="display: none;">
-            <div class="fraud-table-header">
-                <i class="fa-solid fa-triangle-exclamation fa-beat-fade"></i> Alertes Fraudes du Jour
+        <!-- ===== ONGLETS DE FILTRAGE PAR PROMOTION ===== -->
+        <div class="enveloppe-onglets" style="margin-bottom: 25px; display: flex; flex-direction: column; gap: 14px;">
+            <!-- Section IAGE -->
+            <div class="section-faculte" style="background: white; border-radius: 16px; padding: 14px 18px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+                <div class="etiquette-faculte" style="font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; margin-bottom: 10px;">
+                    <i class="fas fa-graduation-cap"></i> Filière IAGE
+                </div>
+                <div class="rangee-onglets" style="display: flex; gap: 6px; flex-wrap: wrap;">
+                    <button class="onglet-promo actif" data-promo="" onclick="switchTab(this)" style="padding: 6px 12px; border-radius: 8px; border: 1px solid #e2e8f0; background: navy; color: white; cursor: pointer; font-family: inherit; font-weight: 600;">Global</button>
+                    <button class="onglet-promo" data-promo="bac1_IAGE" onclick="switchTab(this)" style="padding: 6px 12px; border-radius: 8px; border: 1px solid #e2e8f0; background: white; cursor: pointer; font-family: inherit; font-weight: 600;">BAC 1</button>
+                    <button class="onglet-promo" data-promo="bac2_IAGE" onclick="switchTab(this)" style="padding: 6px 12px; border-radius: 8px; border: 1px solid #e2e8f0; background: white; cursor: pointer; font-family: inherit; font-weight: 600;">BAC 2</button>
+                    <button class="onglet-promo" data-promo="bac3_IAGE" onclick="switchTab(this)" style="padding: 6px 12px; border-radius: 8px; border: 1px solid #e2e8f0; background: white; cursor: pointer; font-family: inherit; font-weight: 600;">BAC 3</button>
+                </div>
             </div>
-            <table class="fraud-table">
-                <thead>
-                    <tr>
-                        <th>Heure</th>
-                        <th>Étudiant</th>
-                        <th>Promotion</th>
-                        <th>Type d'Alerte</th>
-                        <th>Détails</th>
-                    </tr>
-                </thead>
-                <tbody id="fraud-table-body">
-                    <!-- Rempli par JS -->
-                </tbody>
-            </table>
+
+            <!-- Section TECHNOLOGIE -->
+            <div class="section-faculte" style="background: white; border-radius: 16px; padding: 14px 18px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+                <div class="etiquette-faculte" style="font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; margin-bottom: 10px;">
+                    <i class="fas fa-microchip"></i> Parcours Technologie
+                </div>
+                <div class="grille-technique" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 8px;">
+                    <div class="ligne-annee" style="display: flex; align-items: center; gap: 8px; background: #f8fafc; padding: 6px 12px; border-radius: 10px;">
+                        <span class="etiquette-annee" style="font-size: 0.8rem; font-weight: 700; color: navy; width: 50px;">BAC 1:</span>
+                        <div class="onglets-internes" style="display: flex; gap: 5px;">
+                            <button class="onglet-promo" data-promo="bac1_tech_IA" onclick="switchTab(this)" style="padding: 4px 10px; border-radius: 6px; border: 1px solid #e2e8f0; background: white; cursor: pointer;">IA</button>
+                            <button class="onglet-promo" data-promo="bac1_tech_GL" onclick="switchTab(this)" style="padding: 4px 10px; border-radius: 6px; border: 1px solid #e2e8f0; background: white; cursor: pointer;">GL</button>
+                            <button class="onglet-promo" data-promo="bac1_tech_SI" onclick="switchTab(this)" style="padding: 4px 10px; border-radius: 6px; border: 1px solid #e2e8f0; background: white; cursor: pointer;">SI</button>
+                        </div>
+                    </div>
+                    <div class="ligne-annee" style="display: flex; align-items: center; gap: 8px; background: #f8fafc; padding: 6px 12px; border-radius: 10px;">
+                        <span class="etiquette-annee" style="font-size: 0.8rem; font-weight: 700; color: navy; width: 50px;">BAC 2:</span>
+                        <div class="onglets-internes" style="display: flex; gap: 5px;">
+                            <button class="onglet-promo" data-promo="bac2_tech_IA" onclick="switchTab(this)" style="padding: 4px 10px; border-radius: 6px; border: 1px solid #e2e8f0; background: white; cursor: pointer;">IA</button>
+                            <button class="onglet-promo" data-promo="bac2_tech_GL" onclick="switchTab(this)" style="padding: 4px 10px; border-radius: 6px; border: 1px solid #e2e8f0; background: white; cursor: pointer;">GL</button>
+                            <button class="onglet-promo" data-promo="bac2_tech_SI" onclick="switchTab(this)" style="padding: 4px 10px; border-radius: 6px; border: 1px solid #e2e8f0; background: white; cursor: pointer;">SI</button>
+                        </div>
+                    </div>
+                    <div class="ligne-annee" style="display: flex; align-items: center; gap: 8px; background: #f8fafc; padding: 6px 12px; border-radius: 10px;">
+                        <span class="etiquette-annee" style="font-size: 0.8rem; font-weight: 700; color: navy; width: 50px;">BAC 3:</span>
+                        <div class="onglets-internes" style="display: flex; gap: 5px;">
+                            <button class="onglet-promo" data-promo="bac3_tech_IA" onclick="switchTab(this)" style="padding: 4px 10px; border-radius: 6px; border: 1px solid #e2e8f0; background: white; cursor: pointer;">IA</button>
+                            <button class="onglet-promo" data-promo="bac3_tech_GL" onclick="switchTab(this)" style="padding: 4px 10px; border-radius: 6px; border: 1px solid #e2e8f0; background: white; cursor: pointer;">GL</button>
+                            <button class="onglet-promo" data-promo="bac3_tech_SI" onclick="switchTab(this)" style="padding: 4px 10px; border-radius: 6px; border: 1px solid #e2e8f0; background: white; cursor: pointer;">SI</button>
+                        </div>
+                    </div>
+                    <div class="ligne-annee" style="display: flex; align-items: center; gap: 8px; background: #f8fafc; padding: 6px 12px; border-radius: 10px;">
+                        <span class="etiquette-annee" style="font-size: 0.8rem; font-weight: 700; color: navy; width: 50px;">BAC 4:</span>
+                        <div class="onglets-internes" style="display: flex; gap: 5px;">
+                            <button class="onglet-promo" data-promo="bac4_tech_IA" onclick="switchTab(this)" style="padding: 4px 10px; border-radius: 6px; border: 1px solid #e2e8f0; background: white; cursor: pointer;">IA</button>
+                            <button class="onglet-promo" data-promo="bac4_tech_GL" onclick="switchTab(this)" style="padding: 4px 10px; border-radius: 6px; border: 1px solid #e2e8f0; background: white; cursor: pointer;">GL</button>
+                            <button class="onglet-promo" data-promo="bac4_tech_SI" onclick="switchTab(this)" style="padding: 4px 10px; border-radius: 6px; border: 1px solid #e2e8f0; background: white; cursor: pointer;">SI</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="filters">
@@ -114,13 +150,50 @@
             <button onclick="fetchData()"><i class="fa-solid fa-rotate-right"></i> Actualiser</button>
         </div>
 
-        <div id="timeline-container">
-            <!-- Les données seront insérées ici -->
-            <p style="text-align: center; color: var(--text-light); font-weight: 600; font-size: 1.1rem; padding: 40px;"><i class="fa-solid fa-spinner fa-spin"></i> Chargement du flux en direct...</p>
+        <div class="fraud-table-container">
+            <div class="fraud-table-header">
+                <i class="fa-solid fa-list"></i> Chronologie des Événements
+            </div>
+            <table class="fraud-table" id="main-table">
+                <thead>
+                    <tr>
+                        <th>Heure</th>
+                        <th>Matricule</th>
+                        <th>Étudiant</th>
+                        <th>Action</th>
+                        <th>Statut</th>
+                        <th>Détails</th>
+                    </tr>
+                </thead>
+                <tbody id="timeline-body">
+                    <!-- Rempli par JS -->
+                </tbody>
+            </table>
+            
+            <div id="timeline-empty" style="display: none; text-align: center; padding: 60px; background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.02); margin-top: 20px;">
+                <i class="fa-solid fa-folder-open" style="font-size: 3rem; color: #cbd5e1; margin-bottom: 15px;"></i>
+                <h3 style="color: #64748b; margin:0;">Aucune activité aujourd'hui</h3>
+            </div>
         </div>
     </div>
 
     <script>
+        let activePromo = "";
+
+        function switchTab(btn) {
+            document.querySelectorAll('.onglet-promo').forEach(b => {
+                b.style.background = 'white';
+                b.style.color = '#1e293b';
+                b.classList.remove('actif');
+            });
+            btn.classList.add('actif');
+            btn.style.background = 'navy';
+            btn.style.color = 'white';
+            
+            activePromo = btn.dataset.promo || "";
+            fetchData();
+        }
+
         function getIconForType(type) {
             type = type.toLowerCase();
             if (type.includes('entrée')) return 'fa-arrow-right-to-bracket';
@@ -132,7 +205,10 @@
         }
 
         function fetchData() {
-            fetch('/api/admin/timeline')
+            let url = '/api/admin/timeline';
+            if (activePromo) url += '?promotion=' + activePromo;
+            
+            fetch(url)
                 .then(res => res.json())
                 .then(data => {
                     renderTimeline(data);
@@ -140,21 +216,26 @@
         }
 
         function renderTimeline(data) {
-            const container = document.getElementById('timeline-container');
-            container.innerHTML = '';
+            const tbody = document.getElementById('timeline-body');
+            const emptyMsg = document.getElementById('timeline-empty');
+            const mainTable = document.getElementById('main-table');
+            tbody.innerHTML = '';
 
-            // Grouper par étudiant
-            const students = {};
+            let allEvents = [];
+
+            // Création d'un dictionnaire pour retrouver vite les infos d'un étudiant via son matricule
+            const studentsInfo = {};
 
             data.presences.forEach(p => {
-                if (!students[p.matricule]) students[p.matricule] = { info: p, events: [] };
+                studentsInfo[p.matricule] = p; // Sauvegarde infos
                 
-                // Si la presence contient "Fraude" dans le geoloc, on la marque visuellement
                 let statClass = p.type_presence.toLowerCase();
                 let isFraud = p.status_geoloc && p.status_geoloc.toLowerCase().includes('fraude');
                 if(isFraud) statClass = 'fraude';
 
-                students[p.matricule].events.push({
+                allEvents.push({
+                    matricule: p.matricule,
+                    nom_complet: `${p.nom} ${p.prenom}`,
                     type: 'presence',
                     label: p.type_presence,
                     time: p.date_inscription,
@@ -164,12 +245,14 @@
             });
 
             data.reports.forEach(r => {
-                if (!students[r.matricule]) return; // Pas d'entrée aujourd'hui ?
+                let info = studentsInfo[r.matricule] || { nom: "Inconnu", prenom: "" };
                 
                 let statutClass = r.result.replace(' ', '_').toLowerCase();
                 if(statutClass.includes('fraude')) statutClass = 'fraude';
                 
-                students[r.matricule].events.push({
+                allEvents.push({
+                    matricule: r.matricule,
+                    nom_complet: `${info.nom} ${info.prenom}`,
                     type: 'check',
                     label: `Suivi d'activité`,
                     time: r.timestamp,
@@ -178,92 +261,68 @@
                 });
             });
 
-            const sortedMatricules = Object.keys(students).sort();
-            
-            // Gestion du Tableau des Fraudes
-            const fraudBody = document.getElementById('fraud-table-body');
-            const fraudZone = document.getElementById('fraud-zone');
-            fraudBody.innerHTML = '';
-            let hasFrauds = false;
+            // Tri de tous les événements par heure chronologique (décroissant = plus récent en haut)
+            allEvents.sort((a, b) => new Date(b.time) - new Date(a.time));
 
-            sortedMatricules.forEach((mat, index) => {
-                const s = students[mat];
-                
-                // On extrait les événements de type fraude pour le tableau supérieur
-                const fraudEvents = s.events.filter(e => e.status === 'fraude');
-                fraudEvents.forEach(f => {
-                    hasFrauds = true;
-                    const timeStr = new Date(f.time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-                    fraudBody.innerHTML += `
-                        <tr>
-                            <td style="font-weight: 700;">${timeStr}</td>
-                            <td><strong>${s.info.nom} ${s.info.prenom}</strong><br><span style="font-size: 0.8rem; opacity: 0.8;">${mat}</span></td>
-                            <td>${s.info.promotion}</td>
-                            <td><span class="badge" style="background:#7f1d1d; color:white;"><i class="fa-solid fa-ban"></i> ${f.label}</span></td>
-                            <td>${f.details}</td>
-                        </tr>
-                    `;
-                });
-
-                const row = document.createElement('div');
-                row.className = 'student-card';
-                row.setAttribute('data-search', (s.info.nom + " " + s.info.prenom + " " + mat).toLowerCase());
-                row.style.animationDelay = (index * 0.05) + 's';
-                
-                let eventsHtml = '';
-                // Trier les événements par heure CROISSANTE ou DECROISSANTE ?
-                // Souvent on veut le plus récent en HAUT dans la timeline.
-                s.events.sort((a, b) => new Date(b.time) - new Date(a.time));
-
-                s.events.forEach(e => {
-                    const timeStr = new Date(e.time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'});
-                    const iconClass = getIconForType(e.status);
-                    
-                    eventsHtml += `
-                        <div class="timeline-item status-${e.status}">
-                            <div class="timeline-dot"></div>
-                            <div class="timeline-time"><i class="fa-regular fa-clock"></i> ${timeStr}</div>
-                            <div class="timeline-content">
-                                <span class="badge"><i class="fa-solid ${iconClass}"></i> ${e.label}</span>
-                            </div>
-                            <div class="timeline-details">${e.details}</div>
-                        </div>
-                    `;
-                });
-
-                row.innerHTML = `
-                    <div class="student-header">
-                        <div class="student-avatar">
-                            <i class="fa-solid fa-user"></i>
-                        </div>
-                        <div class="student-info">
-                            <h3>${s.info.nom} ${s.info.prenom}</h3>
-                            <p><span>${mat}</span> • <span>${s.info.promotion}</span></p>
-                        </div>
-                    </div>
-                    <div class="timeline-list">${eventsHtml}</div>
-                `;
-                container.appendChild(row);
-            });
-
-            // Afficher ou cacher la zone du tableau de fraudes
-            fraudZone.style.display = hasFrauds ? 'block' : 'none';
-
-            if (sortedMatricules.length === 0) {
-                container.innerHTML = `<div style="text-align: center; padding: 60px; background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.02);"><i class="fa-solid fa-folder-open" style="font-size: 3rem; color: #cbd5e1; margin-bottom: 15px;"></i><h3 style="color: #64748b; margin:0;">Aucune activité aujourd'hui</h3></div>`;
+            if (allEvents.length === 0) {
+                mainTable.style.display = 'none';
+                emptyMsg.style.display = 'block';
+                return;
+            } else {
+                mainTable.style.display = 'table';
+                emptyMsg.style.display = 'none';
             }
+
+            allEvents.forEach((e, index) => {
+                const timeStr = new Date(e.time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'});
+                const iconClass = getIconForType(e.status);
+                
+                // Style spécifique pour les lignes de fraude
+                let badgeStyle = "background: #f1f5f9; color: #475569;";
+                let rowStyle = "";
+                
+                if(e.status === 'fraude') {
+                    badgeStyle = "background: #7f1d1d; color: white;";
+                    rowStyle = "background-color: #fef2f2;";
+                } else if(e.status === 'confirmé') {
+                    badgeStyle = "background: #dcfce7; color: #166534;";
+                } else if(e.status.includes('entrée')) {
+                    badgeStyle = "background: #e0f2fe; color: #075985;";
+                } else if(e.status.includes('hors_zone')) {
+                    badgeStyle = "background: #fee2e2; color: #991b1b;";
+                    rowStyle = "background-color: #fff5f5;";
+                }
+                
+                const tr = document.createElement('tr');
+                tr.className = 'timeline-row';
+                tr.setAttribute('data-search', (e.nom_complet + " " + e.matricule).toLowerCase());
+                if(rowStyle) tr.style.cssText = rowStyle;
+                
+                tr.innerHTML = `
+                    <td style="font-weight: 700;">${timeStr}</td>
+                    <td style="font-weight: 800; color: var(--primary);">${e.matricule}</td>
+                    <td><strong>${e.nom_complet}</strong></td>
+                    <td><span class="badge" style="${badgeStyle}"><i class="fa-solid ${iconClass}"></i> ${e.label}</span></td>
+                    <td>
+                        ${e.status === 'fraude' ? `<span style="color: #dc2626; font-weight: bold;"><i class="fa-solid fa-circle-exclamation"></i> Fraude détectée</span>` : 
+                          `<span style="color: #64748b;">${e.status.toUpperCase()}</span>`}
+                    </td>
+                    <td style="font-size: 0.9rem; color: #475569;">${e.details}</td>
+                `;
+                tbody.appendChild(tr);
+            });
             
-            filterTimelines(); // Ré-appliquer le filtre après l'actualisation
+            filterTimelines(); 
         }
 
         function filterTimelines() {
             const query = document.getElementById('search').value.toLowerCase();
-            const cards = document.querySelectorAll('.student-card');
-            cards.forEach(card => {
-                if(card.getAttribute('data-search').includes(query)) {
-                    card.style.display = 'block';
+            const rows = document.querySelectorAll('.timeline-row');
+            rows.forEach(row => {
+                if(row.getAttribute('data-search').includes(query)) {
+                    row.style.display = 'table-row';
                 } else {
-                    card.style.display = 'none';
+                    row.style.display = 'none';
                 }
             });
         }
