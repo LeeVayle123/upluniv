@@ -313,6 +313,8 @@
                 <p style="color: var(--text-muted);">Bienvenue sur le centre de pilotage UPL.</p>
             </div>
             <div class="date-display">
+                <i class="fa-solid fa-clock"></i>
+                <span id="refresh-timer" style="color: var(--secondary); margin-right: 10px;">15s</span>
                 <i class="fa-solid fa-calendar-day"></i>
                 <span id="current-date">--/--/----</span>
             </div>
@@ -481,9 +483,24 @@
             }
         }
 
-        // Auto-refresh every 30s
+        // Logic for cyclic countdown
+        let timeLeft = 15;
+        const timerDisplay = document.getElementById('refresh-timer');
+
+        function startCountdown() {
+            setInterval(() => {
+                timeLeft--;
+                if (timeLeft < 0) {
+                    timeLeft = 15;
+                    updateStats();
+                }
+                timerDisplay.textContent = timeLeft + "s";
+            }, 1000);
+        }
+
+        // Auto-refresh initially and start countdown
         updateStats();
-        setInterval(updateStats, 30000);
+        startCountdown();
     </script>
 </body>
 </html>

@@ -684,6 +684,9 @@ def check_report():
     user_ip = request.remote_addr
     device_info = request.headers.get('User-Agent', '')
     now_lub = datetime.now(timezone(timedelta(hours=2))).replace(tzinfo=None)
+    
+    # Log pour débogage (essai)
+    print(f"DEBUG: Rapport reçu pour {matricule} ({scheduled_time}) à {now_lub}")
 
     if not all([matricule, auditorium_code, lat, lon]):
         return jsonify({"status": "error", "message": "Données incomplètes"}), 400

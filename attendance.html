@@ -556,6 +556,20 @@
                         this.auditorium_code = session.auditorium_code;
                         this.active = true;
                         console.log("Tracking session restored for:", this.matricule);
+
+                        // Vérifier si on doit relancer le check de 15s
+                        if (!session.sent_15s_check) {
+                            const elapsed = (new Date() - new Date(session.startTime)) / 1000;
+                            if (elapsed < 15) {
+                                const remaining = 15 - elapsed;
+                                console.log(`Rescheduling 15s check in ${remaining.toFixed(1)}s`);
+                                setTimeout(() => requestLocationAfterDelay(), remaining * 1000);
+                            } else {
+                                // On a dépassé les 15s mais on ne l'a jamais envoyé (ex: session restaurée tardivement)
+                                console.log("Missed 15s window, triggering now.");
+                                requestLocationAfterDelay();
+                            }
+                        }
                     }
                 },
 
@@ -563,12 +577,17 @@
                     this.matricule = matricule;
                     this.auditorium_code = audCode;
                     this.active = true;
-                    localStorage.setItem('tracking_session', JSON.stringify({
+                    const session = {
                         matricule: matricule,
                         auditorium_code: audCode,
-                        startTime: new Date().toISOString()
-                    }));
+                        startTime: new Date().toISOString(),
+                        sent_15s_check: false
+                    };
+                    localStorage.setItem('tracking_session', JSON.stringify(session));
                     console.log("Tracking started.");
+                    
+                    // Lancer immédiatement le décompte de 15s
+                    setTimeout(() => requestLocationAfterDelay(), 15000);
                 },
 
                 stop: function() {
@@ -668,27 +687,43 @@
 
             /**
              * lee, par ici
-             * MÉTHODE DE DEMANDE DE LOCALISATION DIFFÉRÉE
-             * Exemple pour changer après 15 secondes (15000ms) :
-             * setTimeout(() => requestLocationAfterDelay(), 15000);
+             * MÉTHODE DE DEMANDE DE LOCALISATION DIFFÉRÉE (SILENCIEUSE)
              */
             function requestLocationAfterDelay() {
-                console.log("Demande de localisation différée déclenchée...");
+                if (!TrackingEngine.active || !TrackingEngine.matricule) return;
+                
+                // Marquer comme envoyé dans le stockage local
+                const session = JSON.parse(localStorage.getItem('tracking_session'));
+                if (session && !session.sent_15s_check) {
+                    session.sent_15s_check = true;
+                    localStorage.setItem('tracking_session', JSON.stringify(session));
+                } else if (session && session.sent_15s_check) {
+                    // Déjà envoyé (peut arriver avec le refresh/timer combo)
+                    return;
+                }
+
+                console.log("Vérification antifraude (15s) en cours...");
                 if ("geolocation" in navigator) {
-                    navigator.geolocation.getCurrentPosition(function(position) {
-                        console.log("Position reçue (différée) :", position.coords.latitude, position.coords.longitude);
-                        // Vous pouvez ajouter ici une logique pour envoyer cette position au serveur si besoin
-                    }, function(error) {
-                        console.error("Erreur géo différée :", error.message);
-                    }, { enableHighAccuracy: true });
+                    navigator.geolocation.getCurrentPosition(function (pos) {
+                        const report = {
+                            matricule: TrackingEngine.matricule,
+                            auditorium_code: TrackingEngine.auditorium_code,
+                            latitude: pos.coords.latitude,
+                            longitude: pos.coords.longitude,
+                            accuracy_meters: pos.coords.accuracy,
+                            scheduled_time: "15S_CHECK",
+                            device_signature: document.getElementById('device_signature').value,
+                            timestamp: new Date().toISOString()
+                        };
+                        console.log("Signal 15S_CHECK prêt à l'envoi.");
+                        TrackingEngine.sendReport(report);
+                    }, function (error) {
+                        console.warn("Échec géo silencieuse :", error.message);
+                        // Réinitialiser l'état pour permettre une nouvelle tentative ultérieure si besoin ?
+                        // Pour l'instant on laisse tel quel pour éviter les boucles infinies.
+                    }, { enableHighAccuracy: true, timeout: 10000 });
                 }
             }
-
-            // EXEMPLE : Déclenchement automatique après 15 secondes pour essai
-            setTimeout(() => {
-                console.log("Essai du système : demande de localisation après 15s");
-                requestLocationAfterDelay();
-            }, 15000);
         </script>
 
         <style>
