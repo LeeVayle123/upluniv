@@ -74,8 +74,9 @@ PUBLIC_URL = os.environ.get('PUBLIC_URL', '')
 if PUBLIC_URL and not PUBLIC_URL.startswith(('http://', 'https://')):
     PUBLIC_URL = f"https://{PUBLIC_URL}"
 
-# --- CONFIGURATION DES HORAIRES DE SUIVI (Commentaires en ) ---
-# place de modification des  heures ici. Format "HH:MM"
+# --- CONFIGURATION DES HORAIRES DE SUIVI (PRODUCTION) ---
+# NOTE: Ces horaires sont utilisés pour le suivi standard.
+# Pour les ESSAIS actuels, un suivi progressif (15s, 60s...) est actif côté client.
 # Heures de vérification pour la session du MATIN (Entrée possible dès 07:00)
 MORNING_CHECK_TIMES = ["09:00", "10:00", "10:30", "10:40", "11:00", "11:30", "11:55"]
 
@@ -572,22 +573,15 @@ def check_attendance():
             reason = "Matricule inconnu"
             result = "Rejeté"
         elif result == "Accepté":
-            # Vérifications additionnelles (doublons, séquence)
-            # Protection contre les doublons d'appareils
-            check_device_query = "SELECT device_signature FROM presences WHERE matricule = %s AND date(date_inscription) = %s LIMIT 1"
-            execute_sql(cursor, check_device_query, (matricule, today_date))
-            device_res = cursor.fetchone()
+            # 4.1 Limite de 4 pointages par jour (2 entrées / 2 sorties)
+            check_limit_query = "SELECT COUNT(*) FROM presences WHERE matricule = %s AND date(date_inscription) = %s"
+            execute_sql(cursor, check_limit_query, (matricule, today_date))
+            count_res = cursor.fetchone()
+            already_count = count_res[0] if isinstance(count_res, (list, tuple)) else (count_res['COUNT(*)'] if 'COUNT(*)' in count_res else 0)
             
-            if device_res:
-                try:
-                    existing_sig = device_res['device_signature'] if not isinstance(device_res, dict) else device_res.get('device_signature')
-                    if not existing_sig and isinstance(device_res, (list, tuple)): existing_sig = device_res[0]
-                    
-                    if existing_sig and existing_sig != device_signature:
-                        reason = "Appareil différent utilisé"
-                        result = "Rejeté"
-                except:
-                    pass
+            if already_count >= 4:
+                reason = "Limite de 4 pointages par jour atteinte (2 Entrées / 2 Sorties)"
+                result = "Rejeté"
 
             if result == "Accepté":
                 # Logique de séquence (Entrée -> Sortie)
