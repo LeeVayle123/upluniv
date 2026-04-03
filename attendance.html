@@ -578,13 +578,7 @@
                         this.matricule = session.matricule;
                         this.auditorium_code = session.auditorium_code;
                         this.active = true;
-
-                        // Calcul du temps écoulé depuis le dernier envoi ? 
-                        // Pour l'essai, on va simplement reprogrammer le prochain check selon next_delay
-                        console.log(`Tracking session restored. Next scheduled check: ${session.next_delay}s`);
-
-                        // Sécurité : si la page est rechargée, on relance le timer basé sur le dernier next_delay enregistré
-                        setTimeout(() => requestLocationAfterDelay(), session.next_delay * 1000);
+                        console.log(`Tracking session restored.`);
                     }
                 },
 
@@ -593,18 +587,14 @@
                     this.auditorium_code = audCode;
                     this.active = true;
 
-                    // Initialisation du cycle de test (15s, 60s, 120s...)
+                    // Initialisation de la session
                     const session = {
                         matricule: matricule,
                         auditorium_code: audCode,
-                        startTime: new Date().toISOString(),
-                        next_delay: 15, // Démarrage à 15s
-                        step_count: 0
+                        startTime: new Date().toISOString()
                     };
                     localStorage.setItem('tracking_session', JSON.stringify(session));
-                    console.log("Tracking started (TEST MODE). Next check in 15s");
-
-                    setTimeout(() => requestLocationAfterDelay(), 15000);
+                    console.log("Tracking started. Checking periodically for schedule matches.");
                 },
 
                 stop: function () {
@@ -624,8 +614,7 @@
 
                     if (this.lastCheckedTime === currentTime) return;
 
-                    // --- COMMENTÉ POUR LES ESSAIS (Désactivation des heures fixes) ---
-                    /*
+                    // Vérification croisée chronologique selon le config backend
                     const allChecks = [...this.config.morning_checks, ...this.config.afternoon_checks];
                     
                     if (allChecks.includes(currentTime)) {
@@ -633,8 +622,6 @@
                         this.lastCheckedTime = currentTime;
                         this.captureAndReport(currentTime);
                     }
-                    */
-                    // -----------------------------------------------------------------
 
                     // Gestion de l'ouverture du formulaire de sortie
                     this.updateUIForExit(currentTime);
@@ -704,62 +691,6 @@
 
             // Démarrage du moteur
             TrackingEngine.init();
-
-            /**
-             * MÉTHODE DE DEMANDE DE LOCALISATION DIFFÉRÉE (VÉRIFICATION PROGRESSIVE)
-             */
-            function requestLocationAfterDelay() {
-                if (!TrackingEngine.active || !TrackingEngine.matricule) return;
-
-                const session = JSON.parse(localStorage.getItem('tracking_session'));
-                if (!session) return;
-
-                console.log(`Exécution du suivi de test (${session.next_delay}s)...`);
-
-                if ("geolocation" in navigator) {
-                    navigator.geolocation.getCurrentPosition(function (pos) {
-                        const currentDelay = session.next_delay;
-
-                        const report = {
-                            matricule: TrackingEngine.matricule,
-                            auditorium_code: TrackingEngine.auditorium_code,
-                            latitude: pos.coords.latitude,
-                            longitude: pos.coords.longitude,
-                            accuracy_meters: pos.coords.accuracy,
-                            scheduled_time: `TEST_SUIVI_${currentDelay}S`,
-                            device_signature: document.getElementById('device_signature').value,
-                            timestamp: new Date().toISOString()
-                        };
-
-                        // Calcul du PROCHAIN délai
-                        // Logique : 15s -> 60s -> 120s -> 180s ... -> 3600s -> boucle à 15s
-                        let nextDelay;
-                        if (currentDelay === 15) {
-                            nextDelay = 60;
-                        } else if (currentDelay >= 3600) {
-                            nextDelay = 15; // Boucle de test
-                        } else {
-                            nextDelay = currentDelay + 60; // Incrément de 1 minute
-                        }
-
-                        // Mise à jour de la session
-                        session.next_delay = nextDelay;
-                        session.step_count += 1;
-                        localStorage.setItem('tracking_session', JSON.stringify(session));
-
-                        console.log(`Signal envoyé. Prochain check dans ${nextDelay}s`);
-                        TrackingEngine.sendReport(report);
-
-                        // Programmation du prochain appel
-                        setTimeout(() => requestLocationAfterDelay(), nextDelay * 1000);
-
-                    }, function (error) {
-                        console.warn("Échec géo silencieuse :", error.message);
-                        // En cas d'échec GPS, on réessaye dans 15s par sécurité
-                        setTimeout(() => requestLocationAfterDelay(), 15000);
-                    }, { enableHighAccuracy: true, timeout: 10000 });
-                }
-            }
         </script>
 
         <style>
