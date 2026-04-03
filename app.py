@@ -3,7 +3,7 @@ import sqlite3
 import qrcode
 import io
 import traceback
-from flask import Flask, request, render_template, redirect, url_for, jsonify, send_file
+from flask import Flask, request, render_template, redirect, url_for, jsonify, send_file, session
 from datetime import datetime, timedelta, timezone
 try:
     from db_config import host, user, password, database
@@ -60,6 +60,7 @@ if not os.path.isdir(static_dir):
     static_dir = basedir
 
 app = Flask(__name__, template_folder=template_dir, static_folder=static_dir)
+app.secret_key = 'admin_secret_key_2024'
 
 # --- CONFIGURATION DU SYSTÈME DE VALIDATION ---
 # Ces valeurs peuvent être ajustées selon les besoins
@@ -90,6 +91,41 @@ AFTERNOON_EXIT_OPEN_TIME = "16:50"
 # Délai de désactivation temporaire du formulaire après une sortie (en secondes)
 # Mis à 30 secondes de l'activaton du formulaire après l'inssertion
 EXIT_COOLDOWN_SECONDS = 30 
+
+# --- sécurité admin ---
+ADMIN_USERNAME = 'Lee-vayle'
+ADMIN_PASSWORD = 'Lee123#'
+
+def login_required(f):
+    def wrapper(*args, **kwargs):
+        if 'admin_logged_in' not in session:
+            # For API routes, return JSON error
+            if request.path.startswith('/api/'):
+                return jsonify({'error': 'Authentication required'}), 401
+            # For web routes, redirect to login
+            return redirect(url_for('admin_login'))
+        return f(*args, **kwargs)
+    wrapper.__name__ = f.__name__
+    return wrapper
+
+@app.route('/admin/login', methods=['GET', 'POST'])
+def admin_login():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        
+        if username == ADMIN_USERNAME and password == ADMIN_PASSWORD:
+            session['admin_logged_in'] = True
+            return redirect(url_for('admin_dashboard'))
+        else:
+            return render_template('admin_login.html', error='Identifiants incorrects')
+    
+    return render_template('admin_login.html')
+
+@app.route('/admin/logout')
+def admin_logout():
+    session.pop('admin_logged_in', None)
+    return redirect(url_for('admin_login'))
 
 # --- CONFIGURATION DE LA CONNEXION À LA BASE DE DONNÉES ---
 def get_db_connection():
@@ -1010,6 +1046,7 @@ def view_presences():
         return f"Erreur lors de la récupération des présences : {err}"
 
 @app.route('/admin/timeline')
+@login_required
 def admin_timeline():
     """
     Affiche l'interface du tableau de bord temps réel (Timeline).
@@ -1017,6 +1054,7 @@ def admin_timeline():
     return render_template('admin_timeline.html')
 
 @app.route('/api/admin/timeline')
+@login_required
 def api_admin_timeline():
     """
     Renvoie les données consolidées pour la timeline (entrées + vérifications).
@@ -1032,12 +1070,24 @@ def api_admin_timeline():
         today = now_lub.strftime('%Y-%m-%d')
 
         promo = request.args.get('promotion')
-        search_promo = f"%{promo.replace('_', ' ')}%" if promo else None
 
         # 1. On récupère toutes les entrées/sorties de 'presences' pour aujourd'hui
         if promo:
-            q_presences = "SELECT * FROM presences WHERE date(date_inscription) = %s AND promotion LIKE %s ORDER BY date_inscription DESC"
-            execute_sql(cursor, q_presences, (today, search_promo))
+            # Filtrage pare-balle: on récupère les matricules exacts de la table correspondante (ex: bac1_IAGE)
+            try:
+                execute_sql(cursor, f"SELECT matricule FROM {promo}")
+                promo_matricules = [r['matricule'] if isinstance(r, dict) else r[0] for r in cursor.fetchall()]
+            except:
+                promo_matricules = []
+
+            if promo_matricules:
+                format_strings = ','.join(['%s'] * len(promo_matricules))
+                q_presences = f"SELECT * FROM presences WHERE date(date_inscription) = %s AND matricule IN ({format_strings}) ORDER BY date_inscription DESC"
+                execute_sql(cursor, q_presences, [today] + promo_matricules)
+            else:
+                # Aucun étudiant pour cette classe ou table introuvable
+                presences = []
+                execute_sql(cursor, "SELECT 1 WHERE 0") # dummy
         else:
             q_presences = "SELECT * FROM presences WHERE date(date_inscription) = %s ORDER BY date_inscription DESC"
             execute_sql(cursor, q_presences, (today,))
@@ -1173,12 +1223,19 @@ def api_presences():
 
         # On interroge la table UNIQUE 'presences' (plus fiable)
         if promo:
-            # On cherche par promotion (insensible à la casse si possible)
-            # Note: promo dans l'onglet est 'bac1_iage', dans la DB c'est 'BAC 1 IAGE' ?
-            # On va essayer de faire matcher.
-            query = "SELECT * FROM presences WHERE promotion LIKE %s ORDER BY date_inscription DESC"
-            search_promo = f"%{promo.replace('_', ' ')}%"
-            execute_sql(cursor, query, (search_promo,))
+            # Filtrage ultra-fiable en utilisant les matricules de la table de promotion
+            try:
+                execute_sql(cursor, f"SELECT matricule FROM {promo}")
+                promo_mats = [r['matricule'] if isinstance(r, dict) else r[0] for r in cursor.fetchall()]
+            except:
+                promo_mats = []
+                
+            if promo_mats:
+                format_strings = ','.join(['%s'] * len(promo_mats))
+                query = f"SELECT * FROM presences WHERE matricule IN ({format_strings}) ORDER BY date_inscription DESC"
+                execute_sql(cursor, query, tuple(promo_mats))
+            else:
+                execute_sql(cursor, "SELECT 1 WHERE 0") # Vide
         else:
             execute_sql(cursor, "SELECT * FROM presences ORDER BY date_inscription DESC")
             
@@ -1253,6 +1310,7 @@ def respond_to_check():
         return jsonify({"status": "error", "message": str(e)}), 500
 
 @app.route('/api/admin/trigger_check', methods=['POST'])
+@login_required
 def trigger_check():
     """
     Simule le déclenchement d'un contrôle aléatoire pour un étudiant.
@@ -1512,6 +1570,7 @@ def debug_db():
 # --- ADMINISTRATION ---
 
 @app.route('/admin')
+@login_required
 def admin_dashboard():
     """
     Tableau de bord pour l'administrateur montrant quelques statistiques.
@@ -1548,6 +1607,7 @@ def admin_dashboard():
         return f"Erreur : {err}"
 
 @app.route('/admin/bac1_iage')
+@login_required
 def admin_bac1_iage():
     """
     Affichage détaillé des étudiants inscrits en Bac1 IAGE.
@@ -1595,7 +1655,7 @@ def admin_bac1_iage():
         
         cursor.close()
         conn.close()
-        return render_template('admin_bac1_iage.html', students=students, count=count)
+        return render_template('students_list.html', students=students, count=count)
     except (mysql.connector.Error, sqlite3.Error, Exception) as err:
         return f"Erreur : {err}"
 
@@ -1659,6 +1719,7 @@ def admin_attendance():
         return f"Erreur : {err}"
 
 @app.route('/admin/reset_table', methods=['POST'])
+@login_required
 def reset_table():
     """
     Cette route sert à réinitialiser (vider) une table de données.
@@ -1702,6 +1763,7 @@ def reset_table():
         return f"Erreur lors de la réinitialisation : {err}"
 
 @app.route('/admin/general_dashboard')
+@login_required
 def admin_general_dashboard():
     """
     Rends le nouveau tableau de bord de rapport général.
@@ -1709,6 +1771,7 @@ def admin_general_dashboard():
     return render_template('general_dashboard.html')
 
 @app.route('/api/admin/stats_summary')
+@login_required
 def api_admin_stats_summary():
     """
     Retourne un résumé des statistiques pour le dashboard.
