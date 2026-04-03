@@ -267,8 +267,8 @@
                     </select>
                 </div>
 
-                <div id="gps-status" style="font-size: 0.7rem; color: #64748b; margin-bottom: 5px;">
-                    <i class="fa-solid fa-location-dot"></i> Authentification...
+                <div id="gps-status" style="font-size: 0.75rem; color: #eab308; margin-bottom: 5px; font-weight: 600;">
+                    <i class="fa-solid fa-spinner fa-spin"></i> Recherche de la localisation...
                 </div>
 
                 <div id="form-loading" style="display: none; text-align: center; font-size: 0.75rem; color: navy;">
@@ -297,7 +297,7 @@
                     document.getElementById('accuracy_meters').value = position.coords.accuracy;
 
                     const status = document.getElementById('gps-status');
-                    status.innerHTML = '<i class="fa-solid fa-location-dot"></i> activé';
+                    status.innerHTML = '<i class="fa-solid fa-circle-check"></i> Localisation trouvée';
                     status.style.color = "#16a34a";
                     status.style.fontWeight = "bold";
 

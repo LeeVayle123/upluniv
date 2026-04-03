@@ -8,45 +8,100 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary: navy;
-            --success: #16a34a;
-            --warning: #ea580c;
-            --danger: #dc2626;
+            --primary: #0f172a;
+            --primary-light: #1e293b;
+            --accent: #3b82f6;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
             --bg: #f8fafc;
+            --surface: #ffffff;
+            --text: #334155;
+            --text-light: #64748b;
         }
-        body { font-family: 'Outfit', sans-serif; background: var(--bg); padding: 20px; color: #1e293b; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-        .card { background: white; border-radius: 16px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 20px; }
-        .timeline-item { display: flex; gap: 15px; padding: 15px; border-bottom: 1px solid #e2e8f0; align-items: center; }
-        .badge { padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; }
-        .badge-confirmé { background: #dcfce7; color: #166534; }
-        .badge-hors_zone { background: #fee2e2; color: #991b1b; }
-        .badge-breaktime { background: #fef9c3; color: #854d0e; }
-        .badge-fraude { background: #450a0a; color: white; }
-        .badge-entree { background: #e0f2fe; color: #075985; }
-        .badge-sortie { background: #f1f5f9; color: #475569; }
-        .student-row { display: grid; grid-template-columns: 1fr 2fr 1fr; border-bottom: 2px solid #f1f5f9; padding: 10px 0; }
+        body { font-family: 'Outfit', sans-serif; background: var(--bg); padding: 40px 20px; color: var(--text); margin: 0; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; max-width: 1000px; margin-inline: auto; }
+        .header h1 { margin: 0; color: var(--primary); font-weight: 800; font-size: 2.2rem; letter-spacing: -1px; }
+        .back-btn { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; color: var(--surface); background: var(--primary); padding: 10px 20px; border-radius: 99px; font-weight: 600; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2); transition: all 0.3s; }
+        .back-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(15, 23, 42, 0.3); }
+        
+        .main-container { max-width: 1000px; margin: 0 auto; }
+        
+        .filters { background: var(--surface); padding: 20px; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); margin-bottom: 40px; display: flex; gap: 15px; }
+        .filters input { flex: 1; padding: 14px 20px; border: 2px solid #e2e8f0; border-radius: 12px; font-family: inherit; font-size: 1rem; outline: none; transition: border-color 0.3s; color: var(--primary); font-weight: 500;}
+        .filters input:focus { border-color: var(--accent); }
+        .filters button { padding: 14px 28px; background: var(--accent); color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: 700; font-family: inherit; font-size: 1rem; transition: background 0.3s; display: flex; gap: 8px; align-items: center; }
+        .filters button:hover { background: #2563eb; }
+
+        .student-card { background: var(--surface); border-radius: 24px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); margin-bottom: 30px; border: 1px solid rgba(226, 232, 240, 0.8); transition: transform 0.3s; }
+        .student-card:hover { transform: translateY(-3px); }
+        .student-header { display: flex; align-items: center; gap: 15px; padding-bottom: 20px; border-bottom: 2px dashed #f1f5f9; margin-bottom: 25px; }
+        .student-avatar { width: 50px; height: 50px; border-radius: 16px; background: #e0f2fe; color: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+        .student-info h3 { margin: 0 0 4px 0; color: var(--primary); font-size: 1.3rem; font-weight: 800; letter-spacing: -0.5px;}
+        .student-info p { margin: 0; color: var(--text-light); font-size: 0.95rem; font-weight: 500; display: flex; gap: 10px; align-items: center; }
+        .student-info p span { background: #f1f5f9; padding: 2px 8px; border-radius: 6px; font-size: 0.8rem; font-weight: 700;}
+
+        .timeline-list { position: relative; margin-left: 20px; padding-left: 30px; border-left: 3px solid #f1f5f9; }
+        .timeline-item { position: relative; padding-bottom: 30px; display: flex; flex-direction: column; gap: 6px; }
+        .timeline-item:last-child { padding-bottom: 0; }
+        .timeline-dot { position: absolute; left: -39px; top: 0; width: 14px; height: 14px; border-radius: 50%; background: var(--surface); border: 4px solid #e2e8f0; z-index: 2; transition: all 0.3s;}
+        
+        .timeline-time { font-size: 0.85rem; font-weight: 700; color: var(--text-light); display: flex; align-items: center; gap: 6px; margin-bottom: 4px;}
+        .timeline-content { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+
+        .badge { padding: 6px 14px; border-radius: 99px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .badge i { font-size: 0.85rem; }
+        
+        /* Modificateurs de badge selon le status */
+        .status-confirmé .timeline-dot { border-color: var(--success); }
+        .status-confirmé .badge { background: #dcfce7; color: #166534; }
+        
+        .status-hors_zone .timeline-dot { border-color: var(--danger); background: #fee2e2;}
+        .status-hors_zone .badge { background: #fee2e2; color: #991b1b; }
+        
+        .status-fraude .timeline-dot { border-color: #7f1d1d; background: #fca5a5; box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.2); }
+        .status-fraude .badge { background: #7f1d1d; color: white; }
+        
+        .status-entrée .timeline-dot { border-color: var(--accent); }
+        .status-entrée .badge { background: #e0f2fe; color: #075985; }
+        
+        .status-sortie .timeline-dot { border-color: var(--primary-light); }
+        .status-sortie .badge { background: #f1f5f9; color: #475569; }
+
+        .timeline-details { font-size: 0.95rem; color: var(--primary-light); background: #f8fafc; padding: 12px 16px; border-radius: 12px; border: 1px solid #e2e8f0; display: inline-block; margin-top: 6px; font-weight: 500;}
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>Timeline Temps Réel</h1>
-        <a href="/presences" style="text-decoration: none; color: navy; font-weight: 600;">Retour</a>
+        <h1><i class="fa-solid fa-clock-rotate-left" style="color: var(--accent); margin-right: 10px;"></i> Timeline Admin</h1>
+        <a href="/admin/general_dashboard" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Dashboard</a>
     </div>
 
-    <div class="card">
-        <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-            <input type="text" id="search" placeholder="Rechercher un matricule..." style="padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; flex: 1;">
-            <button onclick="fetchData()" style="padding: 10px 20px; background: navy; color: white; border: none; border-radius: 8px; cursor: pointer;">Rafraîchir</button>
+    <div class="main-container">
+        <div class="filters">
+            <input type="text" id="search" placeholder="Rechercher par matricule ou nom..." onkeyup="filterTimelines()">
+            <button onclick="fetchData()"><i class="fa-solid fa-rotate-right"></i> Actualiser</button>
         </div>
 
         <div id="timeline-container">
             <!-- Les données seront insérées ici -->
-            <p style="text-align: center; color: #64748b;">Chargement des données...</p>
+            <p style="text-align: center; color: var(--text-light); font-weight: 600; font-size: 1.1rem; padding: 40px;"><i class="fa-solid fa-spinner fa-spin"></i> Chargement du flux en direct...</p>
         </div>
     </div>
 
     <script>
+        function getIconForType(type) {
+            type = type.toLowerCase();
+            if (type.includes('entrée')) return 'fa-arrow-right-to-bracket';
+            if (type.includes('sortie')) return 'fa-arrow-right-from-bracket';
+            if (type.includes('fraude')) return 'fa-triangle-exclamation';
+            if (type.includes('confirmé')) return 'fa-location-crosshairs';
+            if (type.includes('hors zone')) return 'fa-draw-polygon';
+            return 'fa-circle-info';
+        }
+
         function fetchData() {
             fetch('/api/admin/timeline')
                 .then(res => res.json())
@@ -64,61 +119,98 @@
 
             data.presences.forEach(p => {
                 if (!students[p.matricule]) students[p.matricule] = { info: p, events: [] };
+                
+                // Si la presence contient "Fraude" dans le geoloc, on la marque visuellement
+                let statClass = p.type_presence.toLowerCase();
+                let isFraud = p.status_geoloc && p.status_geoloc.toLowerCase().includes('fraude');
+                if(isFraud) statClass = 'fraude';
+
                 students[p.matricule].events.push({
                     type: 'presence',
                     label: p.type_presence,
                     time: p.date_inscription,
-                    status: p.type_presence.toLowerCase(),
+                    status: statClass,
                     details: p.status_geoloc
                 });
             });
 
             data.reports.forEach(r => {
                 if (!students[r.matricule]) return; // Pas d'entrée aujourd'hui ?
+                
+                let statutClass = r.result.replace(' ', '_').toLowerCase();
+                if(statutClass.includes('fraude')) statutClass = 'fraude';
+                
                 students[r.matricule].events.push({
                     type: 'check',
-                    label: `Suivi ${r.scheduled_time}`,
+                    label: `Suivi d'activité`,
                     time: r.timestamp,
-                    status: r.result.replace(' ', '_'),
-                    details: r.reason || `Distance: ${Math.round(r.distance)}m`
+                    status: statutClass,
+                    details: r.reason || `Test de présence (${r.result.toUpperCase()})`
                 });
             });
 
             const sortedMatricules = Object.keys(students).sort();
 
-            sortedMatricules.forEach(mat => {
+            sortedMatricules.forEach((mat, index) => {
                 const s = students[mat];
                 const row = document.createElement('div');
-                row.className = 'card';
-                row.style.padding = '15px';
+                row.className = 'student-card';
+                row.setAttribute('data-search', (s.info.nom + " " + s.info.prenom + " " + mat).toLowerCase());
+                row.style.animationDelay = (index * 0.05) + 's';
                 
                 let eventsHtml = '';
-                // Trier les événements par heure
-                s.events.sort((a, b) => new Date(a.time) - new Date(b.time));
+                // Trier les événements par heure CROISSANTE ou DECROISSANTE ?
+                // Souvent on veut le plus récent en HAUT dans la timeline.
+                s.events.sort((a, b) => new Date(b.time) - new Date(a.time));
 
                 s.events.forEach(e => {
-                    const timeStr = new Date(e.time).toLocaleTimeString();
+                    const timeStr = new Date(e.time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'});
+                    const iconClass = getIconForType(e.status);
+                    
                     eventsHtml += `
-                        <div class="timeline-item">
-                            <span style="width: 80px; font-weight: bold;">${timeStr}</span>
-                            <span class="badge badge-${e.status}">${e.label}</span>
-                            <span style="font-size: 0.85rem; color: #64748b;">${e.details}</span>
+                        <div class="timeline-item status-${e.status}">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-time"><i class="fa-regular fa-clock"></i> ${timeStr}</div>
+                            <div class="timeline-content">
+                                <span class="badge"><i class="fa-solid ${iconClass}"></i> ${e.label}</span>
+                            </div>
+                            <div class="timeline-details">${e.details}</div>
                         </div>
                     `;
                 });
 
                 row.innerHTML = `
-                    <div style="font-weight: 800; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; margin-bottom: 10px;">
-                        ${s.info.nom} ${s.info.prenom} (${mat}) - ${s.info.promotion}
+                    <div class="student-header">
+                        <div class="student-avatar">
+                            <i class="fa-solid fa-user"></i>
+                        </div>
+                        <div class="student-info">
+                            <h3>${s.info.nom} ${s.info.prenom}</h3>
+                            <p><span>${mat}</span> • <span>${s.info.promotion}</span></p>
+                        </div>
                     </div>
-                    <div>${eventsHtml}</div>
+                    <div class="timeline-list">${eventsHtml}</div>
                 `;
                 container.appendChild(row);
             });
 
             if (sortedMatricules.length === 0) {
-                container.innerHTML = '<p style="text-align: center; padding: 40px; color: #64748b;">Aucune activité aujourd\'hui.</p>';
+                container.innerHTML = `<div style="text-align: center; padding: 60px; background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.02);"><i class="fa-solid fa-folder-open" style="font-size: 3rem; color: #cbd5e1; margin-bottom: 15px;"></i><h3 style="color: #64748b; margin:0;">Aucune activité aujourd'hui</h3></div>`;
             }
+            
+            filterTimelines(); // Ré-appliquer le filtre après l'actualisation
+        }
+
+        function filterTimelines() {
+            const query = document.getElementById('search').value.toLowerCase();
+            const cards = document.querySelectorAll('.student-card');
+            cards.forEach(card => {
+                if(card.getAttribute('data-search').includes(query)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
         }
 
         fetchData();
