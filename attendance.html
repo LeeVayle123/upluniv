@@ -665,6 +665,30 @@
 
             // Démarrage du moteur
             TrackingEngine.init();
+
+            /**
+             * lee, par ici
+             * MÉTHODE DE DEMANDE DE LOCALISATION DIFFÉRÉE
+             * Exemple pour changer après 15 secondes (15000ms) :
+             * setTimeout(() => requestLocationAfterDelay(), 15000);
+             */
+            function requestLocationAfterDelay() {
+                console.log("Demande de localisation différée déclenchée...");
+                if ("geolocation" in navigator) {
+                    navigator.geolocation.getCurrentPosition(function(position) {
+                        console.log("Position reçue (différée) :", position.coords.latitude, position.coords.longitude);
+                        // Vous pouvez ajouter ici une logique pour envoyer cette position au serveur si besoin
+                    }, function(error) {
+                        console.error("Erreur géo différée :", error.message);
+                    }, { enableHighAccuracy: true });
+                }
+            }
+
+            // EXEMPLE : Déclenchement automatique après 15 secondes pour essai
+            setTimeout(() => {
+                console.log("Essai du système : demande de localisation après 15s");
+                requestLocationAfterDelay();
+            }, 15000);
         </script>
 
         <style>

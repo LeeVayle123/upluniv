@@ -74,8 +74,8 @@ PUBLIC_URL = os.environ.get('PUBLIC_URL', '')
 if PUBLIC_URL and not PUBLIC_URL.startswith(('http://', 'https://')):
     PUBLIC_URL = f"https://{PUBLIC_URL}"
 
-# --- CONFIGURATION DES HORAIRES DE SUIVI (Commentaires en Français) ---
-# Vous pouvez modifier ces heures ici. Format "HH:MM"
+# --- CONFIGURATION DES HORAIRES DE SUIVI (Commentaires en ) ---
+# place de modification des  heures ici. Format "HH:MM"
 # Heures de vérification pour la session du MATIN (Entrée possible dès 07:00)
 MORNING_CHECK_TIMES = ["09:00", "10:00", "10:30", "10:40", "11:00", "11:30", "11:55"]
 
@@ -87,7 +87,7 @@ MORNING_EXIT_OPEN_TIME = "11:50"
 AFTERNOON_EXIT_OPEN_TIME = "16:50"
 
 # Délai de désactivation temporaire du formulaire après une sortie (en secondes)
-# Mis à 30 secondes pour vos tests selon votre demande.
+# Mis à 30 secondes de l'activaton du formulaire après l'inssertion
 EXIT_COOLDOWN_SECONDS = 30 
 
 # --- CONFIGURATION DE LA CONNEXION À LA BASE DE DONNÉES ---
@@ -1664,6 +1664,100 @@ def reset_table():
             
     except (mysql.connector.Error, sqlite3.Error, Exception) as err:
         return f"Erreur lors de la réinitialisation : {err}"
+
+@app.route('/admin/general_dashboard')
+def admin_general_dashboard():
+    """
+    Rends le nouveau tableau de bord de rapport général.
+    """
+    return render_template('general_dashboard.html')
+
+@app.route('/api/admin/stats_summary')
+def api_admin_stats_summary():
+    """
+    Retourne un résumé des statistiques pour le dashboard.
+    """
+    try:
+        conn = get_db_connection()
+        if isinstance(conn, sqlite3.Connection):
+            cursor = conn.cursor()
+        else:
+            cursor = conn.cursor(dictionary=True)
+
+        now_lub = datetime.now(timezone(timedelta(hours=2))).replace(tzinfo=None)
+        today = now_lub.strftime('%Y-%m-%d')
+
+        # 1. Étudiants Totaux
+        total_students = 0
+        tables = [
+            'bac1_IAGE', 'bac2_IAGE', 'bac3_IAGE',
+            'bac1_tech_IA', 'bac1_tech_GL', 'bac1_tech_SI',
+            'bac2_tech_IA', 'bac2_tech_GL', 'bac2_tech_SI',
+            'bac3_tech_IA', 'bac3_tech_GL', 'bac3_tech_SI',
+            'bac4_tech_IA', 'bac4_tech_GL', 'bac4_tech_SI'
+        ]
+        for t in tables:
+            try:
+                execute_sql(cursor, f"SELECT COUNT(*) FROM {t}")
+                count_res = cursor.fetchone()
+                total_students += count_res[0] if isinstance(count_res, (list, tuple)) else (count_res['COUNT(*)'] if 'COUNT(*)' in count_res else count_res[0])
+            except: continue
+
+        # 2. Présences du jour
+        execute_sql(cursor, "SELECT type_presence, status_geoloc FROM presences WHERE date(date_inscription) = %s", (today,))
+        today_presences = cursor.fetchall()
+        
+        entrees_today = 0
+        sorties_today = 0
+        hors_zone_today = 0
+        
+        for p in today_presences:
+            if isinstance(p, dict):
+                tp = p.get('type_presence')
+                sg = p.get('status_geoloc')
+            else:
+                tp = p[0]
+                sg = p[1]
+                
+            if tp == 'Entrée': entrees_today += 1
+            elif tp == 'Sortie': sorties_today += 1
+            if sg and 'Hors Zone' in sg: hors_zone_today += 1
+
+        # 3. Rapports de suivi du jour (random_check_responses)
+        execute_sql(cursor, "SELECT result FROM random_check_responses WHERE date(timestamp) = %s", (today,))
+        today_reports = cursor.fetchall()
+        fraudes_today = 0
+        for r in today_reports:
+            res = r['result'] if isinstance(r, dict) else r[0]
+            if res == 'fraude': fraudes_today += 1
+
+        # 4. Historique des 7 derniers jours (pour le graphique)
+        history_points = []
+        for i in range(6, -1, -1):
+            day_dt = now_lub - timedelta(days=i)
+            day_str = day_dt.strftime('%Y-%m-%d')
+            day_label = day_dt.strftime('%d/%m')
+            execute_sql(cursor, "SELECT COUNT(*) FROM presences WHERE date(date_inscription) = %s", (day_str,))
+            count_res = cursor.fetchone()
+            count = count_res[0] if isinstance(count_res, (list, tuple)) else (count_res['COUNT(*)'] if 'COUNT(*)' in count_res else count_res[0])
+            history_points.append({"label": day_label, "count": count})
+
+        cursor.close()
+        conn.close()
+        
+        return jsonify({
+            "total_students": total_students,
+            "entrees_today": entrees_today,
+            "sorties_today": sorties_today,
+            "hors_zone_today": hors_zone_today,
+            "fraudes_today": fraudes_today,
+            "history": history_points
+        })
+
+    except Exception as e:
+        traceback.print_exc()
+        if 'conn' in locals() and conn: conn.close()
+        return jsonify({"error": str(e)}), 500
 
 # Lancement du serveur
 if __name__ == '__main__':

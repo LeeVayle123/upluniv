@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Général | UPL</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #000080; /* Navy */
+            --secondary: #ff0000; /* Red */
+            --bg-light: #f8fafc;
+            --card-bg: rgba(255, 255, 255, 0.9);
+            --text-dark: #1e293b;
+            --text-muted: #64748b;
+            --radius: 16px;
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            overflow-x: hidden;
+        }
+
+        /* Sidebar Style */
+        .sidebar {
+            width: 260px;
+            background: var(--primary);
+            color: white;
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            position: fixed;
+            height: 100vh;
+            z-index: 100;
+            transition: var(--transition);
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px;
+        }
+
+        .logo-img {
+            width: 45px;
+            height: 45px;
+            background: white;
+            border-radius: 50%;
+            padding: 5px;
+            object-fit: contain;
+        }
+
+        .logo-text {
+            font-weight: 800;
+            font-size: 1.5rem;
+            letter-spacing: 1px;
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .nav-item a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px 15px;
+            border-radius: 12px;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .nav-item.active a, .nav-item a:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-item i {
+            width: 20px;
+            font-size: 1.1rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 260px;
+            flex: 1;
+            padding: 40px;
+            max-width: 1600px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .date-display {
+            background: white;
+            padding: 10px 20px;
+            border-radius: 999px;
+            box-shadow: var(--shadow);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--primary);
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border-left: 5px solid var(--primary);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card.alert {
+            border-left-color: var(--secondary);
+        }
+
+        .stat-card .icon {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            font-size: 2.5rem;
+            opacity: 0.1;
+            color: var(--primary);
+        }
+
+        .stat-card.alert .icon {
+            color: var(--secondary);
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--text-dark);
+        }
+
+        /* Charts Section */
+        .charts-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .chart-container {
+            background: white;
+            padding: 30px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+
+        .chart-header {
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chart-header h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        /* Activity Table */
+        .activity-card {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 30px;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: left;
+            padding: 15px;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            border-bottom: 2px solid #f1f5f9;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 0.95rem;
+        }
+
+        .badge {
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .badge-success { background: #dcfce7; color: #166534; }
+        .badge-warning { background: #fef9c3; color: #854d0e; }
+        .badge-danger { background: #fee2e2; color: #991b1b; }
+
+        @media (max-width: 1024px) {
+            .sidebar { width: 80px; padding: 20px 10px; }
+            .logo-text, .nav-item span { display: none; }
+            .main-content { margin-left: 80px; }
+            .charts-row { grid-template-columns: 1fr; }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-fade {
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+    </style>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="logo-section">
+            <img src="{{ url_for('static', filename='logo_upl.png') }}" class="logo-img" alt="Logo UPL">
+            <span class="logo-text">UPL</span>
+        </div>
+        <ul class="nav-links">
+            <li class="nav-item active">
+                <a href="#"><i class="fa-solid fa-chart-line"></i> <span>Dashboard</span></a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ url_for('view_presences') }}"><i class="fa-solid fa-users-check"></i> <span>Présences</span></a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ url_for('view_students') }}"><i class="fa-solid fa-user-graduate"></i> <span>Étudiants</span></a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ url_for('official_qr') }}"><i class="fa-solid fa-qrcode"></i> <span>QR Code</span></a>
+            </li>
+            <li class="nav-item">
+                <a href="#"><i class="fa-solid fa-gear"></i> <span>Paramètres</span></a>
+            </li>
+        </ul>
+    </aside>
+
+    <main class="main-content">
+        <header class="header animate-fade" style="animation-delay: 0.1s;">
+            <div>
+                <h1>Rapport Général</h1>
+                <p style="color: var(--text-muted);">Bienvenue sur le centre de pilotage UPL.</p>
+            </div>
+            <div class="date-display">
+                <i class="fa-solid fa-calendar-day"></i>
+                <span id="current-date">--/--/----</span>
+            </div>
+        </header>
+
+        <section class="stats-grid">
+            <div class="stat-card animate-fade" style="animation-delay: 0.2s;">
+                <i class="fa-solid fa-user-group icon"></i>
+                <div class="stat-label">Étudiants Inscrits</div>
+                <div class="stat-value" id="stat-total-students">...</div>
+            </div>
+            <div class="stat-card animate-fade" style="animation-delay: 0.3s;">
+                <i class="fa-solid fa-door-open icon"></i>
+                <div class="stat-label">Arrivées Aujourd'hui</div>
+                <div class="stat-value" id="stat-entrees">...</div>
+            </div>
+            <div class="stat-card alert animate-fade" style="animation-delay: 0.4s;">
+                <i class="fa-solid fa-location-dot icon"></i>
+                <div class="stat-label">Hors Zone</div>
+                <div class="stat-value" id="stat-hors-zone" style="color: var(--secondary);">...</div>
+            </div>
+            <div class="stat-card alert animate-fade" style="animation-delay: 0.5s;">
+                <i class="fa-solid fa-warning icon"></i>
+                <div class="stat-label">Fraudes Détectées</div>
+                <div class="stat-value" id="stat-fraudes" style="color: var(--secondary);">...</div>
+            </div>
+        </section>
+
+        <section class="charts-row">
+            <div class="chart-container animate-fade" style="animation-delay: 0.6s;">
+                <div class="chart-header">
+                    <h2>Fréquentation Hebdomadaire</h2>
+                </div>
+                <canvas id="attendanceChart" height="200"></canvas>
+            </div>
+            <div class="chart-container animate-fade" style="animation-delay: 0.7s;">
+                <div class="chart-header">
+                    <h2>Statut des Pointages</h2>
+                </div>
+                <canvas id="statusPieChart" height="300"></canvas>
+            </div>
+        </section>
+
+        <section class="activity-card animate-fade" style="animation-delay: 0.8s;">
+            <div class="table-header">
+                <h2>Activité Récente</h2>
+                <button onclick="updateStats()" style="background: var(--bg-light); border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-weight: 600; color: var(--primary);">
+                    <i class="fa-solid fa-rotate"></i> Actualiser
+                </button>
+            </div>
+            <table id="recent-activity-table">
+                <thead>
+                    <tr>
+                        <th>Heure</th>
+                        <th>Étudiant</th>
+                        <th>Promotion</th>
+                        <th>Type</th>
+                        <th>Statut</th>
+                    </tr>
+                </thead>
+                <tbody id="activity-body">
+                    <!-- Rempli par JS -->
+                </tbody>
+            </table>
+        </section>
+    </main>
+
+    <script>
+        // Update current date
+        document.getElementById('current-date').textContent = new Date().toLocaleDateString('fr-FR', { 
+            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
+        });
+
+        let attendanceChart, statusPieChart;
+
+        async function updateStats() {
+            try {
+                const response = await fetch('/api/admin/stats_summary');
+                const data = await response.json();
+
+                // Update cards
+                document.getElementById('stat-total-students').textContent = data.total_students;
+                document.getElementById('stat-entrees').textContent = data.entrees_today;
+                document.getElementById('stat-hors-zone').textContent = data.hors_zone_today;
+                document.getElementById('stat-fraudes').textContent = data.fraudes_today;
+
+                // Update Line Chart
+                const ctxLine = document.getElementById('attendanceChart').getContext('2d');
+                if (attendanceChart) attendanceChart.destroy();
+                attendanceChart = new Chart(ctxLine, {
+                    type: 'line',
+                    data: {
+                        labels: data.history.map(h => h.label),
+                        datasets: [{
+                            label: 'Total Pointages',
+                            data: data.history.map(h => h.count),
+                            borderColor: '#000080',
+                            backgroundColor: 'rgba(0, 0, 80, 0.1)',
+                            fill: true,
+                            tension: 0.4,
+                            borderWidth: 3,
+                            pointBackgroundColor: '#000080',
+                            pointBorderColor: 'white',
+                            pointBorderWidth: 2,
+                            pointRadius: 5
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: { beginAtZero: true, grid: { display: false } },
+                            x: { grid: { display: false } }
+                        }
+                    }
+                });
+
+                // Update Pie Chart
+                const ctxPie = document.getElementById('statusPieChart').getContext('2d');
+                if (statusPieChart) statusPieChart.destroy();
+                statusPieChart = new Chart(ctxPie, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Entrées', 'Sorties', 'Fraudes'],
+                        datasets: [{
+                            data: [data.entrees_today, data.sorties_today, data.fraudes_today],
+                            backgroundColor: ['#000080', '#0ea5e9', '#ff0000'],
+                            borderWidth: 0,
+                            cutout: '70%'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20 } }
+                        }
+                    }
+                });
+
+                // Update Recent Activity (Fetch from timeline API)
+                const activityRes = await fetch('/api/admin/timeline');
+                const activityData = await activityRes.json();
+                const tbody = document.getElementById('activity-body');
+                tbody.innerHTML = '';
+                
+                // Show last 10 entries
+                activityData.presences.slice(0, 10).forEach(p => {
+                    const time = p.date_inscription ? new Date(p.date_inscription).toLocaleTimeString() : '??:??';
+                    const sg = p.status_geoloc || '';
+                    let badgeClass = 'badge-success';
+                    if (sg.includes('Hors Zone')) badgeClass = 'badge-danger';
+                    
+                    tbody.innerHTML += `
+                        <tr>
+                            <td><strong>${time}</strong></td>
+                            <td>${p.nom} ${p.prenom}</td>
+                            <td>${p.promotion}</td>
+                            <td>${p.type_presence}</td>
+                            <td><span class="badge ${badgeClass}">${sg}</span></td>
+                        </tr>
+                    `;
+                });
+
+            } catch (err) {
+                console.error("Erreur stats:", err);
+            }
+        }
+
+        // Auto-refresh every 30s
+        updateStats();
+        setInterval(updateStats, 30000);
+    </script>
+</body>
+</html>
