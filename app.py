@@ -715,7 +715,10 @@ def check_report():
         reason = ""
         
         if distance > max_allowed:
-            if scheduled_time == "10:30":
+            if scheduled_time == "15S_CHECK":
+                result = "fraude"
+                reason = f"Signal fraude : le matricule {matricule} est toujours hors zone"
+            elif scheduled_time == "10:30":
                 result = "breaktime"
                 reason = "Hors zone pendant le break"
             elif scheduled_time == "10:40":
