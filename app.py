@@ -611,8 +611,9 @@ def check_attendance():
                             last_aud_code = last_aud_res[0] if isinstance(last_aud_res, (list, tuple)) else (last_aud_res['auditorium_code'] if 'auditorium_code' in last_aud_res else last_aud_res[0])
                             
                             if last_aud_code != auditorium_code:
-                                reason = f"Sortie rejetée : L'entrée a été faite dans l'auditoire '{last_aud_code}'."
-                                result = "Rejeté"
+                                # On accepte la requête (pour ne pas alerter l'étudiant) mais on marque en Fraude
+                                reason = f"L'entrée s'est faite dans '{last_aud_code}', pas '{auditorium_code}'"
+                                auditorium_fraud = True
 
         # 5. JOURNALISATION IMMUABLE (attendance_attempts)
         insert_attempt = """
@@ -626,10 +627,13 @@ def check_attendance():
         if result == "Accepté":
             nom, postnom, prenom, filiere, promotion, sexe, faculte, parcours = student_data
             
-            # Status personnalisé pour l'admin si hors zone
-            status_geoloc = f"Validé ({auditorium_code})"
-            if distance > max_allowed_distance:
-                status_geoloc = f"Hors Zone ({int(distance)}m)"
+            # Status personnalisé pour l'admin si hors zone ou fraude auditoire
+            if locals().get('auditorium_fraud', False):
+                status_geoloc = f"Fraude ({reason})"
+            else:
+                status_geoloc = f"Validé ({auditorium_code})"
+                if distance > max_allowed_distance:
+                    status_geoloc = f"Hors Zone ({int(distance)}m)"
             
             # Table globale
             insert_query = """
@@ -1735,12 +1739,22 @@ def api_admin_stats_summary():
                 
             if tp == 'Entrée': entrees_today += 1
             elif tp == 'Sortie': sorties_today += 1
-            if sg and 'Hors Zone' in sg: hors_zone_today += 1
+            
+            if sg:
+                if 'Hors Zone' in sg:
+                    hors_zone_today += 1
 
         # 3. Rapports de suivi du jour (random_check_responses)
         execute_sql(cursor, "SELECT result FROM random_check_responses WHERE date(timestamp) = %s", (today,))
         today_reports = cursor.fetchall()
+        
         fraudes_today = 0
+        # Ajouter les fraudes détectées au moment de l'entrée/sortie (presences)
+        for p in today_presences:
+            sg = p.get('status_geoloc') if isinstance(p, dict) else p[1]
+            if sg and 'Fraude' in sg:
+                fraudes_today += 1
+
         suivis_ok_today = 0
         for r in today_reports:
             res = r['result'] if isinstance(r, dict) else r[0]
