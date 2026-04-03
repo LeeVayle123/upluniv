@@ -633,7 +633,8 @@ def check_attendance():
             else:
                 status_geoloc = f"Validé ({auditorium_code})"
                 if distance > max_allowed_distance:
-                    status_geoloc = f"Hors Zone ({int(distance)}m)"
+                    # Remplacement de "Hors Zone" par "Fraude"
+                    status_geoloc = f"Fraude (Hors Zone : {int(distance)}m)"
             
             # Table globale
             insert_query = """
