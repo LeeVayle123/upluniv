@@ -70,6 +70,14 @@
 
         .timeline-details { font-size: 0.95rem; color: var(--primary-light); background: #f8fafc; padding: 12px 16px; border-radius: 12px; border: 1px solid #e2e8f0; display: inline-block; margin-top: 6px; font-weight: 500;}
 
+        /* Styles pour le tableau des fraudes */
+        .fraud-table-container { background: white; border-radius: 20px; padding: 25px; box-shadow: 0 10px 30px rgba(220, 38, 38, 0.08); margin-bottom: 40px; border: 1px solid rgba(220, 38, 38, 0.2); }
+        .fraud-table-header { display: flex; align-items: center; gap: 10px; color: var(--danger); margin-bottom: 20px; font-size: 1.4rem; font-weight: 800; }
+        .fraud-table { width: 100%; border-collapse: collapse; }
+        .fraud-table th { background: #fef2f2; color: #991b1b; padding: 12px 15px; text-align: left; font-weight: 700; border-bottom: 2px solid #fecaca; }
+        .fraud-table td { padding: 12px 15px; border-bottom: 1px solid #fee2e2; color: #7f1d1d; font-weight: 500;}
+        .fraud-table tr:hover td { background: #fff5f5; }
+        
         @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
@@ -80,6 +88,27 @@
     </div>
 
     <div class="main-container">
+        <!-- Tableau des alertes fraudes -->
+        <div class="fraud-table-container" id="fraud-zone" style="display: none;">
+            <div class="fraud-table-header">
+                <i class="fa-solid fa-triangle-exclamation fa-beat-fade"></i> Alertes Fraudes du Jour
+            </div>
+            <table class="fraud-table">
+                <thead>
+                    <tr>
+                        <th>Heure</th>
+                        <th>Étudiant</th>
+                        <th>Promotion</th>
+                        <th>Type d'Alerte</th>
+                        <th>Détails</th>
+                    </tr>
+                </thead>
+                <tbody id="fraud-table-body">
+                    <!-- Rempli par JS -->
+                </tbody>
+            </table>
+        </div>
+
         <div class="filters">
             <input type="text" id="search" placeholder="Rechercher par matricule ou nom..." onkeyup="filterTimelines()">
             <button onclick="fetchData()"><i class="fa-solid fa-rotate-right"></i> Actualiser</button>
@@ -150,9 +179,32 @@
             });
 
             const sortedMatricules = Object.keys(students).sort();
+            
+            // Gestion du Tableau des Fraudes
+            const fraudBody = document.getElementById('fraud-table-body');
+            const fraudZone = document.getElementById('fraud-zone');
+            fraudBody.innerHTML = '';
+            let hasFrauds = false;
 
             sortedMatricules.forEach((mat, index) => {
                 const s = students[mat];
+                
+                // On extrait les événements de type fraude pour le tableau supérieur
+                const fraudEvents = s.events.filter(e => e.status === 'fraude');
+                fraudEvents.forEach(f => {
+                    hasFrauds = true;
+                    const timeStr = new Date(f.time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                    fraudBody.innerHTML += `
+                        <tr>
+                            <td style="font-weight: 700;">${timeStr}</td>
+                            <td><strong>${s.info.nom} ${s.info.prenom}</strong><br><span style="font-size: 0.8rem; opacity: 0.8;">${mat}</span></td>
+                            <td>${s.info.promotion}</td>
+                            <td><span class="badge" style="background:#7f1d1d; color:white;"><i class="fa-solid fa-ban"></i> ${f.label}</span></td>
+                            <td>${f.details}</td>
+                        </tr>
+                    `;
+                });
+
                 const row = document.createElement('div');
                 row.className = 'student-card';
                 row.setAttribute('data-search', (s.info.nom + " " + s.info.prenom + " " + mat).toLowerCase());
@@ -193,6 +245,9 @@
                 `;
                 container.appendChild(row);
             });
+
+            // Afficher ou cacher la zone du tableau de fraudes
+            fraudZone.style.display = hasFrauds ? 'block' : 'none';
 
             if (sortedMatricules.length === 0) {
                 container.innerHTML = `<div style="text-align: center; padding: 60px; background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.02);"><i class="fa-solid fa-folder-open" style="font-size: 3rem; color: #cbd5e1; margin-bottom: 15px;"></i><h3 style="color: #64748b; margin:0;">Aucune activité aujourd'hui</h3></div>`;

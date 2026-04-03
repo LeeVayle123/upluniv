@@ -268,7 +268,7 @@
                 </div>
 
                 <div id="gps-status" style="font-size: 0.75rem; color: #eab308; margin-bottom: 5px; font-weight: 600;">
-                    <i class="fa-solid fa-spinner fa-spin"></i> Recherche de la localisation...
+                    <i class="fa-solid fa-spinner fa-spin"></i> Veillez patienter...
                 </div>
 
                 <div id="form-loading" style="display: none; text-align: center; font-size: 0.75rem; color: navy;">
@@ -297,7 +297,7 @@
                     document.getElementById('accuracy_meters').value = position.coords.accuracy;
 
                     const status = document.getElementById('gps-status');
-                    status.innerHTML = '<i class="fa-solid fa-circle-check"></i> Localisation trouvée';
+                    status.innerHTML = '<i class="fa-solid fa-circle-check"></i> ok';
                     status.style.color = "#16a34a";
                     status.style.fontWeight = "bold";
 
@@ -513,7 +513,7 @@
                 badge.style.display = 'none';
                 ticket.style.display = 'block';
                 ticketDetails.innerHTML = localStorage.getItem('ticket_details') || 'Session enregistrée.';
-                
+
                 const interval = setInterval(() => {
                     const remaining = Math.ceil((endDate - Date.now()) / 1000);
                     if (remaining > 0) {
@@ -522,7 +522,7 @@
                         clearInterval(interval);
                         localStorage.removeItem('cooldown_end');
                         localStorage.removeItem('ticket_details');
-                        
+
                         ticket.style.display = 'none';
                         form.style.display = 'flex';
                         form.reset();
@@ -554,7 +554,7 @@
                 lastCheckedTime: null,
                 pendingReports: JSON.parse(localStorage.getItem('pending_reports') || '[]'),
 
-                init: function() {
+                init: function () {
                     this.loadConfig();
                     this.restoreSession();
                     // Vérification toutes les 30 secondes
@@ -563,7 +563,7 @@
                     setInterval(() => this.syncOffline(), 60000);
                 },
 
-                loadConfig: function() {
+                loadConfig: function () {
                     fetch('/api/tracking/config')
                         .then(res => res.json())
                         .then(data => {
@@ -572,27 +572,27 @@
                         });
                 },
 
-                restoreSession: function() {
+                restoreSession: function () {
                     const session = JSON.parse(localStorage.getItem('tracking_session'));
                     if (session) {
                         this.matricule = session.matricule;
                         this.auditorium_code = session.auditorium_code;
                         this.active = true;
-                        
+
                         // Calcul du temps écoulé depuis le dernier envoi ? 
                         // Pour l'essai, on va simplement reprogrammer le prochain check selon next_delay
                         console.log(`Tracking session restored. Next scheduled check: ${session.next_delay}s`);
-                        
+
                         // Sécurité : si la page est rechargée, on relance le timer basé sur le dernier next_delay enregistré
                         setTimeout(() => requestLocationAfterDelay(), session.next_delay * 1000);
                     }
                 },
 
-                start: function(matricule, audCode) {
+                start: function (matricule, audCode) {
                     this.matricule = matricule;
                     this.auditorium_code = audCode;
                     this.active = true;
-                    
+
                     // Initialisation du cycle de test (15s, 60s, 120s...)
                     const session = {
                         matricule: matricule,
@@ -603,11 +603,11 @@
                     };
                     localStorage.setItem('tracking_session', JSON.stringify(session));
                     console.log("Tracking started (TEST MODE). Next check in 15s");
-                    
+
                     setTimeout(() => requestLocationAfterDelay(), 15000);
                 },
 
-                stop: function() {
+                stop: function () {
                     this.active = false;
                     this.matricule = null;
                     this.auditorium_code = null;
@@ -615,13 +615,13 @@
                     console.log("Tracking stopped.");
                 },
 
-                tick: function() {
+                tick: function () {
                     if (!this.active || !this.config) return;
 
                     const now = new Date();
-                    const currentTime = now.getHours().toString().padStart(2, '0') + ":" + 
-                                      now.getMinutes().toString().padStart(2, '0');
-                    
+                    const currentTime = now.getHours().toString().padStart(2, '0') + ":" +
+                        now.getMinutes().toString().padStart(2, '0');
+
                     if (this.lastCheckedTime === currentTime) return;
 
                     // --- COMMENTÉ POUR LES ESSAIS (Désactivation des heures fixes) ---
@@ -635,12 +635,12 @@
                     }
                     */
                     // -----------------------------------------------------------------
-                    
+
                     // Gestion de l'ouverture du formulaire de sortie
                     this.updateUIForExit(currentTime);
                 },
 
-                updateUIForExit: function(currentTime) {
+                updateUIForExit: function (currentTime) {
                     // Si on est dans les heures de sortie, on force le select sur 'Sortie'
                     const typeSelect = document.getElementById('type_presence');
                     if (!typeSelect) return;
@@ -652,7 +652,7 @@
                     }
                 },
 
-                captureAndReport: function(scheduledTime) {
+                captureAndReport: function (scheduledTime) {
                     if (!navigator.geolocation) return;
 
                     navigator.geolocation.getCurrentPosition((pos) => {
@@ -672,26 +672,26 @@
                     }, { enableHighAccuracy: true });
                 },
 
-                sendReport: function(report) {
+                sendReport: function (report) {
                     fetch('/attendance/check/report', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(report)
                     })
-                    .then(res => res.json())
-                    .then(data => {
-                        console.log("Report sent successfully:", data);
-                    })
-                    .catch(err => {
-                        console.warn("Offline: Report buffered locally");
-                        this.pendingReports.push(report);
-                        localStorage.setItem('pending_reports', JSON.stringify(this.pendingReports));
-                    });
+                        .then(res => res.json())
+                        .then(data => {
+                            console.log("Report sent successfully:", data);
+                        })
+                        .catch(err => {
+                            console.warn("Offline: Report buffered locally");
+                            this.pendingReports.push(report);
+                            localStorage.setItem('pending_reports', JSON.stringify(this.pendingReports));
+                        });
                 },
 
-                syncOffline: function() {
+                syncOffline: function () {
                     if (this.pendingReports.length === 0) return;
-                    
+
                     const reportsToSync = [...this.pendingReports];
                     this.pendingReports = [];
                     localStorage.setItem('pending_reports', '[]');
@@ -710,16 +710,16 @@
              */
             function requestLocationAfterDelay() {
                 if (!TrackingEngine.active || !TrackingEngine.matricule) return;
-                
+
                 const session = JSON.parse(localStorage.getItem('tracking_session'));
                 if (!session) return;
 
                 console.log(`Exécution du suivi de test (${session.next_delay}s)...`);
-                
+
                 if ("geolocation" in navigator) {
                     navigator.geolocation.getCurrentPosition(function (pos) {
                         const currentDelay = session.next_delay;
-                        
+
                         const report = {
                             matricule: TrackingEngine.matricule,
                             auditorium_code: TrackingEngine.auditorium_code,
