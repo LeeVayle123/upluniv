@@ -22,11 +22,13 @@
         }
 
         .login-wrapper {
+            /* Ajuster ici la largeur et la hauteur du formulaire */
+            /* Réduction maximale pour un formulaire très compact et rectangulaire */
             display: flex;
-            width: min(520px, 90vw);
-            min-height: 340px;
-            box-shadow: 0 14px 32px rgba(0, 0, 0, 0.14);
-            border-radius: 20px;
+            width: min(580px, 680px);
+            min-height: 160px;
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+            border-radius: 18px;
             overflow: hidden;
             background: white;
         }
@@ -35,44 +37,44 @@
         .left-section {
             background: linear-gradient(135deg, navy 0%, #112f60 100%);
             color: white;
-            padding: 24px 18px;
+            padding: 8px 8px;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             text-align: center;
-            width: 42%;
+            width: 45%;
         }
 
         .left-section img {
-            width: 80px;
-            height: 80px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
-            margin-bottom: 20px;
-            border: 3px solid white;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            margin-bottom: 8px;
+            border: 2px solid white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
         }
 
         .left-section h1 {
-            font-size: 1.3rem;
-            margin-bottom: 12px;
+            font-size: 0.9rem;
+            margin-bottom: 4px;
             font-weight: 800;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.04em;
         }
 
         .left-section p {
-            font-size: 0.8rem;
+            font-size: 0.68rem;
             opacity: 0.9;
-            margin-bottom: 22px;
-            line-height: 1.5;
-            max-width: 180px;
+            margin-bottom: 6px;
+            line-height: 1.3;
+            max-width: 120px;
         }
 
         .left-section .btn-register {
             background: transparent;
             border: 1px solid white;
             color: white;
-            padding: 8px 22px;
+            padding: 4px 10px;
             border-radius: 999px;
             font-weight: 600;
             cursor: pointer;
@@ -80,7 +82,7 @@
             text-decoration: none;
             display: inline-block;
             letter-spacing: 0.04em;
-            font-size: 0.85rem;
+            font-size: 0.68rem;
         }
 
         .left-section .btn-register:hover {
@@ -96,37 +98,37 @@
         /* Côté droit formulaire */
         .right-section {
             background: white;
-            padding: 24px 22px;
+            padding: 6px 6px;
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            width: 58%;
-            min-height: 340px;
+            justify-content: flex-start;
+            width: 55%;
+            min-height: auto;
         }
 
         .login-form-wrapper {
-            max-width: 260px;
+            max-width: 220px;
             margin: 0 auto;
             width: 100%;
         }
 
         .login-form-wrapper h2 {
             color: #071b3d;
-            font-size: 1.25rem;
-            margin-bottom: 8px;
+            font-size: 0.95rem;
+            margin-bottom: 2px;
             font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 0.08em;
+            letter-spacing: 0.04em;
         }
 
         .login-form-wrapper > p {
             color: #6b7280;
-            margin-bottom: 18px;
-            font-size: 0.82rem;
+            margin-bottom: 4px;
+            font-size: 0.68rem;
         }
 
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 4px;
         }
 
         .form-group label {
@@ -140,10 +142,10 @@
 
         .form-group input {
             width: 100%;
-            padding: 10px 12px;
+            padding: 6px 8px;
             border: 1px solid #e5e7eb;
-            border-radius: 10px;
-            font-size: 0.88rem;
+            border-radius: 6px;
+            font-size: 0.78rem;
             transition: border-color 0.3s, box-shadow 0.3s;
             font-family: inherit;
             caret-color: red;
@@ -161,13 +163,13 @@
 
         .forgot-password {
             text-align: right;
-            margin-bottom: 20px;
+            margin-bottom: 4px;
         }
 
         .forgot-password a {
             color: navy;
             text-decoration: none;
-            font-size: 0.85rem;
+            font-size: 0.68rem;
             font-weight: 500;
             cursor: pointer;
         }
@@ -178,18 +180,18 @@
 
         .btn-login {
             width: 100%;
-            padding: 11px;
+            padding: 6px;
             background: navy;
             color: white;
             border: none;
-            border-radius: 10px;
+            border-radius: 6px;
             font-weight: 700;
-            font-size: 0.88rem;
+            font-size: 0.76rem;
             cursor: pointer;
             transition: all 0.3s ease;
-            margin-bottom: 14px;
+            margin-bottom: 6px;
             text-transform: uppercase;
-            letter-spacing: 0.08em;
+            letter-spacing: 0.05em;
         }
 
         .btn-login:hover {
@@ -202,23 +204,23 @@
             background: #ffebee;
             border: 1px solid #ef5350;
             color: #c62828;
-            padding: 12px;
+            padding: 8px;
             border-radius: 6px;
-            margin-bottom: 20px;
-            font-size: 0.9rem;
+            margin-bottom: 10px;
+            font-size: 0.82rem;
         }
 
         .social-login {
             text-align: center;
-            margin-top: 15px;
-            padding-top: 15px;
+            margin-top: 6px;
+            padding-top: 6px;
             border-top: 1px solid #eee;
         }
 
         .social-login p {
             color: #999;
-            font-size: 0.8rem;
-            margin-bottom: 10px;
+            font-size: 0.65rem;
+            margin-bottom: 4px;
         }
 
         /* Curseur rouge au survol */
@@ -254,8 +256,8 @@
         }
 
         .social-btn {
-            width: 40px;
-            height: 40px;
+            width: 28px;
+            height: 28px;
             border-radius: 50%;
             border: 1px solid #ddd;
             display: flex;
@@ -264,7 +266,7 @@
             cursor: pointer;
             transition: all 0.3s;
             color: #666;
-            font-size: 1rem;
+            font-size: 0.8rem;
             text-decoration: none;
         }
 
@@ -313,8 +315,8 @@
         <!-- Côté droit formulaire -->
         <div class="right-section">
             <div class="login-form-wrapper">
-                <h2>Se connecter</h2>
-                <p>Entrez vos identifiants pour accéder à l'interface administrateur</p>
+                <h2>Login</h2>
+                <p>enter your credentials</p>
 
                 {% if error %}
                 <div class="alert-error">
@@ -326,21 +328,21 @@
                 <form method="POST">
                     <div class="form-group">
                         <label for="username">
-                            <i class="fas fa-user me-2" style="color: navy;"></i>Nom d'utilisateur
+                            <i class="fas fa-user me-2" style="color: navy;"></i>Admin
                         </label>
-                        <input type="text" id="username" name="username" placeholder="Nom d'utilisateur" required>
+                        <input type="text" id="username" name="username" placeholder="Ex M. Lee" required>
                     </div>
 
                     <div class="form-group">
                         <label for="password">
-                            <i class="fas fa-lock me-2" style="color: navy;"></i>Mot de passe
+                            <i class="fas fa-lock me-2" style="color: navy;"></i>Admin password
                         </label>
-                        <input type="password" id="password" name="password" placeholder="Mot de passe" required>
+                        <input type="password" id="password" name="password" placeholder="password" required>
                     </div>
 
             
 
-                    <button type="submit" class="btn-login">SE CONNECTER</button>
+                    <button type="submit" class="btn-login">Log in</button>
 
                 <div class="social-login">
                     <p>BY M.LEE L'AMERICAI<br>UPL</p>
