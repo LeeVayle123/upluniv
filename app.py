@@ -65,7 +65,7 @@ app.secret_key = 'admin_secret_key_2024'
 # --- CONFIGURATION DU SYSTÈME DE VALIDATION ---
 # Ces valeurs peuvent être ajustées selon les besoins
 ACCURACY_MAX = 50.0      # Précision GPS maximale acceptée (mètres)
-TIME_MAX_SECONDS = 300   # Fenêtre de temps maximale (secondes)
+TIME_MAX_SECONDS = 300   # Fenêtre de temps maximale (secondes pour que le formulaire puisse réouvrir à nouveau)
 DEFAULT_TOLERANCE = 10.0 # Tolérance par défaut (mètres)
 
 # --- CONFIGURATION DE L'URL PUBLIQUE (NGROK) ---
@@ -92,7 +92,7 @@ AFTERNOON_EXIT_OPEN_TIME = "16:50"
 # Mis à 30 secondes de l'activaton du formulaire après l'inssertion
 EXIT_COOLDOWN_SECONDS = 30 
 
-# --- sécurité admin ---
+# --- sécurité admin pour empecher à n'import qui d'accèder sur l'interface admin---
 ADMIN_USERNAME = 'Lee-vayle'
 ADMIN_PASSWORD = 'Lee123#'
 
@@ -504,7 +504,7 @@ upgrade_db()
 def index():
     return render_template('register.html')
 
-# Nouveau formulaire d'inscription (Premium)
+# Nouveau formulaire d'inscription (un peu moderniser)
 @app.route('/add_student')
 def add_student_form():
     """
@@ -765,7 +765,7 @@ def check_report():
         result = "confirmé"
         reason = ""
         
-        if distance > max_allowed:
+        if distance > max_allowed: # à revoir pour le temps en seconde mis pour le test ligne 768
             if scheduled_time == "15S_CHECK" or scheduled_time.startswith("TEST_SUIVI"):
                 result = "fraude"
                 reason = f"Signal fraude : le matricule {matricule} est toujours hors zone"
@@ -1008,7 +1008,7 @@ def view_presences():
         else:
             cursor = conn.cursor(dictionary=True)
         
-        # On lit la table centrale 'presences'
+        # la lecture de la table centrale 'presences'
 
         try:
             execute_sql(cursor, "SELECT * FROM presences ORDER BY date_inscription DESC")

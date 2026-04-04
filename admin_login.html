@@ -4,127 +4,320 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Connexion Administrateur - UPL University</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             min-height: 100vh;
+            display: flex;
+            background: #f5f5f5;
+        }
+
+        .login-wrapper {
+            display: flex;
+            width: 100%;
+            max-height: 100vh;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Côté bleu gauche */
+        .left-section {
+            background: linear-gradient(135deg, #001a4d 0%, #003d99 100%);
+            color: white;
+            padding: 60px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            width: 45%;
+            min-height: 100vh;
+        }
+
+        .left-section img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin-bottom: 30px;
+            border: 3px solid white;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .left-section h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            font-weight: 700;
+            letter-spacing: -1px;
+        }
+
+        .left-section p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        .left-section .btn-register {
+            background: transparent;
+            border: 2px solid white;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .left-section .btn-register:hover {
+            background: white;
+            color: #001a4d;
+            transform: translateY(-2px);
+        }
+
+        /* Côté droit formulaire */
+        .right-section {
+            background: white;
+            padding: 60px 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            width: 55%;
+            min-height: 100vh;
+        }
+
+        .login-form-wrapper {
+            max-width: 400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .login-form-wrapper h2 {
+            color: #001a4d;
+            font-size: 2rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .login-form-wrapper > p {
+            color: #999;
+            margin-bottom: 30px;
+            font-size: 0.95rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+            font-family: inherit;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #001a4d;
+            box-shadow: 0 0 0 3px rgba(0, 26, 77, 0.1);
+        }
+
+        .form-group input::placeholder {
+            color: #bbb;
+        }
+
+        .forgot-password {
+            text-align: right;
+            margin-bottom: 25px;
+        }
+
+        .forgot-password a {
+            color: #001a4d;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .forgot-password a:hover {
+            text-decoration: underline;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 13px;
+            background: linear-gradient(135deg, #001a4d 0%, #003d99 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 26, 77, 0.3);
+        }
+
+        .alert-error {
+            background: #ffebee;
+            border: 1px solid #ef5350;
+            color: #c62828;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+        }
+
+        .social-login {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .social-login p {
+            color: #999;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        .social-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .social-btn {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: 1px solid #ddd;
             display: flex;
             align-items: center;
             justify-content: center;
-        }
-        .login-container {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-            padding: 40px;
-            width: 100%;
-            max-width: 400px;
-        }
-        .login-header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .login-header h2 {
-            color: #333;
-            font-weight: 600;
-        }
-        .login-header p {
+            cursor: pointer;
+            transition: all 0.3s;
             color: #666;
-            margin-bottom: 0;
+            font-size: 1.2rem;
+            text-decoration: none;
         }
-        .form-control {
-            border-radius: 8px;
-            border: 1px solid #ddd;
-            padding: 12px 15px;
-        }
-        .form-control:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
-        }
-        .btn-login {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            border-radius: 8px;
-            padding: 12px;
-            width: 100%;
-            color: white;
-            font-weight: 600;
-            transition: transform 0.2s;
-        }
-        .btn-login:hover {
+
+        .social-btn:hover {
+            border-color: #001a4d;
+            color: #001a4d;
             transform: translateY(-2px);
-            color: white;
         }
-        .alert {
-            border-radius: 8px;
-            border: none;
-        }
-        .input-group-text {
-            background: #f8f9fa;
-            border: 1px solid #ddd;
-            border-right: none;
-        }
-        .form-control {
-            border-left: none;
-        }
-        .form-control:focus {
-            border-left: none;
+
+        @media (max-width: 768px) {
+            .login-wrapper {
+                flex-direction: column;
+            }
+
+            .left-section, .right-section {
+                width: 100%;
+                min-height: auto;
+                padding: 40px 20px;
+            }
+
+            .left-section {
+                padding: 40px 20px 30px;
+            }
+
+            .left-section h1 {
+                font-size: 1.8rem;
+            }
+
+            .login-form-wrapper h2 {
+                font-size: 1.5rem;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="login-container">
-        <div class="login-header">
-            <i class="fas fa-user-shield fa-3x text-primary mb-3"></i>
-            <h2>Connexion Administrateur</h2>
-            <p>UPL University - Système de Gestion</p>
+    <div class="login-wrapper">
+        <!-- Côté gauche bleu -->
+        <div class="left-section">
+            <img src="{{ url_for('static', filename='logo_upl.png') }}" alt="Logo UPL">
+            <h1>Hello welcome</h1>
+            <p>Bienvenue sur le système de gestion UPL<br>Connexion réservée aux administrateurs</p>
+            <a href="/register" class="btn-register">Register</a>
         </div>
 
-        {% if error %}
-        <div class="alert alert-danger" role="alert">
-            <i class="fas fa-exclamation-triangle me-2"></i>
-            {{ error }}
-        </div>
-        {% endif %}
+        <!-- Côté droit formulaire -->
+        <div class="right-section">
+            <div class="login-form-wrapper">
+                <h2>login</h2>
+                <p>Connectez-vous à votre compte administrateur</p>
 
-        <form method="POST">
-            <div class="mb-3">
-                <label for="username" class="form-label">
-                    <i class="fas fa-user me-2"></i>Nom d'utilisateur
-                </label>
-                <div class="input-group">
-                    <span class="input-group-text"><i class="fas fa-user"></i></span>
-                    <input type="text" class="form-control" id="username" name="username" required
-                           placeholder="Entrez votre nom d'utilisateur">
+                {% if error %}
+                <div class="alert-error">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    {{ error }}
+                </div>
+                {% endif %}
+
+                <form method="POST">
+                    <div class="form-group">
+                        <label for="username">
+                            <i class="fas fa-user me-2" style="color: #001a4d;"></i>Nom d'utilisateur
+                        </label>
+                        <input type="text" id="username" name="username" placeholder="Nom d'utilisateur" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">
+                            <i class="fas fa-lock me-2" style="color: #001a4d;"></i>Mot de passe
+                        </label>
+                        <input type="password" id="password" name="password" placeholder="Mot de passe" required>
+                    </div>
+
+                    <div class="forgot-password">
+                        <a href="#">mot de passe oublier</a>
+                    </div>
+
+                    <button type="submit" class="btn-login">LOGIN</button>
+                </form>
+
+                <div class="social-login">
+                    <p>BY M.LEE L'AMERICAIN</p>
+                    <div class="social-buttons">
+                        <a href="#" class="social-btn" title="Google">
+                            <i class="fab fa-google"></i>
+                        </a>
+                        <a href="#" class="social-btn" title="Facebook">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="social-btn" title="GitHub">
+                            <i class="fab fa-github"></i>
+                        </a>
+                        <a href="#" class="social-btn" title="LinkedIn">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                    </div>
                 </div>
             </div>
-
-            <div class="mb-4">
-                <label for="password" class="form-label">
-                    <i class="fas fa-lock me-2"></i>Mot de passe
-                </label>
-                <div class="input-group">
-                    <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                    <input type="password" class="form-control" id="password" name="password" required
-                           placeholder="Entrez votre mot de passe">
-                </div>
-            </div>
-
-            <button type="submit" class="btn btn-login">
-                <i class="fas fa-sign-in-alt me-2"></i>Se connecter
-            </button>
-        </form>
-
-        <div class="text-center mt-3">
-            <small class="text-muted">
-                <i class="fas fa-info-circle me-1"></i>
-                Accès réservé au personnel autorisé
-            </small>
         </div>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
