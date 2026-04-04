@@ -23,17 +23,17 @@
 
         .login-wrapper {
             display: flex;
-            width: 20%;
-            height: 50px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-            max-width: 110px;
-            border-radius: 20px;
+            width: min(780px, 90vw);
+            min-height: 520px;
+            box-shadow: 0 18px 50px rgba(0, 0, 0, 0.14);
+            border-radius: 24px;
             overflow: hidden;
+            background: white;
         }
 
         /* Côté bleu gauche */
         .left-section {
-            background: linear-gradient(135deg, navy 0%, navy 100%);
+            background: linear-gradient(135deg, navy 0%, #112f60 100%);
             color: white;
             padding: 40px 30px;
             display: flex;
@@ -41,8 +41,7 @@
             justify-content: center;
             align-items: center;
             text-align: center;
-            width: 40%;
-            cursor: pointer;
+            width: 42%;
         }
 
         .left-section img {
@@ -55,30 +54,32 @@
         }
 
         .left-section h1 {
-            font-size: 2rem;
-            margin-bottom: 15px;
-            font-weight: 700;
-            letter-spacing: -1px;
+            font-size: 1.9rem;
+            margin-bottom: 18px;
+            font-weight: 800;
+            letter-spacing: 0.05em;
         }
 
         .left-section p {
             font-size: 0.95rem;
             opacity: 0.9;
             margin-bottom: 30px;
-            line-height: 1.5;
+            line-height: 1.6;
+            max-width: 220px;
         }
 
         .left-section .btn-register {
             background: transparent;
-            border: 2px solid white;
+            border: 1px solid white;
             color: white;
-            padding: 12px 30px;
-            border-radius: 50px;
+            padding: 10px 28px;
+            border-radius: 999px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
             text-decoration: none;
             display: inline-block;
+            letter-spacing: 0.04em;
         }
 
         .left-section .btn-register:hover {
@@ -98,8 +99,8 @@
             display: flex;
             flex-direction: column;
             justify-content: center;
-            width: 60%;
-            min-height: 500px;
+            width: 58%;
+            min-height: 520px;
         }
 
         .login-form-wrapper {
@@ -109,16 +110,18 @@
         }
 
         .login-form-wrapper h2 {
-            color: navy;
-            font-size: 1.6rem;
-            margin-bottom: 8px;
-            font-weight: 700;
+            color: #071b3d;
+            font-size: 1.7rem;
+            margin-bottom: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
         }
 
         .login-form-wrapper > p {
-            color: #999;
-            margin-bottom: 20px;
-            font-size: 0.85rem;
+            color: #6b7280;
+            margin-bottom: 24px;
+            font-size: 0.92rem;
         }
 
         .form-group {
@@ -137,19 +140,18 @@
         .form-group input {
             width: 100%;
             padding: 12px 15px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: border-color 0.3s;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            transition: border-color 0.3s, box-shadow 0.3s;
             font-family: inherit;
-            cursor: text;
+            caret-color: red;
         }
 
         .form-group input:focus {
             outline: none;
             border-color: navy;
-            box-shadow: 0 0 0 3px rgba(0, 0, 128, 0.1);
-            cursor: text;
+            box-shadow: 0 0 0 3px rgba(0, 0, 128, 0.12);
         }
 
         .form-group input::placeholder {
@@ -175,21 +177,24 @@
 
         .btn-login {
             width: 100%;
-            padding: 11px;
-            background: linear-gradient(135deg, navy 0%, #003d7a 100%);
+            padding: 13px;
+            background: navy;
             color: white;
             border: none;
-            border-radius: 8px;
-            font-weight: 600;
+            border-radius: 12px;
+            font-weight: 700;
             font-size: 0.95rem;
             cursor: pointer;
             transition: all 0.3s ease;
-            margin-bottom: 15px;
+            margin-bottom: 18px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
         }
 
         .btn-login:hover {
+            background: #b30000;
             transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(0, 26, 77, 0.3);
+            box-shadow: 0 10px 20px rgba(179, 0, 0, 0.25);
         }
 
         .alert-error {
@@ -299,16 +304,16 @@
         <!-- Côté gauche bleu -->
         <div class="left-section">
             <img src="{{ url_for('static', filename='logo_upl.png') }}" alt="Logo UPL">
-            <h1>Hello welcome</h1>
-            <p>Welcome to the UPL management system<br>Login reserved for administrators</p>
-            <a href="/register" class="btn-register">Register</a>
+            <h1>Soyez le bien venu !</h1>
+            <p>Connectez-vous avec vos informations personnelles<br>Pas de compte ?</p>
+            <a href="/register" class="btn-register">S'inscrire</a>
         </div>
 
         <!-- Côté droit formulaire -->
         <div class="right-section">
             <div class="login-form-wrapper">
-                <h2>login</h2>
-                <p>Log in to your administrator account</p>
+                <h2>Se connecter</h2>
+                <p>Entrez vos identifiants pour accéder à l'interface administrateur</p>
 
                 {% if error %}
                 <div class="alert-error">
@@ -320,22 +325,23 @@
                 <form method="POST">
                     <div class="form-group">
                         <label for="username">
-                            <i class="fas fa-user me-2" style="color: #001a4d;"></i>Admin
+                            <i class="fas fa-user me-2" style="color: navy;"></i>Nom d'utilisateur
                         </label>
-                        <input type="text" id="username" name="username" placeholder="Ex: M. Lee " required>
+                        <input type="text" id="username" name="username" placeholder="Nom d'utilisateur" required>
                     </div>
 
                     <div class="form-group">
                         <label for="password">
-                            <i class="fas fa-lock me-2" style="color: #001a4d;"></i>Password
+                            <i class="fas fa-lock me-2" style="color: navy;"></i>Mot de passe
                         </label>
-                        <input type="password" id="password" name="password" placeholder="Password" required>
+                        <input type="password" id="password" name="password" placeholder="Mot de passe" required>
                     </div>
 
-            
+                    <div class="forgot-password">
+                        <a href="#">Mot de passe oublié ?</a>
+                    </div>
 
-                    <button type="submit" class="btn-login">LOGIN</button>
-                </form>
+                    <button type="submit" class="btn-login">SE CONNECTER</button>
 
                 <div class="social-login">
                     <p>BY M.LEE L'AMERICAI<br>UPL</p>
