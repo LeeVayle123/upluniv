@@ -1,19 +1,23 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Général | UPL</title>
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
-            --primary: #000080; /* Navy */
-            --secondary: #ff0000; /* Red */
+            --primary: #000080;
+            /* Navy */
+            --secondary: #ff0000;
+            /* Red */
             --bg-light: #f8fafc;
             --card-bg: rgba(255, 255, 255, 0.9);
             --text-dark: #1e293b;
@@ -94,7 +98,8 @@
             transition: var(--transition);
         }
 
-        .nav-item.active a, .nav-item a:hover {
+        .nav-item.active a,
+        .nav-item a:hover {
             color: white;
             background: rgba(255, 255, 255, 0.1);
         }
@@ -259,21 +264,52 @@
             font-weight: 700;
         }
 
-        .badge-success { background: #dcfce7; color: #166534; }
-        .badge-warning { background: #fef9c3; color: #854d0e; }
-        .badge-danger { background: #fee2e2; color: #991b1b; }
+        .badge-success {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .badge-warning {
+            background: #fef9c3;
+            color: #854d0e;
+        }
+
+        .badge-danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
 
         @media (max-width: 1024px) {
-            .sidebar { width: 80px; padding: 20px 10px; }
-            .logo-text, .nav-item span { display: none; }
-            .main-content { margin-left: 80px; }
-            .charts-row { grid-template-columns: 1fr; }
+            .sidebar {
+                width: 80px;
+                padding: 20px 10px;
+            }
+
+            .logo-text,
+            .nav-item span {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 80px;
+            }
+
+            .charts-row {
+                grid-template-columns: 1fr;
+            }
         }
 
         /* Animations */
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .animate-fade {
@@ -281,6 +317,7 @@
         }
     </style>
 </head>
+
 <body>
     <aside class="sidebar">
         <div class="logo-section">
@@ -292,19 +329,22 @@
                 <a href="#"><i class="fa-solid fa-chart-line"></i> <span>Dashboard</span></a>
             </li>
             <li class="nav-item">
-                <a href="{{ url_for('view_presences') }}"><i class="fa-solid fa-clipboard-user"></i> <span>Présences</span></a>
+                <a href="{{ url_for('view_presences') }}"><i class="fa-solid fa-clipboard-user"></i>
+                    <span>Attendance</span></a>
             </li>
             <li class="nav-item">
                 <a href="{{ url_for('official_qr') }}"><i class="fa-solid fa-qrcode"></i> <span>QR Code</span></a>
             </li>
             <li class="nav-item">
-                <a href="{{ url_for('admin_timeline') }}"><i class="fa-solid fa-clock-rotate-left"></i> <span>Timeline (Suivi)</span></a>
+                <a href="{{ url_for('admin_timeline') }}"><i class="fa-solid fa-clock-rotate-left"></i>
+                    <span>Timeline</span></a>
             </li>
             <li class="nav-item">
-                <a href="#"><i class="fa-solid fa-gear"></i> <span>Paramètres</span></a>
+                <a href="#"><i class="fa-solid fa-gear"></i> <span>Settings</span></a>
             </li>
             <li class="nav-item" style="margin-top: auto;">
-                <a href="{{ url_for('admin_logout') }}" style="color: #ff6b6b;"><i class="fa-solid fa-sign-out-alt"></i> <span>Déconnexion</span></a>
+                <a href="{{ url_for('admin_logout') }}" style="color: #ff6b6b;"><i class="fa-solid fa-sign-out-alt"></i>
+                    <span>Logout</span></a>
             </li>
         </ul>
     </aside>
@@ -312,8 +352,8 @@
     <main class="main-content">
         <header class="header animate-fade" style="animation-delay: 0.1s;">
             <div>
-                <h1>Rapport Général</h1>
-                <p style="color: var(--text-muted);">Bienvenue sur le centre de pilotage UPL.</p>
+                <h1>General Report</h1>
+                <p style="color: var(--text-muted);">Welcome to the UPL control center.</p>
             </div>
             <div class="date-display">
                 <i class="fa-solid fa-clock"></i>
@@ -326,22 +366,22 @@
         <section class="stats-grid">
             <div class="stat-card animate-fade" style="animation-delay: 0.2s;">
                 <i class="fa-solid fa-user-group icon"></i>
-                <div class="stat-label">Étudiants Inscrits</div>
+                <div class="stat-label">Students Registered</div>
                 <div class="stat-value" id="stat-total-students">...</div>
             </div>
             <div class="stat-card animate-fade" style="animation-delay: 0.3s;">
                 <i class="fa-solid fa-door-open icon"></i>
-                <div class="stat-label">Arrivées Aujourd'hui</div>
+                <div class="stat-label">Today's Arrivals</div>
                 <div class="stat-value" id="stat-entrees">...</div>
             </div>
             <div class="stat-card alert animate-fade" style="animation-delay: 0.4s;">
                 <i class="fa-solid fa-location-dot icon"></i>
-                <div class="stat-label">Hors Zone</div>
+                <div class="stat-label">Outside Zone</div>
                 <div class="stat-value" id="stat-hors-zone" style="color: var(--secondary);">...</div>
             </div>
             <div class="stat-card alert animate-fade" style="animation-delay: 0.5s;">
                 <i class="fa-solid fa-warning icon"></i>
-                <div class="stat-label">Fraudes Détectées</div>
+                <div class="stat-label">Detected Frauds</div>
                 <div class="stat-value" id="stat-fraudes" style="color: var(--secondary);">...</div>
             </div>
         </section>
@@ -349,13 +389,13 @@
         <section class="charts-row">
             <div class="chart-container animate-fade" style="animation-delay: 0.6s;">
                 <div class="chart-header">
-                    <h2>Fréquentation Hebdomadaire</h2>
+                    <h2>Weekly Attendance</h2>
                 </div>
                 <canvas id="attendanceChart" height="200"></canvas>
             </div>
             <div class="chart-container animate-fade" style="animation-delay: 0.7s;">
                 <div class="chart-header">
-                    <h2>Statut des Pointages</h2>
+                    <h2>Status of Attendance</h2>
                 </div>
                 <canvas id="statusPieChart" height="300"></canvas>
             </div>
@@ -363,19 +403,20 @@
 
         <section class="activity-card animate-fade" style="animation-delay: 0.8s;">
             <div class="table-header">
-                <h2>Activité Récente</h2>
-                <button onclick="updateStats()" style="background: var(--bg-light); border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-weight: 600; color: var(--primary);">
-                    <i class="fa-solid fa-rotate"></i> Actualiser
+                <h2>Recent Activity</h2>
+                <button onclick="updateStats()"
+                    style="background: var(--bg-light); border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-weight: 600; color: var(--primary);">
+                    <i class="fa-solid fa-rotate"></i> Refresh
                 </button>
             </div>
             <table id="recent-activity-table">
                 <thead>
                     <tr>
-                        <th>Heure</th>
-                        <th>Étudiant</th>
-                        <th>Promotion</th>
+                        <th>Time</th>
+                        <th>Student</th>
+                        <th>Level</th>
                         <th>Type</th>
-                        <th>Statut</th>
+                        <th>Status</th>
                     </tr>
                 </thead>
                 <tbody id="activity-body">
@@ -387,8 +428,8 @@
 
     <script>
         // Update current date
-        document.getElementById('current-date').textContent = new Date().toLocaleDateString('fr-FR', { 
-            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
+        document.getElementById('current-date').textContent = new Date().toLocaleDateString('fr-FR', {
+            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
         });
 
         let attendanceChart, statusPieChart;
@@ -475,14 +516,14 @@
                 const activityData = await activityRes.json();
                 const tbody = document.getElementById('activity-body');
                 tbody.innerHTML = '';
-                
+
                 // Show last 10 entries
                 activityData.presences.slice(0, 10).forEach(p => {
                     const time = p.date_inscription ? new Date(p.date_inscription).toLocaleTimeString() : '??:??';
                     const sg = p.status_geoloc || '';
                     let badgeClass = 'badge-success';
                     if (sg.includes('Hors Zone')) badgeClass = 'badge-danger';
-                    
+
                     tbody.innerHTML += `
                         <tr>
                             <td><strong>${time}</strong></td>
@@ -501,11 +542,11 @@
 
         // Logic for progressive countdown (persisted on refresh)
         const timerDisplay = document.getElementById('refresh-timer');
-        
-        let currentDelay = sessionStorage.getItem('dashboard_current_delay') 
-            ? parseInt(sessionStorage.getItem('dashboard_current_delay')) 
+
+        let currentDelay = sessionStorage.getItem('dashboard_current_delay')
+            ? parseInt(sessionStorage.getItem('dashboard_current_delay'))
             : 15;
-            
+
         let timeLeft = sessionStorage.getItem('dashboard_time_left')
             ? parseInt(sessionStorage.getItem('dashboard_time_left'))
             : currentDelay;
@@ -536,4 +577,5 @@
         startCountdown();
     </script>
 </body>
+
 </html>
