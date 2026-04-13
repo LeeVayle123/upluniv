@@ -509,6 +509,11 @@ def index():
 def attendance():
     return render_template('attendance.html')
 
+# Route de redirection courte pour "masquer" le lien du code QR
+@app.route('/s')
+def short_presence_redirect():
+    return redirect(url_for('attendance'))
+
 # --- LOGIQUE DE RÉCUPÉRATION ET TRAITEMENT DES DONNÉES ---
 @app.route('/check_attendance', methods=['POST'])
 def check_attendance():
@@ -892,11 +897,10 @@ def generate_qr():
     download = request.args.get('download', '0') == '1'
     # On utilise l'URL publique si elle est définie, sinon l'URL locale
     if PUBLIC_URL:
-        # Nettoyage de l'URL pour éviter les doubles slashes
         base_url = PUBLIC_URL.rstrip('/')
-        target_url = f"{base_url}{url_for('admin_general_dashboard')}"
+        target_url = f"{base_url}{url_for('attendance')}"
     else:
-        target_url = url_for('admin_general_dashboard', _external=True)
+        target_url = url_for('attendance', _external=True)
     
 
     
@@ -927,9 +931,9 @@ def official_qr():
     """
     if PUBLIC_URL:
         base_url = PUBLIC_URL.rstrip('/')
-        target_url = f"{base_url}{url_for('admin_general_dashboard')}"
+        target_url = f"{base_url}{url_for('attendance')}"
     else:
-        target_url = url_for('admin_general_dashboard', _external=True)
+        target_url = url_for('attendance', _external=True)
         
     return render_template('qr_poster.html', target_url=target_url)
 
