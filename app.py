@@ -64,7 +64,7 @@ app.secret_key = 'admin_secret_key_2024'
 
 # --- CONFIGURATION DU SYSTÈME DE VALIDATION ---
 # Ces valeurs peuvent être ajustées selon les besoins
-ACCURACY_MAX = 50.0      # Précision GPS maximale acceptée (mètres)
+ACCURACY_MAX = 150.0     # Précision GPS maximale acceptée (mètres)
 TIME_MAX_SECONDS = 300   # Fenêtre de temps maximale (secondes pour que le formulaire puisse réouvrir à nouveau)
 DEFAULT_TOLERANCE = 10.0 # Tolérance par défaut (mètres)
 

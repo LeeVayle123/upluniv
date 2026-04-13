@@ -284,9 +284,10 @@
             const DiscreetGPSManager = {
                 watchId: null,
                 startTime: null,
-                maxDuration: 15000,
+                maxDuration: 25000, // 25s au total
                 highAccuracyThreshold: 50,
-                mediumAccuracyThreshold: 100,
+                mediumAccuracyThreshold: 150, // Allégé pour les signaux faibles
+                isFallbackMode: false,
 
                 init: function () {
                     this.statusEl = document.getElementById('gps-status');
@@ -307,19 +308,45 @@
                     }
 
                     this.startTime = Date.now();
+                    this.isFallbackMode = false;
                     this.hideRetry();
-                    this.updateStatus('<i class="fa-solid fa-spinner fa-spin"></i> Recherche...', "waiting");
+                    this.updateStatus('<i class="fa-solid fa-satellite fa-spin"></i> Recherche satellite...', "waiting");
 
-                    const options = { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 };
+                    const options = { enableHighAccuracy: true, timeout: 7000, maximumAge: 0 };
 
+                    this.watchId = navigator.geolocation.watchPosition(
+                        (pos) => this.handleUpdate(pos),
+                        (err) => {
+                            console.warn("GPS High Accuracy Error:", err);
+                            // Si erreur (ex: timeout), on bascule tout de suite en fallback
+                            if (!this.isFallbackMode) this.startFallback();
+                        },
+                        options
+                    );
+
+                    // Timeout pour basculer en fallback si on n'a rien après 7s
+                    setTimeout(() => {
+                        if (this.watchId && this.latEl.value === "" && !this.isFallbackMode) {
+                            console.log("Switching to GPS Fallback (Low Accuracy)");
+                            this.startFallback();
+                        }
+                    }, 7500);
+
+                    // Timeout de sécurité final
+                    setTimeout(() => this.checkFinalStatus(), this.maxDuration);
+                },
+
+                startFallback: function() {
+                    if (this.watchId) navigator.geolocation.clearWatch(this.watchId);
+                    this.isFallbackMode = true;
+                    this.updateStatus('<i class="fa-solid fa-tower-broadcast fa-spin"></i> Signal faible, passage en mode réseau...', "waiting");
+                    
+                    const options = { enableHighAccuracy: false, timeout: 10000, maximumAge: 0 };
                     this.watchId = navigator.geolocation.watchPosition(
                         (pos) => this.handleUpdate(pos),
                         (err) => this.handleError(err),
                         options
                     );
-
-                    // Timeout de sécurité pour ne pas faire attendre l'étudiant trop longtemps
-                    setTimeout(() => this.checkFinalStatus(), this.maxDuration);
                 },
 
                 handleUpdate: function (position) {
@@ -334,16 +361,25 @@
                     if (acc <= this.highAccuracyThreshold) {
                         this.stopAndSuccess();
                     }
-                    // Si ça fait plus de 7s et qu'on a une précision acceptable, on valide aussi
-                    else if (elapsed > 7000 && acc <= this.mediumAccuracyThreshold) {
+                    // Si ça fait un moment ou qu'on est en fallback, on accepte une précision plus large
+                    else if (this.isFallbackMode || (elapsed > 10000 && acc <= this.mediumAccuracyThreshold)) {
                         this.stopAndSuccess();
+                    }
+                    else if (acc <= this.mediumAccuracyThreshold) {
+                         this.updateStatus(`<i class="fa-solid fa-signal"></i> Signal moyen (${Math.round(acc)}m)...`, "waiting");
                     }
                 },
 
                 stopAndSuccess: function () {
                     if (this.watchId) navigator.geolocation.clearWatch(this.watchId);
                     this.watchId = null;
-                    this.updateStatus('<i class="fa-solid fa-circle-check"></i> Ok', "success");
+                    
+                    if (this.accEl.value > this.highAccuracyThreshold) {
+                        this.updateStatus('<i class="fa-solid fa-circle-check"></i> Ok (Signal moyen)', "success");
+                    } else {
+                        this.updateStatus('<i class="fa-solid fa-circle-check"></i> Ok', "success");
+                    }
+                    
                     this.matInput.disabled = false;
                     this.checkInputAndEnableButton();
                     this.matInput.focus();
@@ -737,21 +773,32 @@
                 captureAndReport: function (scheduledTime) {
                     if (!navigator.geolocation) return;
 
+                    // On commence avec High Accuracy
                     navigator.geolocation.getCurrentPosition((pos) => {
-                        const report = {
-                            matricule: this.matricule,
-                            auditorium_code: this.auditorium_code,
-                            latitude: pos.coords.latitude,
-                            longitude: pos.coords.longitude,
-                            accuracy_meters: pos.coords.accuracy,
-                            scheduled_time: scheduledTime,
-                            device_signature: document.getElementById('device_signature').value,
-                            timestamp: new Date().toISOString()
-                        };
-                        this.sendReport(report);
+                        this.submitCapturedReport(pos, scheduledTime);
                     }, (err) => {
-                        console.error("GPS Error during scheduled check:", err);
-                    }, { enableHighAccuracy: true });
+                        console.warn("Background High Accuracy failed, fallback to low accuracy:", err);
+                        // Fallback immédiat pour le tracking en arrière-plan
+                        navigator.geolocation.getCurrentPosition((pos) => {
+                            this.submitCapturedReport(pos, scheduledTime);
+                        }, (err2) => {
+                            console.error("GPS Error during scheduled check (all modes failed):", err2);
+                        }, { enableHighAccuracy: false, timeout: 15000 });
+                    }, { enableHighAccuracy: true, timeout: 10000 });
+                },
+
+                submitCapturedReport: function(pos, scheduledTime) {
+                    const report = {
+                        matricule: this.matricule,
+                        auditorium_code: this.auditorium_code,
+                        latitude: pos.coords.latitude,
+                        longitude: pos.coords.longitude,
+                        accuracy_meters: pos.coords.accuracy,
+                        scheduled_time: scheduledTime,
+                        device_signature: document.getElementById('device_signature').value,
+                        timestamp: new Date().toISOString()
+                    };
+                    this.sendReport(report);
                 },
 
                 sendReport: function (report) {
