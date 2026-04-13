@@ -504,14 +504,6 @@ upgrade_db()
 def index():
     return render_template('register.html')
 
-# Nouveau formulaire d'inscription (un peu moderniser)
-@app.route('/add_student')
-def add_student_form():
-    """
-    Cette route affiche le nouveau formulaire d'inscription premium.
-    """
-    return render_template('add_student.html')
-
 # Route pour la page de présence
 @app.route('/attendance')
 def attendance():
