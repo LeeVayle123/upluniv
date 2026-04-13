@@ -198,6 +198,46 @@
             color: var(--text-muted);
         }
 
+        .radio-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 5px;
+        }
+
+        .radio-option {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            padding: 10px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: var(--radius-md);
+            transition: var(--transition);
+        }
+
+        .radio-option:hover {
+            border-color: var(--primary);
+            background: rgba(0, 0, 128, 0.05);
+        }
+
+        .radio-option input[type="radio"]:checked+.radio-label {
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .radio-option input[type="radio"] {
+            accent-color: var(--primary);
+        }
+
+        .radio-label {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-main);
+        }
+
         @media (max-width: 700px) {
             .conteneur-principal {
                 flex-direction: column;
@@ -284,13 +324,18 @@
                     <input type="text" id="prenom" name="prenom" class="champ-formulaire" required>
                 </div>
 
-                <div class="groupe-formulaire">
-                    <label class="etiquette-formulaire" for="parcours">Path</label>
-                    <select id="parcours" name="parcours" class="champ-formulaire" onchange="updateFields()" required>
-                        <option value="">Select</option>
-                        <option value="IAGE">IAGE</option>
-                        <option value="TECHNOLOGIE">TECHNOLOGY</option>
-                    </select>
+                <div class="groupe-formulaire complet">
+                    <label class="etiquette-formulaire">Choose your Path</label>
+                    <div class="radio-group" style="display: flex; gap: 15px; margin-top: 5px;">
+                        <label class="radio-option">
+                            <input type="radio" name="parcours" value="IAGE" onchange="updateFields()" required>
+                            <span class="radio-label">IAGE</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="parcours" value="TECHNOLOGIE" onchange="updateFields()" required>
+                            <span class="radio-label">TECHNOLOGY</span>
+                        </label>
+                    </div>
                 </div>
 
                 <div id="promotionDiv" style="display:none;" class="groupe-formulaire">
@@ -327,7 +372,8 @@
 
     <script>
         function updateFields() {
-            var parcours = document.getElementById('parcours').value;
+            var parcoursElement = document.querySelector('input[name="parcours"]:checked');
+            var parcours = parcoursElement ? parcoursElement.value : '';
             var promotionDiv = document.getElementById('promotionDiv');
             var filiereDiv = document.getElementById('filiereDiv');
             var promotionSelect = document.getElementById('promotion');
