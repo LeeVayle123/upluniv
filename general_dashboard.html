@@ -115,7 +115,7 @@
         .main-content {
             margin-left: 260px;
             flex: 1;
-            padding: 40px;
+            padding: 25px 40px;
             max-width: 1600px;
         }
 
@@ -123,11 +123,11 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 40px;
+            margin-bottom: 25px;
         }
 
         .header h1 {
-            font-size: 2rem;
+            font-size: 1.6rem;
             font-weight: 700;
         }
 
@@ -146,14 +146,14 @@
         /* Stats Grid */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 25px;
-            margin-bottom: 40px;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
         }
 
         .stat-card {
             background: var(--card-bg);
-            padding: 25px;
+            padding: 18px 22px;
             border-radius: var(--radius);
             box-shadow: var(--shadow);
             border-left: 5px solid var(--primary);
@@ -192,7 +192,7 @@
         }
 
         .stat-value {
-            font-size: 2.2rem;
+            font-size: 1.8rem;
             font-weight: 800;
             color: var(--text-dark);
         }
@@ -201,13 +201,13 @@
         .charts-row {
             display: grid;
             grid-template-columns: 2fr 1fr;
-            gap: 25px;
-            margin-bottom: 40px;
+            gap: 20px;
+            margin-bottom: 30px;
         }
 
         .chart-container {
             background: white;
-            padding: 30px;
+            padding: 20px;
             border-radius: var(--radius);
             box-shadow: var(--shadow);
         }
@@ -246,7 +246,7 @@
 
         th {
             text-align: left;
-            padding: 15px;
+            padding: 12px 15px;
             color: var(--text-muted);
             font-size: 0.85rem;
             text-transform: uppercase;
@@ -254,7 +254,7 @@
         }
 
         td {
-            padding: 15px;
+            padding: 12px 15px;
             border-bottom: 1px solid #f1f5f9;
             font-size: 0.95rem;
         }
@@ -411,13 +411,13 @@
                 <div class="chart-header">
                     <h2>Weekly Attendance</h2>
                 </div>
-                <canvas id="attendanceChart" height="200"></canvas>
+                <canvas id="attendanceChart" height="160"></canvas>
             </div>
             <div class="chart-container animate-fade" style="animation-delay: 0.7s;">
                 <div class="chart-header">
                     <h2>Status of Attendance</h2>
                 </div>
-                <canvas id="statusPieChart" height="300"></canvas>
+                <canvas id="statusPieChart" height="240"></canvas>
             </div>
         </section>
 
@@ -520,7 +520,7 @@
                             data: [data.entrees_today, data.sorties_today, data.fraudes_today, data.suivis_ok_today || 0],
                             backgroundColor: ['#000080', '#0ea5e9', '#ff0000', '#22c55e'],
                             borderWidth: 0,
-                            cutout: '70%'
+                            cutout: '75%'
                         }]
                     },
                     options: {
