@@ -270,6 +270,7 @@
                 <div id="gps-status" style="font-size: 0.75rem; color: #eab308; margin-bottom: 5px; font-weight: 600;">
                     <i class="fa-solid fa-spinner fa-spin"></i> Veillez patienter...
                 </div>
+                <div id="gps-help" style="display: none; font-size: 0.7rem; color: #64748b; margin-top: 5px; background: #f1f5f9; padding: 8px; border-radius: 8px;"></div>
 
                 <div id="form-loading" style="display: none; text-align: center; font-size: 0.75rem; color: navy;">
                     <span><i class="fa-solid fa-magnifying-glass fa-spin"></i> Checking...</span>
@@ -280,47 +281,166 @@
         </main>
 
         <script>
-            // 1. Géolocalisation
-            let gpsSuccess = false;
+            // 1. GESTIONNAIRE GPS ROBUSTE
+            const GPSManager = {
+                attempts: 0,
+                maxAttempts: 3,
+                accuracyThreshold: 50, // mètres
+                timeout: 15000,
 
-            if ("geolocation" in navigator) {
-                const options = {
-                    enableHighAccuracy: true,
-                    timeout: 10000,
-                    maximumAge: 0
-                };
+                init: function() {
+                    this.statusEl = document.getElementById('gps-status');
+                    this.helpEl = document.getElementById('gps-help');
+                    this.latEl = document.getElementById('latitude');
+                    this.lonEl = document.getElementById('longitude');
+                    this.accEl = document.getElementById('accuracy_meters');
+                    this.matInput = document.getElementById('matricule');
+                    this.submitBtn = document.getElementById('submit-btn');
+                    this.retryBtnId = 'retry-gps-btn';
 
-                navigator.geolocation.getCurrentPosition(function (position) {
-                    gpsSuccess = true;
-                    document.getElementById('latitude').value = position.coords.latitude;
-                    document.getElementById('longitude').value = position.coords.longitude;
-                    document.getElementById('accuracy_meters').value = position.coords.accuracy;
+                    this.startLocationRequest();
+                },
 
-                    const status = document.getElementById('gps-status');
-                    status.innerHTML = '<i class="fa-solid fa-circle-check"></i> ok';
-                    status.style.color = "#16a34a";
-                    status.style.fontWeight = "bold";
+                startLocationRequest: function() {
+                    if (!("geolocation" in navigator)) {
+                        this.updateStatus("Navigateur non compatible GPS", "error");
+                        return;
+                    }
 
-                    // Activer le champ matricule une fois localisé
-                    const matInput = document.getElementById('matricule');
-                    matInput.disabled = false;
-                    matInput.placeholder = "Ex: 2024000000";
-                    matInput.focus();
-                }, function (error) {
-                    gpsSuccess = false;
-                    const status = document.getElementById('gps-status');
-                    status.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> veuillez activer le gps';
-                    status.style.color = "#dc2626";
-                    status.style.background = "#fee2e2";
-                    status.style.padding = "10px";
-                    status.style.borderRadius = "8px";
-                    status.style.fontWeight = "bold";
+                    this.attempts = 0;
+                    this.hideRetryButton();
+                    this.helpEl.style.display = 'none';
+                    this.updateStatus('<i class="fa-solid fa-location-crosshairs fa-spin"></i> Recherche du signal GPS...', "waiting");
+                    
+                    this.getLocation();
+                },
 
-                    alert("Attention : Vous devez activer le GPS et autoriser la localisation pour remplir ce formulaire.");
-                }, options);
-            } else {
-                alert("Votre navigateur ne supporte pas la géolocalisation. Impossible de pointer.");
-            }
+                getLocation: function() {
+                    const options = {
+                        enableHighAccuracy: true,
+                        timeout: this.timeout,
+                        maximumAge: 0
+                    };
+
+                    navigator.geolocation.getCurrentPosition(
+                        (pos) => this.handleSuccess(pos),
+                        (err) => this.handleError(err),
+                        options
+                    );
+                },
+
+                handleSuccess: function(position) {
+                    const acc = position.coords.accuracy;
+                    this.latEl.value = position.coords.latitude;
+                    this.lonEl.value = position.coords.longitude;
+                    this.accEl.value = acc;
+
+                    if (acc <= this.accuracyThreshold) {
+                        this.updateStatus('<i class="fa-solid fa-circle-check"></i> Position précise (' + Math.round(acc) + 'm)', "success");
+                        this.matInput.disabled = false;
+                        this.matInput.placeholder = "Ex: 2024000000";
+                        this.checkInputAndEnableButton();
+                        this.matInput.focus();
+                    } else {
+                        this.attempts++;
+                        if (this.attempts < this.maxAttempts) {
+                            this.updateStatus('<i class="fa-solid fa-spinner fa-spin"></i> Signal faible (' + Math.round(acc) + 'm)... réessai ' + this.attempts + '/' + this.maxAttempts, "waiting");
+                            setTimeout(() => this.getLocation(), 2000);
+                        } else {
+                            this.updateStatus('<i class="fa-solid fa-triangle-exclamation"></i> Précision moyenne (' + Math.round(acc) + 'm). Vous pouvez essayer.', "warning");
+                            this.matInput.disabled = false;
+                            this.matInput.placeholder = "Ex: 2024000000";
+                            this.checkInputAndEnableButton();
+                        }
+                    }
+                },
+
+                checkInputAndEnableButton: function() {
+                    // This is handled by the matricule input listener, but good to have a trigger
+                    const event = new Event('input', { bubbles: true });
+                    this.matInput.dispatchEvent(event);
+                },
+
+                handleError: function(error) {
+                    let msg = "Erreur GPS";
+                    switch(error.code) {
+                        case error.PERMISSION_DENIED:
+                            msg = "Permission refusée. Activez le GPS.";
+                            this.showHelp();
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            msg = "Position indisponible. Sortez à l'extérieur.";
+                            break;
+                        case error.TIMEOUT:
+                            msg = "Délai dépassé. Signal trop faible.";
+                            break;
+                    }
+                    this.updateStatus('<i class="fa-solid fa-circle-xmark"></i> ' + msg, "error");
+                    this.showRetryButton();
+                },
+
+                updateStatus: function(html, type) {
+                    this.statusEl.innerHTML = html;
+                    this.statusEl.style.display = 'block';
+                    
+                    // Style reset
+                    this.statusEl.style.background = "transparent";
+                    this.statusEl.style.padding = "0";
+                    this.statusEl.style.borderRadius = "0";
+                    this.statusEl.style.color = "#eab308";
+                    this.statusEl.style.fontWeight = "600";
+
+                    if (type === "error") {
+                        this.statusEl.style.color = "#dc2626";
+                        this.statusEl.style.background = "#fee2e2";
+                        this.statusEl.style.padding = "10px";
+                        this.statusEl.style.borderRadius = "8px";
+                    } else if (type === "success") {
+                        this.statusEl.style.color = "#16a34a";
+                    } else if (type === "warning") {
+                        this.statusEl.style.color = "#854d0e";
+                        this.statusEl.style.background = "#fef9c3";
+                        this.statusEl.style.padding = "10px";
+                        this.statusEl.style.borderRadius = "8px";
+                    }
+                },
+
+                showRetryButton: function() {
+                    let btn = document.getElementById(this.retryBtnId);
+                    if (!btn) {
+                        btn = document.createElement('button');
+                        btn.id = this.retryBtnId;
+                        btn.type = 'button';
+                        btn.className = 'bouton-validation';
+                        btn.style.marginTop = '10px';
+                        btn.style.background = '#64748b';
+                        btn.style.fontSize = '0.75rem';
+                        btn.style.padding = '8px';
+                        btn.innerHTML = '<i class="fa-solid fa-rotate-right"></i> Réessayer la localisation';
+                        btn.onclick = () => this.startLocationRequest();
+                        this.statusEl.parentNode.insertBefore(btn, this.statusEl.nextSibling);
+                    } else {
+                        btn.style.display = 'block';
+                    }
+                },
+
+                hideRetryButton: function() {
+                    const btn = document.getElementById(this.retryBtnId);
+                    if (btn) btn.style.display = 'none';
+                },
+
+                showHelp: function() {
+                    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+                    this.helpEl.style.display = 'block';
+                    if (isIOS) {
+                        this.helpEl.innerHTML = '<strong>iPhone :</strong> Allez dans <em>Réglages > Confidentialité > Service de localisation</em> et assurez-vous que Safari est autorisé.';
+                    } else {
+                        this.helpEl.innerHTML = '<strong>Android :</strong> Cliquez sur le cadenas dans la barre d\'adresse > Paramètres du site > Localisation > Autoriser.';
+                    }
+                }
+            };
+
+            GPSManager.init();
 
             // 2. Signature de l'appareil
             function generateDeviceSignature() {
@@ -345,9 +465,17 @@
             matriculeInput.addEventListener('input', function () {
                 const matricule = this.value.trim();
                 clearTimeout(lookupTimeout);
+                
+                // Activer le bouton de validation seulement si le matricule est assez long ET que le GPS est prêt
+                const gpsReady = document.getElementById('latitude').value !== "";
+                if (matricule.length >= 3 && gpsReady) {
+                    submitBtn.disabled = false;
+                } else {
+                    submitBtn.disabled = true;
+                }
+
                 if (matricule.length < 3) {
                     badge.style.display = 'none';
-                    submitBtn.disabled = true;
                     return;
                 }
 
@@ -642,21 +770,30 @@
                 captureAndReport: function (scheduledTime) {
                     if (!navigator.geolocation) return;
 
-                    navigator.geolocation.getCurrentPosition((pos) => {
-                        const report = {
-                            matricule: this.matricule,
-                            auditorium_code: this.auditorium_code,
-                            latitude: pos.coords.latitude,
-                            longitude: pos.coords.longitude,
-                            accuracy_meters: pos.coords.accuracy,
-                            scheduled_time: scheduledTime,
-                            device_signature: document.getElementById('device_signature').value,
-                            timestamp: new Date().toISOString()
-                        };
-                        this.sendReport(report);
-                    }, (err) => {
-                        console.error("GPS Error during scheduled check:", err);
-                    }, { enableHighAccuracy: true });
+                    const options = { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 };
+                    
+                    const tryCapture = (retryCount) => {
+                        navigator.geolocation.getCurrentPosition((pos) => {
+                            const report = {
+                                matricule: this.matricule,
+                                auditorium_code: this.auditorium_code,
+                                latitude: pos.coords.latitude,
+                                longitude: pos.coords.longitude,
+                                accuracy_meters: pos.coords.accuracy,
+                                scheduled_time: scheduledTime,
+                                device_signature: document.getElementById('device_signature').value,
+                                timestamp: new Date().toISOString()
+                            };
+                            this.sendReport(report);
+                        }, (err) => {
+                            console.error(`GPS Error (Scheduled ${scheduledTime}, Try ${retryCount}):`, err);
+                            if (retryCount < 2) {
+                                setTimeout(() => tryCapture(retryCount + 1), 5000);
+                            }
+                        }, options);
+                    };
+
+                    tryCapture(0);
                 },
 
                 sendReport: function (report) {

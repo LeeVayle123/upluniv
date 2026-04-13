@@ -687,7 +687,7 @@ def check_attendance():
             conn.commit()
             cursor.close()
             conn.close()
-            return jsonify({"status": "success", "message": "Présence enregistrée avec succès", "auditorium": aud['nom']})
+            return jsonify({"status": "success", "message": f"Présence enregistrée avec succès (Précision: {int(accuracy)}m)", "auditorium": aud['nom']})
         else:
             conn.commit()
             cursor.close()
@@ -1883,4 +1883,4 @@ def api_admin_stats_summary():
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=5000, debug=False, threaded=True)
 
-#deuxième système antifraude avec GPS pour chaque zone deja definit. 
+#deuxième système de : refelxion en cours: 
