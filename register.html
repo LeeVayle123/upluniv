@@ -7,6 +7,8 @@
     <title>Inscription Étudiant - UPL</title>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --primary: navy;
@@ -235,8 +237,11 @@
             <h1 class="titre-panneau">Hello welcome</h1>
             <p class="description-marque">Don't have Account ?</p>
             <div style="display: flex; flex-direction: column; gap: 10px;">
-                <!--<a href="/attendance" class="bouton-hors-ligne">Se connecter</a>-->
-                <a href="/students" class="bouton-hors-ligne" text-align: center;
+                <a href="{{ url_for('admin_general_dashboard') }}" class="bouton-hors-ligne"
+                    style="background: rgba(255,255,255,0.2); border-color: white;">
+                    <i class="fa-solid fa-house" style="margin-right: 8px;"></i> Dashboard
+                </a>
+                <a href="/students" class="bouton-hors-ligne"
                     style="background: rgba(255,255,255,0.1);">Liste des étudiants</a>
             </div>
         </aside>
