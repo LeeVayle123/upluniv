@@ -902,9 +902,9 @@ def generate_qr():
     if PUBLIC_URL:
         # Nettoyage de l'URL pour éviter les doubles slashes
         base_url = PUBLIC_URL.rstrip('/')
-        target_url = f"{base_url}{url_for('attendance')}"
+        target_url = f"{base_url}{url_for('admin_general_dashboard')}"
     else:
-        target_url = url_for('attendance', _external=True)
+        target_url = url_for('admin_general_dashboard', _external=True)
     
 
     
@@ -935,9 +935,9 @@ def official_qr():
     """
     if PUBLIC_URL:
         base_url = PUBLIC_URL.rstrip('/')
-        target_url = f"{base_url}{url_for('attendance')}"
+        target_url = f"{base_url}{url_for('admin_general_dashboard')}"
     else:
-        target_url = url_for('attendance', _external=True)
+        target_url = url_for('admin_general_dashboard', _external=True)
         
     return render_template('qr_poster.html', target_url=target_url)
 
