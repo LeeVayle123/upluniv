@@ -256,7 +256,7 @@
                 <div class="groupe-formulaire">
                     <label class="etiquette-formulaire" for="matricule">Matricule</label>
                     <input type="text" id="matricule" name="matricule" class="champ-formulaire" required
-                        placeholder="Attente de localisation..." disabled autofocus autocomplete="off">
+                        placeholder="ex: 2024......" disabled autofocus autocomplete="off">
                 </div>
 
                 <div class="groupe-formulaire">
@@ -284,11 +284,11 @@
             const DiscreetGPSManager = {
                 watchId: null,
                 startTime: null,
-                maxDuration: 15000, 
+                maxDuration: 15000,
                 highAccuracyThreshold: 50,
                 mediumAccuracyThreshold: 100,
 
-                init: function() {
+                init: function () {
                     this.statusEl = document.getElementById('gps-status');
                     this.latEl = document.getElementById('latitude');
                     this.lonEl = document.getElementById('longitude');
@@ -300,7 +300,7 @@
                     this.start();
                 },
 
-                start: function() {
+                start: function () {
                     if (!("geolocation" in navigator)) {
                         this.updateStatus("Appareil non compatible", "error");
                         return;
@@ -311,7 +311,7 @@
                     this.updateStatus('<i class="fa-solid fa-spinner fa-spin"></i> Recherche...', "waiting");
 
                     const options = { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 };
-                    
+
                     this.watchId = navigator.geolocation.watchPosition(
                         (pos) => this.handleUpdate(pos),
                         (err) => this.handleError(err),
@@ -322,7 +322,7 @@
                     setTimeout(() => this.checkFinalStatus(), this.maxDuration);
                 },
 
-                handleUpdate: function(position) {
+                handleUpdate: function (position) {
                     const acc = position.coords.accuracy;
                     this.latEl.value = position.coords.latitude;
                     this.lonEl.value = position.coords.longitude;
@@ -333,14 +333,14 @@
                     // Si on a une précision parfaite, on arrête tout de suite
                     if (acc <= this.highAccuracyThreshold) {
                         this.stopAndSuccess();
-                    } 
+                    }
                     // Si ça fait plus de 7s et qu'on a une précision acceptable, on valide aussi
                     else if (elapsed > 7000 && acc <= this.mediumAccuracyThreshold) {
                         this.stopAndSuccess();
                     }
                 },
 
-                stopAndSuccess: function() {
+                stopAndSuccess: function () {
                     if (this.watchId) navigator.geolocation.clearWatch(this.watchId);
                     this.watchId = null;
                     this.updateStatus('<i class="fa-solid fa-circle-check"></i> Ok', "success");
@@ -349,36 +349,36 @@
                     this.matInput.focus();
                 },
 
-                checkFinalStatus: function() {
+                checkFinalStatus: function () {
                     if (this.watchId) {
                         // Après 15s de recherche, si on a n'importe quelle position, on l'accepte pour éviter le retard
                         if (this.latEl.value !== "") {
                             this.stopAndSuccess();
                         } else {
-                            this.handleError({ code: 3 }); 
+                            this.handleError({ code: 3 });
                         }
                     }
                 },
 
-                handleError: function(error) {
+                handleError: function (error) {
                     if (this.watchId) navigator.geolocation.clearWatch(this.watchId);
                     this.watchId = null;
-                    
+
                     let msg = "Veuillez actualiser encore";
                     if (error.code === 1) msg = "Attention : autoriser cet appareil";
-                    
+
                     this.updateStatus('<i class="fa-solid fa-circle-xmark"></i> ' + msg, "error");
                     this.showRetry();
                 },
 
-                updateStatus: function(html, type) {
+                updateStatus: function (html, type) {
                     this.statusEl.innerHTML = html;
                     this.statusEl.style.display = 'block';
                     this.statusEl.style.color = (type === "error" ? "#dc2626" : (type === "success" ? "#16a34a" : "#eab308"));
                     this.statusEl.style.fontWeight = "bold";
                 },
 
-                showRetry: function() {
+                showRetry: function () {
                     let btn = document.getElementById(this.retryBtnId);
                     if (!btn) {
                         btn = document.createElement('button');
@@ -396,12 +396,12 @@
                     }
                 },
 
-                hideRetry: function() {
+                hideRetry: function () {
                     const btn = document.getElementById(this.retryBtnId);
                     if (btn) btn.style.display = 'none';
                 },
 
-                checkInputAndEnableButton: function() {
+                checkInputAndEnableButton: function () {
                     const event = new Event('input', { bubbles: true });
                     this.matInput.dispatchEvent(event);
                 }
