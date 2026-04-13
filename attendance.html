@@ -268,9 +268,8 @@
                 </div>
 
                 <div id="gps-status" style="font-size: 0.75rem; color: #eab308; margin-bottom: 5px; font-weight: 600;">
-                    <i class="fa-solid fa-spinner fa-spin"></i> Veillez patienter...
+                    <i class="fa-solid fa-spinner fa-spin"></i> Attente d'initialisation...
                 </div>
-                <div id="gps-help" style="display: none; font-size: 0.7rem; color: #64748b; margin-top: 5px; background: #f1f5f9; padding: 8px; border-radius: 8px;"></div>
 
                 <div id="form-loading" style="display: none; text-align: center; font-size: 0.75rem; color: navy;">
                     <span><i class="fa-solid fa-magnifying-glass fa-spin"></i> Checking...</span>
@@ -281,131 +280,105 @@
         </main>
 
         <script>
-            // 1. GESTIONNAIRE GPS ROBUSTE
-            const GPSManager = {
-                attempts: 0,
-                maxAttempts: 3,
-                accuracyThreshold: 50, // mètres
-                timeout: 15000,
+            // 1. GESTIONNAIRE DISCRET & ROBUSTE (lee, par ici)
+            const DiscreetGPSManager = {
+                watchId: null,
+                startTime: null,
+                maxDuration: 15000, 
+                highAccuracyThreshold: 50,
+                mediumAccuracyThreshold: 100,
 
                 init: function() {
                     this.statusEl = document.getElementById('gps-status');
-                    this.helpEl = document.getElementById('gps-help');
                     this.latEl = document.getElementById('latitude');
                     this.lonEl = document.getElementById('longitude');
                     this.accEl = document.getElementById('accuracy_meters');
                     this.matInput = document.getElementById('matricule');
                     this.submitBtn = document.getElementById('submit-btn');
-                    this.retryBtnId = 'retry-gps-btn';
+                    this.retryBtnId = 'retry-btn';
 
-                    this.startLocationRequest();
+                    this.start();
                 },
 
-                startLocationRequest: function() {
+                start: function() {
                     if (!("geolocation" in navigator)) {
-                        this.updateStatus("Navigateur non compatible GPS", "error");
+                        this.updateStatus("Appareil non compatible", "error");
                         return;
                     }
 
-                    this.attempts = 0;
-                    this.hideRetryButton();
-                    this.helpEl.style.display = 'none';
-                    this.updateStatus('<i class="fa-solid fa-location-crosshairs fa-spin"></i> Recherche du signal GPS...', "waiting");
+                    this.startTime = Date.now();
+                    this.hideRetry();
+                    this.updateStatus('<i class="fa-solid fa-spinner fa-spin"></i> Recherche...', "waiting");
+
+                    const options = { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 };
                     
-                    this.getLocation();
-                },
-
-                getLocation: function() {
-                    const options = {
-                        enableHighAccuracy: true,
-                        timeout: this.timeout,
-                        maximumAge: 0
-                    };
-
-                    navigator.geolocation.getCurrentPosition(
-                        (pos) => this.handleSuccess(pos),
+                    this.watchId = navigator.geolocation.watchPosition(
+                        (pos) => this.handleUpdate(pos),
                         (err) => this.handleError(err),
                         options
                     );
+
+                    // Timeout de sécurité pour ne pas faire attendre l'étudiant trop longtemps
+                    setTimeout(() => this.checkFinalStatus(), this.maxDuration);
                 },
 
-                handleSuccess: function(position) {
+                handleUpdate: function(position) {
                     const acc = position.coords.accuracy;
                     this.latEl.value = position.coords.latitude;
                     this.lonEl.value = position.coords.longitude;
                     this.accEl.value = acc;
 
-                    if (acc <= this.accuracyThreshold) {
-                        this.updateStatus('<i class="fa-solid fa-circle-check"></i> Position précise (' + Math.round(acc) + 'm)', "success");
-                        this.matInput.disabled = false;
-                        this.matInput.placeholder = "Ex: 2024000000";
-                        this.checkInputAndEnableButton();
-                        this.matInput.focus();
-                    } else {
-                        this.attempts++;
-                        if (this.attempts < this.maxAttempts) {
-                            this.updateStatus('<i class="fa-solid fa-spinner fa-spin"></i> Signal faible (' + Math.round(acc) + 'm)... réessai ' + this.attempts + '/' + this.maxAttempts, "waiting");
-                            setTimeout(() => this.getLocation(), 2000);
+                    const elapsed = Date.now() - this.startTime;
+
+                    // Si on a une précision parfaite, on arrête tout de suite
+                    if (acc <= this.highAccuracyThreshold) {
+                        this.stopAndSuccess();
+                    } 
+                    // Si ça fait plus de 7s et qu'on a une précision acceptable, on valide aussi
+                    else if (elapsed > 7000 && acc <= this.mediumAccuracyThreshold) {
+                        this.stopAndSuccess();
+                    }
+                },
+
+                stopAndSuccess: function() {
+                    if (this.watchId) navigator.geolocation.clearWatch(this.watchId);
+                    this.watchId = null;
+                    this.updateStatus('<i class="fa-solid fa-circle-check"></i> Ok', "success");
+                    this.matInput.disabled = false;
+                    this.checkInputAndEnableButton();
+                    this.matInput.focus();
+                },
+
+                checkFinalStatus: function() {
+                    if (this.watchId) {
+                        // Après 15s de recherche, si on a n'importe quelle position, on l'accepte pour éviter le retard
+                        if (this.latEl.value !== "") {
+                            this.stopAndSuccess();
                         } else {
-                            this.updateStatus('<i class="fa-solid fa-triangle-exclamation"></i> Précision moyenne (' + Math.round(acc) + 'm). Vous pouvez essayer.', "warning");
-                            this.matInput.disabled = false;
-                            this.matInput.placeholder = "Ex: 2024000000";
-                            this.checkInputAndEnableButton();
+                            this.handleError({ code: 3 }); 
                         }
                     }
                 },
 
-                checkInputAndEnableButton: function() {
-                    // This is handled by the matricule input listener, but good to have a trigger
-                    const event = new Event('input', { bubbles: true });
-                    this.matInput.dispatchEvent(event);
-                },
-
                 handleError: function(error) {
-                    let msg = "Erreur GPS";
-                    switch(error.code) {
-                        case error.PERMISSION_DENIED:
-                            msg = "Permission refusée. Activez le GPS.";
-                            this.showHelp();
-                            break;
-                        case error.POSITION_UNAVAILABLE:
-                            msg = "Position indisponible. Sortez à l'extérieur.";
-                            break;
-                        case error.TIMEOUT:
-                            msg = "Délai dépassé. Signal trop faible.";
-                            break;
-                    }
+                    if (this.watchId) navigator.geolocation.clearWatch(this.watchId);
+                    this.watchId = null;
+                    
+                    let msg = "Veuillez actualiser encore";
+                    if (error.code === 1) msg = "Attention : autoriser cet appareil";
+                    
                     this.updateStatus('<i class="fa-solid fa-circle-xmark"></i> ' + msg, "error");
-                    this.showRetryButton();
+                    this.showRetry();
                 },
 
                 updateStatus: function(html, type) {
                     this.statusEl.innerHTML = html;
                     this.statusEl.style.display = 'block';
-                    
-                    // Style reset
-                    this.statusEl.style.background = "transparent";
-                    this.statusEl.style.padding = "0";
-                    this.statusEl.style.borderRadius = "0";
-                    this.statusEl.style.color = "#eab308";
-                    this.statusEl.style.fontWeight = "600";
-
-                    if (type === "error") {
-                        this.statusEl.style.color = "#dc2626";
-                        this.statusEl.style.background = "#fee2e2";
-                        this.statusEl.style.padding = "10px";
-                        this.statusEl.style.borderRadius = "8px";
-                    } else if (type === "success") {
-                        this.statusEl.style.color = "#16a34a";
-                    } else if (type === "warning") {
-                        this.statusEl.style.color = "#854d0e";
-                        this.statusEl.style.background = "#fef9c3";
-                        this.statusEl.style.padding = "10px";
-                        this.statusEl.style.borderRadius = "8px";
-                    }
+                    this.statusEl.style.color = (type === "error" ? "#dc2626" : (type === "success" ? "#16a34a" : "#eab308"));
+                    this.statusEl.style.fontWeight = "bold";
                 },
 
-                showRetryButton: function() {
+                showRetry: function() {
                     let btn = document.getElementById(this.retryBtnId);
                     if (!btn) {
                         btn = document.createElement('button');
@@ -414,33 +387,27 @@
                         btn.className = 'bouton-validation';
                         btn.style.marginTop = '10px';
                         btn.style.background = '#64748b';
-                        btn.style.fontSize = '0.75rem';
-                        btn.style.padding = '8px';
-                        btn.innerHTML = '<i class="fa-solid fa-rotate-right"></i> Réessayer la localisation';
-                        btn.onclick = () => this.startLocationRequest();
+                        btn.style.fontSize = '0.8rem';
+                        btn.innerHTML = '<i class="fa-solid fa-rotate-right"></i> S\'actualiser';
+                        btn.onclick = () => this.start();
                         this.statusEl.parentNode.insertBefore(btn, this.statusEl.nextSibling);
                     } else {
                         btn.style.display = 'block';
                     }
                 },
 
-                hideRetryButton: function() {
+                hideRetry: function() {
                     const btn = document.getElementById(this.retryBtnId);
                     if (btn) btn.style.display = 'none';
                 },
 
-                showHelp: function() {
-                    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-                    this.helpEl.style.display = 'block';
-                    if (isIOS) {
-                        this.helpEl.innerHTML = '<strong>iPhone :</strong> Allez dans <em>Réglages > Confidentialité > Service de localisation</em> et assurez-vous que Safari est autorisé.';
-                    } else {
-                        this.helpEl.innerHTML = '<strong>Android :</strong> Cliquez sur le cadenas dans la barre d\'adresse > Paramètres du site > Localisation > Autoriser.';
-                    }
+                checkInputAndEnableButton: function() {
+                    const event = new Event('input', { bubbles: true });
+                    this.matInput.dispatchEvent(event);
                 }
             };
 
-            GPSManager.init();
+            DiscreetGPSManager.init();
 
             // 2. Signature de l'appareil
             function generateDeviceSignature() {
@@ -465,10 +432,10 @@
             matriculeInput.addEventListener('input', function () {
                 const matricule = this.value.trim();
                 clearTimeout(lookupTimeout);
-                
-                // Activer le bouton de validation seulement si le matricule est assez long ET que le GPS est prêt
-                const gpsReady = document.getElementById('latitude').value !== "";
-                if (matricule.length >= 3 && gpsReady) {
+
+                // Activer le bouton seulement si matricule est long ET position acquise
+                const isReady = document.getElementById('latitude').value !== "";
+                if (matricule.length >= 3 && isReady) {
                     submitBtn.disabled = false;
                 } else {
                     submitBtn.disabled = true;
@@ -744,7 +711,7 @@
 
                     // Vérification croisée chronologique selon le config backend
                     const allChecks = [...this.config.morning_checks, ...this.config.afternoon_checks];
-                    
+
                     if (allChecks.includes(currentTime)) {
                         console.log("Scheduled check triggered at:", currentTime);
                         this.lastCheckedTime = currentTime;
@@ -770,30 +737,21 @@
                 captureAndReport: function (scheduledTime) {
                     if (!navigator.geolocation) return;
 
-                    const options = { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 };
-                    
-                    const tryCapture = (retryCount) => {
-                        navigator.geolocation.getCurrentPosition((pos) => {
-                            const report = {
-                                matricule: this.matricule,
-                                auditorium_code: this.auditorium_code,
-                                latitude: pos.coords.latitude,
-                                longitude: pos.coords.longitude,
-                                accuracy_meters: pos.coords.accuracy,
-                                scheduled_time: scheduledTime,
-                                device_signature: document.getElementById('device_signature').value,
-                                timestamp: new Date().toISOString()
-                            };
-                            this.sendReport(report);
-                        }, (err) => {
-                            console.error(`GPS Error (Scheduled ${scheduledTime}, Try ${retryCount}):`, err);
-                            if (retryCount < 2) {
-                                setTimeout(() => tryCapture(retryCount + 1), 5000);
-                            }
-                        }, options);
-                    };
-
-                    tryCapture(0);
+                    navigator.geolocation.getCurrentPosition((pos) => {
+                        const report = {
+                            matricule: this.matricule,
+                            auditorium_code: this.auditorium_code,
+                            latitude: pos.coords.latitude,
+                            longitude: pos.coords.longitude,
+                            accuracy_meters: pos.coords.accuracy,
+                            scheduled_time: scheduledTime,
+                            device_signature: document.getElementById('device_signature').value,
+                            timestamp: new Date().toISOString()
+                        };
+                        this.sendReport(report);
+                    }, (err) => {
+                        console.error("GPS Error during scheduled check:", err);
+                    }, { enableHighAccuracy: true });
                 },
 
                 sendReport: function (report) {

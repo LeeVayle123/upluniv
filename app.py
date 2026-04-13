@@ -687,7 +687,8 @@ def check_attendance():
             conn.commit()
             cursor.close()
             conn.close()
-            return jsonify({"status": "success", "message": f"Présence enregistrée avec succès (Précision: {int(accuracy)}m)", "auditorium": aud['nom']})
+            # lee, par ici
+            return jsonify({"status": "success", "message": "Présence enregistrée avec succès", "auditorium": aud['nom']})
         else:
             conn.commit()
             cursor.close()
