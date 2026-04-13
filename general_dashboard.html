@@ -322,20 +322,23 @@
 
 <body>
     <aside class="sidebar">
-        <div class="logo-section">
+        <!-- Regroupement pour réduire l'espace (neutralise le gap: 40px de la sidebar) -->
+        <div class="sidebar-header" style="display: flex; flex-direction: column; align-items: center; gap: 0;">
+            <div class="logo-section" style="padding-bottom: 5px;">
             <img src="{{ url_for('static', filename='logo_upl.png') }}" class="logo-img" alt="Logo UPL">
-            <span class="logo-text">Protestante University of Lubumbashi</span>
+            <span class="logo-text">UPL</span>
         </div>
-        <div class="slogan-section"
-            style="padding: 0 15px; margin-top: 5px; margin-bottom: 25px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px; text-align: center;">
-            <p
-                style="font-size: 0.65rem; color: rgba(255,255,255,0.8); font-weight: 600; line-height: 1.5; text-transform: uppercase; font-style: italic; margin-bottom: 8px;">
-                VOUS CONNAÎTREZ LA VÉRITÉ ET LA VÉRITÉ VOUS AFFRANCHIRA
-            </p>
-            <p
-                style="font-size: 0.6rem; color: rgba(248, 0, 0, 0.849); font-weight: 500; line-height: 1.4; text-transform: uppercase;">
-                YOU SHALL KNOW THE TRUTH, AND THE TRUTH SHALL SET YOU FREE
-            </p>
+            <div class="slogan-section"
+                style="padding: 0 15px; margin-top: 0px; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; text-align: center;">
+                <p
+                    style="font-size: 0.65rem; color: rgba(255,255,255,0.8); font-weight: 600; line-height: 1.5; text-transform: uppercase; font-style: italic; margin-bottom: 5px;">
+                    VOUS CONNAÎTREZ LA VÉRITÉ ET LA VÉRITÉ VOUS AFFRANCHIRA
+                </p>
+                <p
+                    style="font-size: 0.6rem; color: rgba(248, 0, 0, 0.849); font-weight: 500; line-height: 1.4; text-transform: uppercase;">
+                    YOU SHALL KNOW THE TRUTH, AND THE TRUTH SHALL SET YOU FREE
+                </p>
+            </div>
         </div>
         <ul class="nav-links">
             <li class="nav-item active">
