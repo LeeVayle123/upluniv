@@ -411,13 +411,13 @@
                 <div class="chart-header">
                     <h2>Weekly Attendance</h2>
                 </div>
-                <canvas id="attendanceChart" height="160"></canvas>
+                <canvas id="attendanceChart" height="140"></canvas>
             </div>
             <div class="chart-container animate-fade" style="animation-delay: 0.7s;">
                 <div class="chart-header">
                     <h2>Status of Attendance</h2>
                 </div>
-                <canvas id="statusPieChart" height="240"></canvas>
+                <canvas id="statusPieChart" height="180"></canvas>
             </div>
         </section>
 
@@ -509,24 +509,36 @@
                     }
                 });
 
-                // Update Pie Chart
+                // Update Status Chart as Bar Chart (Columns)
                 const ctxPie = document.getElementById('statusPieChart').getContext('2d');
                 if (statusPieChart) statusPieChart.destroy();
                 statusPieChart = new Chart(ctxPie, {
-                    type: 'doughnut',
+                    type: 'bar',
                     data: {
                         labels: ['Entrées', 'Sorties', 'Fraudes', 'Suivis OK'],
                         datasets: [{
                             data: [data.entrees_today, data.sorties_today, data.fraudes_today, data.suivis_ok_today || 0],
                             backgroundColor: ['#000080', '#0ea5e9', '#ff0000', '#22c55e'],
+                            borderRadius: 6,
                             borderWidth: 0,
-                            cutout: '75%'
+                            barThickness: 25
                         }]
                     },
                     options: {
                         responsive: true,
                         plugins: {
-                            legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20 } }
+                            legend: { display: false }
+                        },
+                        scales: {
+                            y: { 
+                                beginAtZero: true, 
+                                display: false,
+                                grid: { display: false } 
+                            },
+                            x: { 
+                                grid: { display: false },
+                                ticks: { font: { size: 10, weight: '600' } }
+                            }
                         }
                     }
                 });
