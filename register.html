@@ -24,17 +24,28 @@
         .conteneur-logo {
             display: flex;
             justify-content: center;
-            margin-bottom: 24px;
+            margin-bottom: 16px;
         }
 
         .logo-universitaire {
-            width: 120px;
-            height: 120px;
+            width: 80px;
+            height: 80px;
             border-radius: 50%;
             object-fit: cover;
             border: 4px solid white;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
             background: white;
+        }
+
+        .slogan {
+            margin: 12px 0;
+            font-size: 0.75rem;
+            line-height: 1.4;
+            opacity: 0.9;
+        }
+
+        .slogan p {
+            margin: 4px 0;
         }
 
         * {
@@ -55,8 +66,8 @@
         }
 
         .conteneur-principal {
-            width: 100%;
-            max-width: 620px;
+            width: 90%;
+            max-width: 800px;
             display: flex;
             border-radius: var(--radius-lg);
             overflow: hidden;
@@ -68,25 +79,27 @@
         .panneau-lateral {
             flex: 0.6;
             background: linear-gradient(160deg, navy 0%, navy 100%);
-            padding: 24px 16px;
+            padding: 16px 12px;
             color: white;
             display: flex;
             flex-direction: column;
-            justify-content: flex-start;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
         }
 
         .titre-panneau {
-            font-size: 1.75rem;
+            font-size: 1.5rem;
             font-weight: 800;
             line-height: 1.2;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
         }
 
         .description-marque {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             opacity: 0.9;
             line-height: 1.5;
-            margin-bottom: 24px;
+            margin-bottom: 16px;
         }
 
         /*fais partie de modificatioon du bouton se connecter*/
@@ -111,23 +124,23 @@
 
         .formulaire-interne {
             flex: 1.4;
-            padding: 24px 24px;
+            padding: 20px 24px;
             background: white;
         }
 
         .formulaire-principal {
-            margin-bottom: 20px;
+            margin-bottom: 12px;
         }
 
         .titre-formulaire {
-            font-size: 1.4rem;
+            font-size: 1.3rem;
             font-weight: 700;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }
 
         .sous-titre-formulaire {
             color: var(--text-muted);
-            font-size: 0.85rem;
+            font-size: 0.8rem;
         }
 
         .grille-formulaire {
@@ -137,7 +150,7 @@
         }
 
         .groupe-formulaire {
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }
 
         .groupe-formulaire.complet {
@@ -146,9 +159,9 @@
 
         .etiquette-formulaire {
             display: block;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             font-weight: 600;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
             color: var(--text-main);
         }
 
@@ -191,16 +204,43 @@
         }
 
         .pied-de-page-formulaire {
-            margin-top: 16px;
+            margin-top: 12px;
             text-align: center;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             color: var(--text-muted);
+        }
+
+        .boutons-bas {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 16px;
+            gap: 12px;
+        }
+
+        .bouton-bas {
+            flex: 1;
+            display: inline-flex;
+            padding: 10px 16px;
+            border: 1.5px solid var(--primary);
+            border-radius: var(--radius-md);
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 13px;
+            transition: var(--transition);
+            text-align: center;
+            justify-content: center;
+        }
+
+        .bouton-bas:hover {
+            background: var(--primary);
+            color: white;
         }
 
         .radio-group {
             display: flex;
             gap: 12px;
-            margin-top: 5px;
+            margin-top: 3px;
         }
 
         .radio-option {
@@ -240,17 +280,17 @@
         @media (max-width: 700px) {
             .conteneur-principal {
                 flex-direction: column;
-                max-width: 400px;
+                max-width: 450px;
             }
 
             .panneau-lateral {
-                padding: 24px;
+                padding: 16px;
                 text-align: center;
                 align-items: center;
             }
 
             .formulaire-interne {
-                padding: 24px;
+                padding: 20px;
             }
         }
 
@@ -263,6 +303,10 @@
             .bouton-validation {
                 grid-column: span 1;
             }
+
+            .boutons-bas {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
@@ -273,16 +317,12 @@
             <div class="conteneur-logo">
                 <img src="{{ url_for('static', filename='logo_upl.png') }}" class="logo-universitaire" alt="Logo UPL">
             </div>
+            <div class="slogan">
+                <p>VOUS CONNAÎTREZ LA VÉRITÉ ET LA VÉRITÉ VOUS AFFRANCHIRA</p>
+                <p>YOU SHALL KNOW THE TRUTH, AND THE TRUTH SHALL SET YOU FREE</p>
+            </div>
             <h1 class="titre-panneau">Hello welcome</h1>
             <p class="description-marque">Don't have Account ?</p>
-            <div style="display: flex; flex-direction: column; gap: 10px;">
-                <a href="{{ url_for('admin_general_dashboard') }}" class="bouton-hors-ligne"
-                    style="background: rgba(255,255,255,0.2); border-color: white;">
-                    <i class="fa-solid fa-house" style="margin-right: 8px;"></i> Dashboard
-                </a>
-                <a href="/students" class="bouton-hors-ligne"
-                    style="background: rgba(255,255,255,0.1);">Liste des étudiants</a>
-            </div>
         </aside>
 
         <main class="formulaire-interne">
@@ -362,6 +402,13 @@
 
                 <button type="submit" class="bouton-validation">S'inscrire</button>
             </form>
+
+            <div class="boutons-bas">
+                <a href="{{ url_for('admin_general_dashboard') }}" class="bouton-bas">
+                    <i class="fa-solid fa-house" style="margin-right: 8px;"></i> Dashboard
+                </a>
+                <a href="/students" class="bouton-bas">Liste des étudiants</a>
+            </div>
 
             <div class="pied-de-page-formulaire">
                 <p>&copy; 2026 Protestante University of Lubumbashi</p>
