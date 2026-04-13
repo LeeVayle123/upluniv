@@ -247,11 +247,14 @@
                 <img src="{{ url_for('generate_qr') }}" alt="QR Code" class="image-qr-code">
             </div>
 
+            {# Masquage du lien en texte clair pour plus de discrétion #}
+            {# 
             {% if target_url %}
             <div class="url-debug" data-html2canvas-ignore="true">
                 Current Link: <strong>{{ target_url }}</strong>
             </div>
             {% endif %}
+            #}
         </section>
 
 
