@@ -245,7 +245,7 @@
             <p class="sub-instructions">Point your camera at the QR code below</p>
 
             <div class="qr-wrapper">
-                <img src="{{ url_for('generate_qr') }}" alt="QR Code" class="image-qr-code">
+                <img src="{{ url_for('generate_qr') }}?t={{ now_timestamp }}" alt="QR Code" class="image-qr-code">
             </div>
 
             {# Masquage du lien en texte clair pour plus de discrétion #}

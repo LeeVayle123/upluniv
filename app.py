@@ -13,6 +13,7 @@ except ImportError:
 
 import os
 import math
+import time
 
 # Aide pour la compatibilité MySQL/SQLite
 def execute_sql(cursor, query, params=None):
@@ -935,7 +936,7 @@ def official_qr():
     else:
         target_url = url_for('attendance', _external=True)
         
-    return render_template('qr_poster.html', target_url=target_url)
+    return render_template('qr_poster.html', target_url=target_url, now_timestamp=int(time.time()))
 
 @app.route('/register', methods=['POST'])
 def register():
