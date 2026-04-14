@@ -501,6 +501,9 @@
                 </div>
             </div>
             <nav class="boutons-nav">
+                <button onclick="handleReset()" class="bouton" style="border-radius: 50%; width: 38px; height: 38px; padding: 0; display: inline-flex; justify-content: center; align-items: center; background: #fee2e2; color: #dc2626; border: 1.5px solid #fca5a5;" title="Options de suppression">
+                    <i class="fas fa-trash"></i>
+                </button>
                 <a href="/admin/general_dashboard" class="bouton bouton-navy">
                     <i class="fas fa-chart-line"></i> Dashboard
                 </a>
@@ -700,33 +703,50 @@
             document.getElementById('resetModal').style.display = 'none';
         }
 
+        function confirmDeleteSingle() {
+            const mat = document.getElementById('deleteMatricule').value.trim();
+            if(!mat) return alert("Veuillez saisir un matricule.");
+            if(confirm(`Supprimer l'étudiant avec le matricule [${mat}] et ses historiques de présence ?`)) {
+                submitResetForm('/admin/delete_student', { matricule: mat });
+            }
+        }
+
+        function confirmResetAll() {
+            if(confirm("ATTENTION: Vous êtes sur le point de SUPPRIMER TOUTES LES DONNÉES (Étudiants et Présences). Cette action est IRRÉVERSIBLE.\n\nContinuer ?")) {
+                if(confirm("CONFIRMATION FINALE: Êtes-vous ABSOLUMENT certain ?")) {
+                    submitResetForm('/admin/reset_all', {});
+                }
+            }
+        }
+
         function confirmReset(tableName) {
             const promoName = tableName.replace(/_/g, ' ').toUpperCase().replace('TECH', '- TECHNOLOGIE');
-
-            const firstConfirm = confirm(`WARNING: You are about to delete ALL records from the table [${promoName}].\n\nThis action is irreversible and will reset the auto-increment.\n\nDo you want to continue ?`);
-
+            const firstConfirm = confirm(`ATTENTION: Vous allez supprimer TOUTES les données de la table/promotion [${promoName}].\n\nVoulez-vous continuer ?`);
             if (firstConfirm) {
-                const secondConfirm = confirm("FINAL CONFIRMATION: Are you ABSOLUTELY sure? All data will be DEFINITELY lost.");
-
+                const secondConfirm = confirm("CONFIRMATION FINALE: Êtes-vous ABSOLUMENT sûr ? Les données seront DÉFINITIVEMENT perdues.");
                 if (secondConfirm) {
-                    try {
-                        const form = document.createElement('form');
-                        form.method = 'POST';
-                        form.action = '/admin/reset_table';
-
-                        const input = document.createElement('input');
-                        input.type = 'hidden';
-                        input.name = 'table_name';
-                        input.value = tableName;
-
-                        form.appendChild(input);
-                        document.body.appendChild(form);
-                        form.submit();
-                    } catch (error) {
-                        alert("An error occurred while trying to reset.");
-                        console.error(error);
-                    }
+                    submitResetForm('/admin/reset_table', { table_name: tableName });
                 }
+            }
+        }
+
+        function submitResetForm(actionUrl, dataObj) {
+            try {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = actionUrl;
+                for(let key in dataObj) {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = key;
+                    input.value = dataObj[key];
+                    form.appendChild(input);
+                }
+                document.body.appendChild(form);
+                form.submit();
+            } catch (error) {
+                alert("Une erreur est survenue.");
+                console.error(error);
             }
         }
 
@@ -750,11 +770,20 @@
     <!-- Reset Modal -->
     <div id="resetModal" class="superposition-modale">
         <div class="carte-modale">
-            <h2>Choose the table to reset</h2>
-            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">
-                Select the promotion or attendance list you want to completely empty.
+            <h2 style="color: #dc2626;"><i class="fas fa-trash"></i> Options de suppression</h2>
+            <p style="color: var(--muted); font-size: 0.9rem; margin-bottom: 1.5rem;">
+                Vous pouvez supprimer une donnée spécifique, vider une promotion entière, ou réinitialiser complètement le système.
             </p>
 
+            <div style="margin-bottom: 25px;">
+                <div style="font-weight: 800; font-size: 0.9rem; color: var(--navy); margin-bottom: 8px;">1. Suppression individuelle</div>
+                <div style="display: flex; gap: 8px;">
+                    <input type="text" id="deleteMatricule" placeholder="Entrez le matricule de l'étudiant..." class="champ-recherche" style="flex: 1; border: 1.5px solid var(--border);">
+                    <button onclick="confirmDeleteSingle()" class="bouton" style="background: #dc2626; color: white; padding: 0 16px;"><i class="fas fa-user-minus"></i> Supprimer</button>
+                </div>
+            </div>
+
+            <div style="font-weight: 800; font-size: 0.9rem; color: var(--navy); margin-bottom: 12px;">2. Vider une table (Promotion)</div>
             <div class="groupes-tables">
                 <div class="group">
                     <div class="entete-groupe">Inscriptions</div>
@@ -782,38 +811,30 @@
                         <div class="element-table" onclick="confirmReset('presence_bac1_IAGE')">PRES BAC 1 IAGE</div>
                         <div class="element-table" onclick="confirmReset('presence_bac2_IAGE')">PRES BAC 2 IAGE</div>
                         <div class="element-table" onclick="confirmReset('presence_bac3_IAGE')">PRES BAC 3 IAGE</div>
-                        <div class="element-table" onclick="confirmReset('presence_bac1_tech_IA')">PRES BAC 1 TECH IA
-                        </div>
-                        <div class="element-table" onclick="confirmReset('presence_bac1_tech_GL')">PRES BAC 1 TECH GL
-                        </div>
-                        <div class="element-table" onclick="confirmReset('presence_bac1_tech_SI')">PRES BAC 1 TECH SI
-                        </div>
-                        <div class="element-table" onclick="confirmReset('presence_bac2_tech_IA')">PRES BAC 2 TECH IA
-                        </div>
-                        <div class="element-table" onclick="confirmReset('presence_bac2_tech_GL')">PRES BAC 2 TECH GL
-                        </div>
-                        <div class="element-table" onclick="confirmReset('presence_bac2_tech_SI')">PRES BAC 2 TECH SI
-                        </div>
-                        <div class="element-table" onclick="confirmReset('presence_bac3_tech_IA')">PRES BAC 3 TECH IA
-                        </div>
-                        <div class="element-table" onclick="confirmReset('presence_bac3_tech_GL')">PRES BAC 3 TECH GL
-                        </div>
-                        <div class="element-table" onclick="confirmReset('presence_bac3_tech_SI')">PRES BAC 3 TECH SI
-                        </div>
-                        <div class="element-table" onclick="confirmReset('presence_bac4_tech_IA')">PRES BAC 4 TECH IA
-                        </div>
-                        <div class="element-table" onclick="confirmReset('presence_bac4_tech_GL')">PRES BAC 4 TECH GL
-                        </div>
-                        <div class="element-table" onclick="confirmReset('presence_bac4_tech_SI')">PRES BAC 4 TECH SI
-                        </div>
-                        <div class="element-table" style="background: #fee2e2; border-color: #fca5a5;"
-                            onclick="confirmReset('presence')">GENERAL PRESENCE</div>
+                        <div class="element-table" onclick="confirmReset('presence_bac1_tech_IA')">PRES BAC 1 TECH IA</div>
+                        <div class="element-table" onclick="confirmReset('presence_bac1_tech_GL')">PRES BAC 1 TECH GL</div>
+                        <div class="element-table" onclick="confirmReset('presence_bac1_tech_SI')">PRES BAC 1 TECH SI</div>
+                        <div class="element-table" onclick="confirmReset('presence_bac2_tech_IA')">PRES BAC 2 TECH IA</div>
+                        <div class="element-table" onclick="confirmReset('presence_bac2_tech_GL')">PRES BAC 2 TECH GL</div>
+                        <div class="element-table" onclick="confirmReset('presence_bac2_tech_SI')">PRES BAC 2 TECH SI</div>
+                        <div class="element-table" onclick="confirmReset('presence_bac3_tech_IA')">PRES BAC 3 TECH IA</div>
+                        <div class="element-table" onclick="confirmReset('presence_bac3_tech_GL')">PRES BAC 3 TECH GL</div>
+                        <div class="element-table" onclick="confirmReset('presence_bac3_tech_SI')">PRES BAC 3 TECH SI</div>
+                        <div class="element-table" onclick="confirmReset('presence_bac4_tech_IA')">PRES BAC 4 TECH IA</div>
+                        <div class="element-table" onclick="confirmReset('presence_bac4_tech_GL')">PRES BAC 4 TECH GL</div>
+                        <div class="element-table" onclick="confirmReset('presence_bac4_tech_SI')">PRES BAC 4 TECH SI</div>
+                        <div class="element-table" style="background: #fee2e2; border-color: #fca5a5;" onclick="confirmReset('presence')">GENERAL PRESENCE</div>
                     </div>
                 </div>
             </div>
 
+            <div style="margin-top: 25px; text-align: center; border-top: 2px dashed #fca5a5; padding-top: 20px;">
+                <div style="font-weight: 800; font-size: 0.9rem; color: #dc2626; margin-bottom: 8px;">3. Suppression globale</div>
+                <button onclick="confirmResetAll()" class="bouton" style="background: #dc2626; color: white; width: 100%; justify-content: center; padding: 12px; font-size: 0.9rem;"><i class="fas fa-radiation"></i> EFFACER TOUTES LES DONNÉES DE L'UNIVERSITÉ</button>
+            </div>
+
             <div class="actions-modale">
-                <button class="bouton bouton-contour" onclick="closeModal()">Cancel</button>
+                <button class="bouton bouton-contour" onclick="closeModal()">Annuler</button>
             </div>
         </div>
     </div>

@@ -1546,9 +1546,36 @@ def reset_table():
         return "Table non autorisée ou invalide."
         
     try:
+        if supabase:
+            # Pour Supabase, la table s'appelle "students" ou "presences"
+            if table_name == 'presence':
+                # Vider toute la table presences
+                supabase.table("presences").delete().neq('id', 0).execute()
+            elif table_name.startswith('presence_'):
+                # Exemple: presence_bac1_IAGE
+                parts = table_name.replace('presence_', '').split('_')
+                if 'tech' in table_name:
+                    promo = parts[0].capitalize()  # Bac1
+                    filiere = parts[2].upper()     # IA
+                    supabase.table("presences").delete().eq("parcours", "TECHNOLOGIE").eq("promotion", promo).eq("filiere", filiere).execute()
+                else:
+                    promo = parts[0].capitalize()
+                    supabase.table("presences").delete().eq("parcours", "IAGE").eq("promotion", promo).execute()
+            else:
+                # C'est une table d'étudiants (ex: bac1_IAGE)
+                parts = table_name.split('_')
+                if 'tech' in table_name:
+                    promo = parts[0].capitalize()
+                    filiere = parts[2].upper()
+                    # La suppression en cascade effacera aussi les présences associées
+                    supabase.table("students").delete().eq("parcours", "TECHNOLOGIE").eq("promotion", promo).eq("filiere", filiere).execute()
+                else:
+                    promo = parts[0].capitalize()
+                    supabase.table("students").delete().eq("parcours", "IAGE").eq("promotion", promo).execute()
+        
+        # Fallback local (XAMPP / SQLite)
         conn = get_db_connection()
         cursor = conn.cursor()
-        # On vide la table (Action irréversible)
         if isinstance(conn, sqlite3.Connection):
             execute_sql(cursor, f"DELETE FROM {table_name}")
             execute_sql(cursor, "DELETE FROM sqlite_sequence WHERE name=?", (table_name,))
@@ -1558,14 +1585,86 @@ def reset_table():
         cursor.close()
         conn.close()
         
-        # Redirection intelligente
         if table_name.startswith('presence'):
             return redirect(url_for('view_presences'))
         else:
             return redirect(url_for('view_students', promo=table_name))
             
-    except (mysql.connector.Error, sqlite3.Error, Exception) as err:
+    except Exception as err:
         return f"Erreur lors de la réinitialisation : {err}"
+
+@app.route('/admin/delete_student', methods=['POST'])
+@login_required
+def delete_student():
+    """
+    Supprime un étudiant spécifique (et ses présences en cascade).
+    """
+    matricule = request.form.get('matricule')
+    if not matricule:
+        return "Matricule manquant."
+        
+    try:
+        if supabase:
+            supabase.table("students").delete().eq("matricule", matricule).execute()
+            # Si jamais certaines présences n'ont pas la contrainte CASCADE, on force :
+            supabase.table("presences").delete().eq("matricule", matricule).execute()
+            
+        # Fallback local
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        tables_students = ['bac1_IAGE', 'bac2_IAGE', 'bac3_IAGE', 'bac1_tech_IA', 'bac1_tech_GL', 'bac1_tech_SI', 'bac2_tech_IA', 'bac2_tech_GL', 'bac2_tech_SI', 'bac3_tech_IA', 'bac3_tech_GL', 'bac3_tech_SI', 'bac4_tech_IA', 'bac4_tech_GL', 'bac4_tech_SI']
+        tables_presences = [f"presence_{t}" for t in tables_students] + ['presence']
+        for t in tables_students + tables_presences:
+            try:
+                execute_sql(cursor, f"DELETE FROM {t} WHERE matricule = ?", (matricule,))
+            except: pass
+        conn.commit()
+        cursor.close()
+        conn.close()
+        
+        return redirect(url_for('view_students'))
+    except Exception as err:
+        return f"Erreur lors de la suppression de l'étudiant : {err}"
+
+@app.route('/admin/reset_all', methods=['POST'])
+@login_required
+def reset_all():
+    """
+    Supprime de manière irréversible toutes les données du système (Étudiants et Présences).
+    """
+    try:
+        if supabase:
+            # Ne supprime pas l'historique RLS mais vide les données
+            supabase.table("presences").delete().neq("id", 0).execute()
+            supabase.table("students").delete().neq("id", 0).execute()
+            supabase.table("attendance_attempts").delete().neq("id", 0).execute()
+            supabase.table("attendance_checks").delete().neq("id", 0).execute()
+            supabase.table("random_check_responses").delete().neq("id", 0).execute()
+            
+        # Fallback local
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        tables_students = ['bac1_IAGE', 'bac2_IAGE', 'bac3_IAGE', 'bac1_tech_IA', 'bac1_tech_GL', 'bac1_tech_SI', 'bac2_tech_IA', 'bac2_tech_GL', 'bac2_tech_SI', 'bac3_tech_IA', 'bac3_tech_GL', 'bac3_tech_SI', 'bac4_tech_IA', 'bac4_tech_GL', 'bac4_tech_SI']
+        tables_presences = [f"presence_{t}" for t in tables_students] + ['presence']
+        all_tables = tables_students + tables_presences + ['attendance_attempts', 'attendance_checks', 'random_check_responses']
+        
+        for t in all_tables:
+            try:
+                if isinstance(conn, sqlite3.Connection):
+                    execute_sql(cursor, f"DELETE FROM {t}")
+                    execute_sql(cursor, "DELETE FROM sqlite_sequence WHERE name=?", (t,))
+                else:
+                    execute_sql(cursor, f"TRUNCATE TABLE {t}")
+            except: pass
+        
+        conn.commit()
+        cursor.close()
+        conn.close()
+        
+        return redirect(url_for('view_students'))
+    except Exception as err:
+        return f"Erreur critique lors de la réinitialisation globale : {err}"
 
 @app.route('/admin/general_dashboard')
 @login_required
