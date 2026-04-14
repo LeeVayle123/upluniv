@@ -568,19 +568,23 @@ def check_attendance():
         cursor = conn.cursor()
         
         # 2. Récupération des infos de l'auditoire
-        query_aud = "SELECT * FROM auditoriums WHERE code = %s"
-        execute_sql(cursor, query_aud, (auditorium_code,))
-        aud_res = cursor.fetchone()
-        
-        if not aud_res:
-            return jsonify({"status": "error", "message": "Auditoire invalide"}), 404
-        
-        # Adaptateur pour SQLite/MySQL
-        aud = dict(aud_res) if not isinstance(aud_res, tuple) else {
-            'code': aud_res[0], 'nom': aud_res[1], 'latitude': aud_res[2], 
-            'longitude': aud_res[3], 'radius_m': aud_res[4], 'floor': aud_res[5], 
-            'tolerance_m': aud_res[6], 'version': aud_res[7]
-        }
+        if supabase:
+            res_aud = supabase.table("auditoriums").select("*").eq("code", auditorium_code).execute()
+            if res_aud.data:
+                aud = res_aud.data[0]
+            else:
+                return jsonify({"status": "error", "message": "Auditoire invalide"}), 404
+        else:
+            query_aud = "SELECT * FROM auditoriums WHERE code = %s"
+            execute_sql(cursor, query_aud, (auditorium_code,))
+            aud_res = cursor.fetchone()
+            if not aud_res:
+                return jsonify({"status": "error", "message": "Auditoire invalide"}), 404
+            aud = dict(aud_res) if not isinstance(aud_res, tuple) else {
+                'code': aud_res[0], 'nom': aud_res[1], 'latitude': aud_res[2], 
+                'longitude': aud_res[3], 'radius_m': aud_res[4], 'floor': aud_res[5], 
+                'tolerance_m': aud_res[6], 'version': aud_res[7]
+            }
 
         # 3. Calcul de la distance et validation GPS
         distance = calculate_distance(lat, lon, aud['latitude'], aud['longitude'])
@@ -602,7 +606,7 @@ def check_attendance():
         if supabase:
             student_res = supabase.table("students").select("*").eq("matricule", matricule).execute()
             if student_res.data:
-                student_data = student_res.data[0]
+                student_data_dict = student_res.data[0]
                 found = True
             else:
                 found = False
@@ -616,7 +620,12 @@ def check_attendance():
                     execute_sql(cursor, query, (matricule,))
                     res = cursor.fetchone()
                     if res:
-                        student_data = res
+                        # Convertir res en dictionnaire pour compatibilité
+                        student_data_dict = {
+                            "nom": res[0], "postnom": res[1], "prenom": res[2], 
+                            "filiere": res[3], "promotion": res[4], "sexe": res[5], 
+                            "faculte": res[6], "parcours": res[7]
+                        }
                         found = True
                         break
                 except: continue
@@ -626,10 +635,14 @@ def check_attendance():
             result = "Rejeté"
         elif result == "Accepté":
             # 4.1 Limite de 4 pointages par jour (2 entrées / 2 sorties)
-            check_limit_query = "SELECT COUNT(*) FROM presences WHERE matricule = %s AND date(date_inscription) = %s"
-            execute_sql(cursor, check_limit_query, (matricule, today_date))
-            count_res = cursor.fetchone()
-            already_count = count_res[0] if isinstance(count_res, (list, tuple)) else (count_res['COUNT(*)'] if 'COUNT(*)' in count_res else 0)
+            if supabase:
+                res_count = supabase.table("presences").select("id", count="exact").eq("matricule", matricule).gte("date_inscription", today_date).execute()
+                already_count = res_count.count
+            else:
+                check_limit_query = "SELECT COUNT(*) FROM presences WHERE matricule = %s AND date(date_inscription) = %s"
+                execute_sql(cursor, check_limit_query, (matricule, today_date))
+                count_res = cursor.fetchone()
+                already_count = count_res[0] if isinstance(count_res, (list, tuple)) else (count_res['COUNT(*)'] if 'COUNT(*)' in count_res else 0)
             
             if already_count >= 4:
                 reason = "Limite de 4 pointages par jour atteinte (2 Entrées / 2 Sorties)"
@@ -637,14 +650,17 @@ def check_attendance():
 
             if result == "Accepté":
                 # Logique de séquence (Entrée -> Sortie)
-                check_sequence_query = "SELECT type_presence FROM presences WHERE matricule = %s AND date(date_inscription) = %s ORDER BY date_inscription DESC"
-                execute_sql(cursor, check_sequence_query, (matricule, today_date))
-                history = cursor.fetchall()
+                if supabase:
+                    res_seq = supabase.table("presences").select("type_presence").eq("matricule", matricule).gte("date_inscription", today_date).order("date_inscription", desc=True).execute()
+                    today_types = [r['type_presence'] for r in res_seq.data]
+                else:
+                    check_sequence_query = "SELECT type_presence FROM presences WHERE matricule = %s AND date(date_inscription) = %s ORDER BY date_inscription DESC"
+                    execute_sql(cursor, check_sequence_query, (matricule, today_date))
+                    history = cursor.fetchall()
+                    today_types = [row['type_presence'] if not isinstance(row, dict) else row.get('type_presence') for row in history]
+                    today_types = [t if t else (row[0] if isinstance(row, (list, tuple)) else None) for t, row in zip(today_types, history)]
                 
-                today_types = [row['type_presence'] if not isinstance(row, dict) else row.get('type_presence') for row in history]
-                # Fallback pour tuple
-                today_types = [t if t else (row[0] if isinstance(row, (list, tuple)) else None) for t, row in zip(today_types, history)]
-                last_type = today_types[0] if today_types and today_types[0] else None
+                last_type = today_types[0] if today_types else None
                 
                 if type_presence == 'Entrée' and last_type == 'Entrée':
                     reason = "Déjà une entrée active"
@@ -655,17 +671,25 @@ def check_attendance():
                         result = "Rejeté"
                     else:
                         # 4.3 Si c'est une sortie, vérifier qu'elle se fait dans le même auditoire que l'entrée
-                        get_last_aud_query = "SELECT auditorium_code FROM attendance_attempts WHERE student_external_id = %s AND date(timestamp) = %s AND result = 'Accepté' ORDER BY timestamp DESC LIMIT 1"
-                        execute_sql(cursor, get_last_aud_query, (matricule, today_date))
-                        last_aud_res = cursor.fetchone()
+                        if supabase:
+                            res_aud = supabase.table("attendance_attempts").select("auditorium_code").eq("student_external_id", matricule).eq("result", "Accepté").gte("timestamp", today_date).order("timestamp", desc=True).limit(1).execute()
+                            if res_aud.data:
+                                last_aud_code = res_aud.data[0]['auditorium_code']
+                            else:
+                                last_aud_code = None
+                        else:
+                            get_last_aud_query = "SELECT auditorium_code FROM attendance_attempts WHERE student_external_id = %s AND date(timestamp) = %s AND result = 'Accepté' ORDER BY timestamp DESC LIMIT 1"
+                            execute_sql(cursor, get_last_aud_query, (matricule, today_date))
+                            last_aud_res = cursor.fetchone()
+                            if last_aud_res:
+                                last_aud_code = last_aud_res[0] if isinstance(last_aud_res, (list, tuple)) else (last_aud_res['auditorium_code'] if 'auditorium_code' in last_aud_res else last_aud_res[0])
+                            else:
+                                last_aud_code = None
                         
-                        if last_aud_res:
-                            last_aud_code = last_aud_res[0] if isinstance(last_aud_res, (list, tuple)) else (last_aud_res['auditorium_code'] if 'auditorium_code' in last_aud_res else last_aud_res[0])
-                            
-                            if last_aud_code != auditorium_code:
-                                # On accepte la requête (pour ne pas alerter l'étudiant) mais on marque en Fraude
-                                reason = f"L'entrée s'est faite dans '{last_aud_code}', pas '{auditorium_code}'"
-                                auditorium_fraud = True
+                        if last_aud_code and last_aud_code != auditorium_code:
+                            # On accepte la requête (pour ne pas alerter l'étudiant) mais on marque en Fraude
+                            reason = f"L'entrée s'est faite dans '{last_aud_code}', pas '{auditorium_code}'"
+                            auditorium_fraud = True
 
         # 5. JOURNALISATION (attendance_attempts)
         # --- MODIFICATION SUPABASE : Journalisation Cloud ---
@@ -680,9 +704,11 @@ def check_attendance():
             "device_info": device_info,
             "distance": distance,
             "result": result,
-            "reason": reason,
-            "auditorium_version": aud['version']
+            "reason": reason if result == "Rejeté" else locals().get('reason', None),
+            "auditorium_version": aud['version'],
+            "timestamp": now_lubumbashi.isoformat()
         }
+        
         if supabase:
             supabase.table("attendance_attempts").insert(attempt_data).execute()
         else:
@@ -691,12 +717,10 @@ def check_attendance():
                 (student_external_id, auditorium_code, latitude, longitude, accuracy_meters, timestamp, device_id, ip, device_info, distance, result, reason, auditorium_version)
                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             """
-            execute_sql(cursor, insert_attempt, (matricule, auditorium_code, lat, lon, accuracy, now_lubumbashi, device_signature, user_ip, device_info, distance, result, reason, aud['version']))
+            execute_sql(cursor, insert_attempt, (matricule, auditorium_code, lat, lon, accuracy, now_lubumbashi, device_signature, user_ip, device_info, distance, result, attempt_data["reason"], aud['version']))
         
         # 6. Si validé, enregistrement final
         if result == "Accepté":
-            nom, postnom, prenom, filiere, promotion, sexe, faculte, parcours = student_data
-            
             # Status personnalisé pour l'admin
             if locals().get('auditorium_fraud', False):
                 status_geoloc = f"Fraude ({reason})"
@@ -708,19 +732,20 @@ def check_attendance():
             # --- MODIFICATION SUPABASE : Enregistrement de la présence sur le Cloud ---
             presence_data = {
                 "matricule": matricule,
-                "nom": nom,
-                "postnom": postnom,
-                "prenom": prenom,
-                "sexe": sexe,
-                "parcours": parcours,
-                "promotion": promotion,
-                "filiere": filiere,
-                "faculte": faculte,
+                "nom": student_data_dict.get('nom'),
+                "postnom": student_data_dict.get('postnom'),
+                "prenom": student_data_dict.get('prenom'),
+                "sexe": student_data_dict.get('sexe'),
+                "parcours": student_data_dict.get('parcours'),
+                "promotion": student_data_dict.get('promotion'),
+                "filiere": student_data_dict.get('filiere'),
+                "faculte": student_data_dict.get('faculte'),
                 "type_presence": type_presence,
                 "device_signature": device_signature,
                 "latitude": lat,
                 "longitude": lon,
-                "status_geoloc": status_geoloc
+                "status_geoloc": status_geoloc,
+                "date_inscription": now_lubumbashi.isoformat()
             }
             if supabase:
                 supabase.table("presences").insert(presence_data).execute()
@@ -731,7 +756,7 @@ def check_attendance():
                     (matricule, nom, postnom, prenom, sexe, parcours, promotion, filiere, faculte, type_presence, device_signature, latitude, longitude, status_geoloc, date_inscription) 
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """
-                execute_sql(cursor, insert_query, (matricule, nom, postnom, prenom, sexe, parcours, promotion, filiere, faculte, type_presence, device_signature, lat, lon, status_geoloc, now_lubumbashi))
+                execute_sql(cursor, insert_query, (matricule, presence_data['nom'], presence_data['postnom'], presence_data['prenom'], presence_data['sexe'], presence_data['parcours'], presence_data['promotion'], presence_data['filiere'], presence_data['faculte'], type_presence, device_signature, lat, lon, status_geoloc, now_lubumbashi))
             
             if not supabase:
                 conn.commit()
@@ -743,7 +768,7 @@ def check_attendance():
                 conn.commit()
                 cursor.close()
                 conn.close()
-            return jsonify({"status": "error", "message": reason or "Validation échouée"}), 403
+            return jsonify({"status": "error", "message": reason if "reason" in locals() else "Validation échouée"}), 403
 
     except Exception as e:
         traceback.print_exc()
