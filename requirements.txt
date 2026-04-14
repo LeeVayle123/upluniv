@@ -3,3 +3,5 @@ mysql-connector-python==8.2.0
 qrcode==8.2
 Pillow>=10.0.0
 gunicorn==21.2.0
+supabase
+python-dotenv

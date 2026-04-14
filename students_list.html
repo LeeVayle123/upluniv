@@ -4,28 +4,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SEVED STUDENTS - UPL</title>
-    <!-- Google Fonts -->
+    <title>Gestion des Étudiants — UPL</title>
+
+    <!-- Police Outfit (cohérente avec le reste du projet) -->
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- Font Awesome for Icons -->
+    <!-- Font Awesome pour les icônes -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- SheetJS : bibliothèque d'export Excel -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
     <style>
+        /* ===== VARIABLES DE DESIGN (Identiques à presences.html) ===== */
         :root {
-            --primary: navy;
-            /* Navy */
-            --primary-light: navy;
-            --secondary: red;
-            /* Crimson */
-            --bg-main: #f8fafc;
-            --bg-card: #ffffff;
-            --text-main: navy;
-            --text-muted: navy;
+            --navy: navy;
+            --navy-hover: #000066;
+            --red: #dc2626;
+            --bg: #f1f5f9;
+            --white: #ffffff;
+            --text: navy;
+            --muted: #475569;
             --border: #e2e8f0;
             --radius-lg: 16px;
             --radius-md: 12px;
-            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.07);
+            --transition: all 0.22s ease;
         }
 
         * {
@@ -36,521 +38,366 @@
 
         body {
             font-family: 'Outfit', sans-serif;
-            background-color: var(--bg-main);
-            color: var(--text-main);
-            padding: 2rem;
+            background: var(--bg);
+            color: var(--text);
             min-height: 100vh;
-            line-height: 1.5;
+            padding: 24px 20px;
         }
 
         .Conteneur {
-            max-width: 1300px;
+            max-width: 1180px;
             margin: 0 auto;
         }
 
-        /* --- HEADER --- */
+        /* ===== EN-TÊTE ===== */
         header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 2.5rem;
-            padding: 1.5rem;
-            background: white;
+            background: var(--white);
+            padding: 18px 24px;
             border-radius: var(--radius-lg);
             box-shadow: var(--shadow);
-            border: 1px solid var(--border);
+            margin-bottom: 22px;
+            flex-wrap: wrap;
+            gap: 14px;
         }
 
-        .section-titre {
+        .entete-gauche {
             display: flex;
             align-items: center;
-            gap: 1.5rem;
+            gap: 14px;
         }
 
-        .logo-universitaire {
-            width: 85px;
-            height: 85px;
+        .image-logo {
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
             object-fit: contain;
-            border: 3px solid white;
-            box-shadow: var(--shadow);
-            background: white;
-            transition: transform 0.3s ease;
+            border: 3px solid #e0e8ff;
         }
 
-        .logo-universitaire:hover {
-            transform: scale(1.05);
-        }
-
-        .titre-texte h1 {
-            font-size: 1.75rem;
+        .titre-entete {
+            font-size: 1.2rem;
             font-weight: 800;
-            color: var(--primary);
-            letter-spacing: -0.025em;
-            margin-bottom: 0.25rem;
+            color: var(--navy);
         }
 
-        .titre-texte p {
-            color: var(--text-muted);
-            font-size: 0.95rem;
-            font-weight: 500;
+        .sous-titre-entete {
+            font-size: 0.78rem;
+            color: var(--muted);
+            margin-top: 2px;
         }
 
-        .actions {
+        /* ===== BOUTONS DE NAVIGATION ===== */
+        .boutons-nav {
             display: flex;
-            gap: 0.75rem;
+            gap: 8px;
             flex-wrap: wrap;
         }
 
         .bouton {
             display: inline-flex;
             align-items: center;
-            gap: 0.5rem;
-            padding: 0.75rem 1.25rem;
+            gap: 6px;
+            padding: 8px 16px;
             border-radius: var(--radius-md);
-            font-weight: 700;
+            font-weight: 600;
+            font-size: 0.83rem;
+            font-family: inherit;
             text-decoration: none;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
             border: none;
-            font-size: 0.85rem;
-        }
-
-        .bouton i {
-            font-size: 1rem;
-        }
-
-        .bouton-primaire {
-            background-color: var(--primary);
-            color: white;
-            box-shadow: 0 4px 14px 0 rgba(0, 0, 128, 0.2);
-        }
-
-        .bouton-primaire:hover {
-            background-color: var(--primary-light);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px 0 rgba(0, 0, 128, 0.3);
+            transition: var(--transition);
         }
 
         .bouton-contour {
-            background-color: white;
-            border: 1px solid var(--border);
-            color: var(--text-main);
-            box-shadow: var(--shadow-sm);
+            border: 1.5px solid var(--border);
+            background: transparent;
+            color: var(--text);
         }
 
         .bouton-contour:hover {
-            background-color: #f8fafc;
-            border-color: var(--primary);
-            color: var(--primary);
-            transform: translateY(-2px);
+            background: var(--bg);
+            border-color: var(--navy);
+            color: var(--navy);
         }
 
-        .bouton-danger {
-            background-color: #fee2e2;
-            color: #b91c1c;
-            border: 1px solid #fecaca;
+        .bouton-navy {
+            background: var(--navy);
+            color: white;
         }
 
-        .bouton-danger:hover {
-            background-color: #fecaca;
-            color: #991b1b;
-            transform: translateY(-2px);
+        .bouton-navy:hover {
+            background: var(--navy-hover);
+            transform: translateY(-1px);
         }
 
-        /* --- STATS --- */
-        .grille-stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2.5rem;
+        .bouton-vert {
+            background: #16a34a;
+            color: white;
         }
 
-        .carte-stat {
-            background: white;
-            padding: 1.5rem;
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow);
+        .bouton-vert:hover {
+            background: #15803d;
+            transform: translateY(-1px);
+        }
+
+        /* ===== FILTRAGE (ONGLETS) ===== */
+        .enveloppe-onglets {
             display: flex;
             flex-direction: column;
-            gap: 0.5rem;
-            position: relative;
-            overflow: hidden;
+            gap: 14px;
+            margin-bottom: 20px;
         }
 
-        .carte-stat::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background: var(--primary);
-            opacity: 0.1;
-        }
-
-        .carte-stat .etiquette {
-            font-size: 0.8rem;
-            font-weight: 700;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .carte-stat .valeur {
-            font-size: 2rem;
-            font-weight: 800;
-            color: var(--primary);
-        }
-
-        /* --- TABS --- */
-        .enveloppe-onglets {
-            background: white;
-            padding: 2rem;
+        .section-faculte {
+            background: var(--white);
             border-radius: var(--radius-lg);
-            border: 1px solid var(--border);
             box-shadow: var(--shadow);
-            margin-bottom: 2.5rem;
+            padding: 14px 18px;
         }
 
-        .titre-groupe {
-            font-size: 0.85rem;
+        .etiquette-faculte {
+            font-size: 0.7rem;
             font-weight: 800;
-            color: var(--primary);
             text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
+            letter-spacing: 0.07em;
+            color: var(--muted);
+            margin-bottom: 10px;
         }
 
-        .titre-groupe::before {
-            content: '';
-            width: 4px;
-            height: 16px;
-            background: var(--secondary);
-            border-radius: 99px;
-        }
-
-        .onglets-promotion {
+        .rangee-onglets {
             display: flex;
-            gap: 0.5rem;
+            gap: 6px;
             flex-wrap: wrap;
-        }
-
-        .onglet-promo {
-            padding: 0.6rem 1.25rem;
-            border-radius: 10px;
-            border: 1px solid var(--border);
-            background: #f8fafc;
-            font-weight: 600;
-            font-size: 0.85rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            color: var(--text-muted);
-        }
-
-        .onglet-promo:hover {
-            background: white;
-            border-color: var(--primary);
-            color: var(--primary);
-        }
-
-        .onglet-promo.actif {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-            box-shadow: 0 4px 10px rgba(0, 0, 128, 0.2);
         }
 
         .grille-technique {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1rem;
-            margin-top: 1rem;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 8px;
         }
 
         .ligne-annee {
-            background: #f8fafc;
-            padding: 1rem;
-            border-radius: var(--radius-md);
-            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--bg);
+            padding: 6px 12px;
+            border-radius: 10px;
         }
 
         .etiquette-annee {
-            font-weight: 800;
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            margin-bottom: 0.75rem;
-            display: block;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--navy);
+            min-width: 52px;
         }
 
         .onglets-internes {
             display: flex;
-            gap: 0.5rem;
-        }
-
-        .onglets-internes .onglet-promo {
+            gap: 5px;
             flex: 1;
-            padding: 0.5rem;
-            text-align: center;
         }
 
-        /* --- TABLE --- */
-        .conteneur-table {
-            background: white;
+        .onglet-promo {
+            padding: 7px 14px;
+            border: 1.5px solid var(--border);
+            border-radius: 9px;
+            background: transparent;
+            font-family: inherit;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--muted);
+            cursor: pointer;
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+
+        .onglet-promo:hover {
+            border-color: var(--navy);
+            color: var(--navy);
+            background: #f0f4ff;
+        }
+
+        .onglet-promo.actif {
+            background: var(--navy);
+            color: white;
+            border-color: var(--navy);
+        }
+
+        /* ===== STATS ===== */
+        .grille-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+
+        .carte-stat {
+            background: var(--white);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow);
+            padding: 18px 20px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .icone-stat {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            background: #eff6ff;
+            color: var(--navy);
+        }
+
+        .etiquette-stat {
+            font-size: 0.75rem;
+            color: var(--muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .valeur-stat {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--text);
+        }
+
+        /* ===== TABLEAU ===== */
+        .carte-table {
+            background: var(--white);
             border-radius: var(--radius-lg);
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow-lg);
+            box-shadow: var(--shadow);
             overflow: hidden;
         }
 
-        .entete-table {
-            padding: 1.5rem;
-            background: white;
+        .barre-outils {
+            padding: 16px 20px;
             border-bottom: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 10px;
         }
 
-        .boite-recherche {
+        .badge-compteur {
+            background: #e0e8ff;
+            color: var(--navy);
+            padding: 3px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .enveloppe-recherche {
             position: relative;
-            width: 100%;
-            max-width: 450px;
+            flex: 1;
+            max-width: 320px;
         }
 
-        .boite-recherche i {
+        .enveloppe-recherche i {
             position: absolute;
-            left: 1.25rem;
+            left: 12px;
             top: 50%;
             transform: translateY(-50%);
-            color: var(--text-muted);
+            color: var(--muted);
         }
 
-        .boite-recherche input {
+        .champ-recherche {
             width: 100%;
-            padding: 0.8rem 1.25rem 0.8rem 3rem;
+            padding: 9px 14px 9px 34px;
             border: 1.5px solid var(--border);
-            border-radius: 12px;
+            border-radius: var(--radius-md);
             font-family: inherit;
-            font-size: 0.9rem;
-            transition: all 0.2s;
-            background: #f8fafc;
+            font-size: 0.85rem;
+            outline: none;
         }
 
-        .boite-recherche input:focus {
-            outline: none;
-            border-color: var(--primary);
-            background: white;
-            box-shadow: 0 0 0 4px rgba(0, 0, 128, 0.05);
+        .table-responsive {
+            overflow-x: auto;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
+            text-align: left;
         }
 
-        th {
+        thead th {
             background: #f8fafc;
-            padding: 1.25rem 1.5rem;
-            text-align: left;
-            font-size: 0.75rem;
-            font-weight: 800;
-            color: var(--text-muted);
+            padding: 12px 18px;
+            font-size: 0.71rem;
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            color: var(--muted);
             border-bottom: 2px solid var(--border);
         }
 
-        td {
-            padding: 1.25rem 1.5rem;
-            font-size: 0.9rem;
-            border-bottom: 1px solid var(--border);
-            color: var(--text-main);
-        }
-
-        tr:last-child td {
-            border-bottom: none;
-        }
-
-        tr:hover td {
-            background-color: #f1f5f9;
+        tbody td {
+            padding: 13px 18px;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 0.88rem;
         }
 
         .info-etudiant {
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 10px;
         }
 
         .avatar {
-            width: 40px;
-            height: 40px;
-            background: var(--primary);
-            color: white;
-            border-radius: 12px;
+            width: 36px;
+            height: 36px;
+            background: #dde8ff;
+            color: var(--navy);
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: 800;
-            font-size: 0.85rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 128, 0.1);
-        }
-
-        .matricule {
-            font-family: 'Courier New', Courier, monospace;
-            font-weight: 700;
-            color: var(--secondary);
-            background: #fff1f2;
-            padding: 0.25rem 0.6rem;
-            border-radius: 6px;
-            font-size: 0.85rem;
-        }
-
-        .badge {
-            padding: 0.35rem 0.75rem;
-            border-radius: 8px;
             font-weight: 700;
             font-size: 0.75rem;
-            text-transform: uppercase;
         }
 
-        .badge-info {
-            background: #e0f2fe;
-            color: #0369a1;
+        .tag-matricule {
+            font-family: monospace;
+            background: #f1f5f9;
+            padding: 4px 10px;
+            border-radius: 7px;
+            font-weight: 600;
+            color: var(--navy);
         }
 
-        .badge-succes {
-            background: #dcfce7;
-            color: #15803d;
-        }
-
-        .badge-avertissement {
-            background: #fef9c3;
-            color: #a16207;
-        }
-
-        /* --- MODAL --- */
-        .superposition-modale {
-            position: fixed;
-            inset: 0;
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(8px);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            padding: 2rem;
-            animation: fadeIn 0.2s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-
-            to {
-                opacity: 1;
-            }
-        }
-
-        .carte-modale {
-            background: white;
-            width: 100%;
-            max-width: 800px;
-            border-radius: 24px;
-            padding: 2.5rem;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        .carte-modale h2 {
-            font-size: 1.75rem;
-            font-weight: 800;
-            color: var(--primary);
-            margin-bottom: 0.5rem;
-        }
-
-        .groupes-tables {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
-            margin-bottom: 2rem;
-            margin-top: 1.5rem;
-        }
-
-        .entete-groupe {
-            font-weight: 800;
-            font-size: 0.85rem;
-            color: var(--primary);
-            margin-bottom: 1rem;
-            text-transform: uppercase;
-            padding-bottom: 0.5rem;
-            border-bottom: 2px solid #f1f5f9;
-        }
-
-        .liste-tables {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 0.5rem;
-        }
-
-        .element-table {
-            padding: 0.85rem 1rem;
-            background: #f8fafc;
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.2s;
+        .badge-genre {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
             font-weight: 700;
-            font-size: 0.8rem;
-            color: var(--text-muted);
         }
 
-        .element-table:hover {
-            background: white;
-            border-color: var(--primary);
-            color: var(--primary);
-            transform: translateX(4px);
-            box-shadow: var(--shadow-sm);
+        .genre-M { background: #eff6ff; color: #2563eb; }
+        .genre-F { background: #fdf2f8; color: #db2777; }
+
+        .tag-promo {
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            background: #ecfdf5;
+            color: #059669;
         }
 
-        .actions-modale {
-            display: flex;
-            justify-content: flex-end;
-            margin-top: 2rem;
-        }
-
-        @media (max-width: 768px) {
-            body {
-                padding: 1rem;
-            }
-
-            header {
-                flex-direction: column;
-                text-align: center;
-                gap: 1.5rem;
-            }
-
-            .section-titre {
-                flex-direction: column;
-            }
-
-            .actions {
-                justify-content: center;
-            }
-
-            .groupes-tables {
-                grid-template-columns: 1fr;
-            }
-
-            .carte-stat .valeur {
-                font-size: 1.5rem;
-            }
+        .etat-vide, .etat-chargement {
+            padding: 60px 20px;
+            text-align: center;
+            color: var(--muted);
         }
     </style>
 </head>
@@ -558,272 +405,195 @@
 <body>
     <div class="Conteneur">
         <header>
-            <div class="section-titre">
-                <img src="{{ url_for('static', filename='logo_upl.png') }}" class="logo-universitaire" alt="Logo UPL">
-                <div class="titre-texte">
-                    <h1 id="pageTitle">STUDENT MANAGEMENT</h1>
-                    <p id="pageSubtitle">Management and monitoring of UPL registrations</p>
+            <div class="entete-gauche">
+                <img src="{{ url_for('static', filename='logo_upl.png') }}" class="image-logo" alt="Logo UPL">
+                <div>
+                    <div class="titre-entete">Protestant University of Lubumbashi</div>
+                    <div class="sous-titre-entete">Student Management System — Cloud Supabase</div>
                 </div>
             </div>
-            <div class="actions">
-                <a href="/admin/general_dashboard" class="bouton bouton-primaire">
+            <nav class="boutons-nav">
+                <a href="/admin/general_dashboard" class="bouton bouton-navy">
                     <i class="fas fa-chart-line"></i> Dashboard
                 </a>
                 <a href="/presences" class="bouton bouton-contour">
-                    <i class="fas fa-list-check"></i> See Attendance
+                    <i class="fas fa-list-check"></i> Présences
                 </a>
                 <a href="/register_student" class="bouton bouton-contour">
-                    <i class="fas fa-plus"></i> New Student
+                    <i class="fas fa-user-plus"></i> Inscription
                 </a>
-                <button class="bouton bouton-primaire" onclick="window.print()">
-                    <i class="fas fa-download"></i> Export
+                <button onclick="exportToExcel()" class="bouton bouton-vert">
+                    <i class="fas fa-file-excel"></i> Export Students
                 </button>
-                <button class="bouton bouton-danger" onclick="handleReset()">
-                    <i class="fas fa-trash-alt"></i> Reset
-                </button>
-            </div>
+            </nav>
         </header>
 
+        <!-- ===== ONGLET FILTRAGE ===== -->
         <div class="enveloppe-onglets">
-            <div class="groupe-faculte">
-                <h3 class="titre-groupe">IAGE PATH</h3>
-                <div class="onglets-promotion">
-                    <button class="onglet-promo actif" data-promo="" onclick="switchPromo(this)">GLOBAL VIEW</button>
-                    <button class="onglet-promo" data-promo="bac1_IAGE" onclick="switchPromo(this)">BAC 1</button>
-                    <button class="onglet-promo" data-promo="bac2_IAGE" onclick="switchPromo(this)">BAC 2</button>
-                    <button class="onglet-promo" data-promo="bac3_IAGE" onclick="switchPromo(this)">BAC 3</button>
+            <div class="section-faculte">
+                <div class="etiquette-faculte">IAGE PATH</div>
+                <div class="rangee-onglets">
+                    <button class="onglet-promo actif" data-promo="" onclick="switchTab(this)">GLOBAL VIEW</button>
+                    <button class="onglet-promo" data-promo="bac1_IAGE" onclick="switchTab(this)">BAC 1</button>
+                    <button class="onglet-promo" data-promo="bac2_IAGE" onclick="switchTab(this)">BAC 2</button>
+                    <button class="onglet-promo" data-promo="bac3_IAGE" onclick="switchTab(this)">BAC 3</button>
                 </div>
             </div>
 
-            <div class="groupe-faculte" style="margin-top: 2rem;">
-                <h3 class="titre-groupe">TECHNOLOGY PATH</h3>
+            <div class="section-faculte">
+                <div class="etiquette-faculte">TECHNOLOGY PATH</div>
                 <div class="grille-technique">
                     <div class="ligne-annee">
                         <span class="etiquette-annee">BAC 1 :</span>
                         <div class="onglets-internes">
-                            <button class="onglet-promo" data-promo="bac1_tech_IA"
-                                onclick="switchPromo(this)">IA</button>
-                            <button class="onglet-promo" data-promo="bac1_tech_GL"
-                                onclick="switchPromo(this)">GL</button>
-                            <button class="onglet-promo" data-promo="bac1_tech_SI"
-                                onclick="switchPromo(this)">SI</button>
+                            <button class="onglet-promo" data-promo="bac1_tech_IA" onclick="switchTab(this)">IA</button>
+                            <button class="onglet-promo" data-promo="bac1_tech_GL" onclick="switchTab(this)">GL</button>
+                            <button class="onglet-promo" data-promo="bac1_tech_SI" onclick="switchTab(this)">SI</button>
                         </div>
                     </div>
                     <div class="ligne-annee">
                         <span class="etiquette-annee">BAC 2 :</span>
                         <div class="onglets-internes">
-                            <button class="onglet-promo" data-promo="bac2_tech_IA"
-                                onclick="switchPromo(this)">IA</button>
-                            <button class="onglet-promo" data-promo="bac2_tech_GL"
-                                onclick="switchPromo(this)">GL</button>
-                            <button class="onglet-promo" data-promo="bac2_tech_SI"
-                                onclick="switchPromo(this)">SI</button>
+                            <button class="onglet-promo" data-promo="bac2_tech_IA" onclick="switchTab(this)">IA</button>
+                            <button class="onglet-promo" data-promo="bac2_tech_GL" onclick="switchTab(this)">GL</button>
+                            <button class="onglet-promo" data-promo="bac2_tech_SI" onclick="switchTab(this)">SI</button>
                         </div>
                     </div>
                     <div class="ligne-annee">
                         <span class="etiquette-annee">BAC 3 :</span>
                         <div class="onglets-internes">
-                            <button class="onglet-promo" data-promo="bac3_tech_IA"
-                                onclick="switchPromo(this)">IA</button>
-                            <button class="onglet-promo" data-promo="bac3_tech_GL"
-                                onclick="switchPromo(this)">GL</button>
-                            <button class="onglet-promo" data-promo="bac3_tech_SI"
-                                onclick="switchPromo(this)">SI</button>
-                        </div>
-                    </div>
-                    <div class="ligne-annee">
-                        <span class="etiquette-annee">BAC 4 :</span>
-                        <div class="onglets-internes">
-                            <button class="onglet-promo" data-promo="bac4_tech_IA"
-                                onclick="switchPromo(this)">IA</button>
-                            <button class="onglet-promo" data-promo="bac4_tech_GL"
-                                onclick="switchPromo(this)">GL</button>
-                            <button class="onglet-promo" data-promo="bac4_tech_SI"
-                                onclick="switchPromo(this)">SI</button>
+                            <button class="onglet-promo" data-promo="bac3_tech_IA" onclick="switchTab(this)">IA</button>
+                            <button class="onglet-promo" data-promo="bac3_tech_GL" onclick="switchTab(this)">GL</button>
+                            <button class="onglet-promo" data-promo="bac3_tech_SI" onclick="switchTab(this)">SI</button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
+        <!-- ===== STATS ===== -->
         <div class="grille-stats">
             <div class="carte-stat">
-                <span class="etiquette">TOTAL STUDENTS</span>
-                <span id="totalStudents" class="valeur">0</span>
+                <div class="icone-stat"><i class="fas fa-users"></i></div>
+                <div>
+                    <div class="etiquette-stat">Total Étudiants</div>
+                    <div id="statTotal" class="valeur-stat">0</div>
+                </div>
             </div>
             <div class="carte-stat">
-                <span class="etiquette">MALE STUDENTS</span>
-                <span id="maleCount" class="valeur">0</span>
+                <div class="icone-stat" style="color:#2563eb; background:#eff6ff;"><i class="fas fa-mars"></i></div>
+                <div>
+                    <div class="etiquette-stat">Étudiants (H)</div>
+                    <div id="statMale" class="valeur-stat">0</div>
+                </div>
             </div>
             <div class="carte-stat">
-                <span class="etiquette">FEMALE STUDENTS</span>
-                <span id="femaleCount" class="valeur">0</span>
+                <div class="icone-stat" style="color:#db2777; background:#fdf2f8;"><i class="fas fa-venus"></i></div>
+                <div>
+                    <div class="etiquette-stat">Étudiantes (F)</div>
+                    <div id="statFemale" class="valeur-stat">0</div>
+                </div>
             </div>
         </div>
 
-        <div class="conteneur-table">
-            <div class="entete-table">
-                <div class="boite-recherche">
+        <!-- ===== TABLEAU ===== -->
+        <div class="carte-table">
+            <div class="barre-outils">
+                <div class="titre-barre-outils">
+                    Liste des Étudiants <span id="compteurBadge" class="badge-compteur">0</span>
+                </div>
+                <div class="enveloppe-recherche">
                     <i class="fas fa-search"></i>
-                    <input type="text" id="searchInput" placeholder="Search student, matricule, promotion..."
-                        onkeyup="filterTable()">
+                    <input type="text" id="rechercheInput" class="champ-recherche" placeholder="Rechercher un étudiant..." onkeyup="rechercher()">
                 </div>
             </div>
-            <table id="studentsTable">
-                <thead>
-                    <tr>
-                        <th>STUDENT</th>
-                        <th>MATRICULE</th>
-                        <th>GENDER</th>
-                        <th>PROMOTION</th>
-                        <th>PATH / OPTION</th>
-                        <th>REG. DATE</th>
-                    </tr>
-                </thead>
-                <tbody id="studentsBody">
-                    <tr>
-                        <td colspan="6" style="text-align: center; padding: 4rem; color: var(--text-muted);">
-                            <i class="fas fa-spinner fa-spin fa-3x" style="margin-bottom: 1.5rem; display: block;"></i>
-                            Loading student database...
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Étudiant</th>
+                            <th>Matricule</th>
+                            <th>Genre</th>
+                            <th>Promotion</th>
+                            <th>Parcours / Option</th>
+                            <th>Date Inscription</th>
+                        </tr>
+                    </thead>
+                    <tbody id="corpsTableau">
+                        <!-- Chargement via JS -->
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
     <script>
-        let currentPromo = "{{ promo if promo else '' }}";
+        let currentPromo = "";
 
-        async function loadData(promo = currentPromo) {
+        async function fetchStudents(promo = "") {
+            const corps = document.getElementById('corpsTableau');
+            corps.innerHTML = '<tr><td colspan="6" class="etat-chargement"><i class="fas fa-spinner fa-spin"></i> Chargement...</td></tr>';
+            
             try {
-                // Update UI for active tab
-                document.querySelectorAll('.onglet-promo').forEach(tab => {
-                    if (tab.dataset.promo === promo) {
-                        tab.classList.add('actif');
-                    } else {
-                        tab.classList.remove('actif');
-                    }
-                });
-
-                // Update Title
-                const title = document.getElementById('pageTitle');
-                const subtitle = document.getElementById('pageSubtitle');
-                if (promo) {
-                    let promoName = promo.replace(/_/g, ' ').toUpperCase();
-                    // Clean up: BAC1_TECH_IA -> BAC 1 - TECHNOLOGIE IA
-                    promoName = promoName.replace('TECH', '- TECHNOLOGIE');
-                    title.textContent = `STUDENTS ${promoName}`;
-                    subtitle.textContent = `Specific list for the promotion ${promoName}`;
-                } else {
-                    title.textContent = "All Students";
-                    subtitle.textContent = "Global management and tracking of UPL registrations";
-                }
-
-                // Show loading state
-                const tbody = document.getElementById('studentsBody');
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="6" style="text-align: center; padding: 3rem; color: var(--text-muted);">
-                            <i class="fas fa-spinner fa-spin fa-2x" style="margin-bottom: 1rem; display: block;"></i>
-                            Chargement des données...
-                        </td>
-                    </tr>
-                `;
-
-                const promoQuery = promo ? `?promotion=${promo}` : '';
-
                 // Fetch Stats
-                const statsResponse = await fetch(`/api/stats${promoQuery}`);
-                const stats = await statsResponse.json();
-                document.getElementById('totalStudents').textContent = stats.total_students;
-                document.getElementById('maleCount').textContent = stats.male_count;
-                document.getElementById('femaleCount').textContent = stats.female_count;
+                const resStats = await fetch(`/api/stats?promotion=${promo}`);
+                const stats = await resStats.json();
+                document.getElementById('statTotal').innerText = stats.total_students || 0;
+                document.getElementById('statMale').innerText = stats.male_count || 0;
+                document.getElementById('statFemale').innerText = stats.female_count || 0;
+                document.getElementById('compteurBadge').innerText = stats.total_students || 0;
 
                 // Fetch Students
-                const studentsResponse = await fetch(`/api/students${promoQuery}`);
-                const students = await studentsResponse.json();
+                const res = await fetch(`/api/students?promotion=${promo}`);
+                const data = await res.json();
 
-                if (students.length === 0) {
-                    tbody.innerHTML = `
-                        <tr>
-                            <td colspan="6" style="text-align: center; padding: 3rem; color: var(--text-muted);">
-                                <i class="fas fa-user-slash fa-3x" style="margin-bottom: 1rem; display: block; opacity: 0.2;"></i>
-                                Aucun étudiant trouvé dans cette promotion.
-                            </td>
-                        </tr>
-                    `;
+                if(data.length === 0) {
+                    corps.innerHTML = '<tr><td colspan="6" class="etat-vide"><i class="fas fa-user-slash"></i> Aucun étudiant trouvé.</td></tr>';
                     return;
                 }
 
-                tbody.innerHTML = students.map(student => `
+                corps.innerHTML = data.map(s => `
                     <tr>
                         <td>
                             <div class="info-etudiant">
-                                <div class="avatar">${student.nom[0]}${student.prenom[0]}</div>
+                                <div class="avatar">${s.nom[0]}${s.prenom[0]}</div>
                                 <div>
-                                    <div style="font-weight: 600;">${student.nom} ${student.postnom}</div>
-                                    <div style="font-size: 0.75rem; color: var(--text-muted);">${student.prenom}</div>
+                                    <div style="font-weight: 700;">${s.nom} ${s.postnom}</div>
+                                    <div style="font-size: 0.75rem; color: var(--muted);">${s.prenom}</div>
                                 </div>
                             </div>
                         </td>
-                        <td><span class="matricule">${student.matricule}</span></td>
+                        <td><span class="tag-matricule">${s.matricule}</span></td>
+                        <td><span class="badge-genre genre-${s.sexe}">${s.sexe}</span></td>
+                        <td><span class="tag-promo">${s.promotion}</span></td>
                         <td>
-                            <span class="badge ${student.sexe === 'F' ? 'badge-avertissement' : 'badge-info'}">
-                                ${student.sexe}
-                            </span>
+                            <div style="font-weight: 600;">${s.parcours}</div>
+                            <div style="font-size: 0.7rem; color: var(--muted);">${s.filiere || '-'}</div>
                         </td>
-                        <td><span class="badge badge-succes">${student.promotion}</span></td>
                         <td>
-                            <div style="font-weight: 500;">${student.parcours}</div>
-                            <div style="font-size: 0.75rem; color: var(--text-muted);">${student.filiere || '-'}</div>
+                            <div style="font-weight: 600;">${s.formatted_date.split(' ')[0]}</div>
+                            <div style="font-size: 0.7rem; color: var(--muted);">${s.formatted_date.split(' ')[1] || ''}</div>
                         </td>
-                        <td>${student.formatted_date}</td>
                     </tr>
                 `).join('');
             } catch (error) {
-                console.error('Error loading data:', error);
-                document.getElementById('studentsBody').innerHTML = `
-                    <tr>
-                        <td colspan="6" style="text-align: center; padding: 3rem; color: #ef4444;">
-                            <i class="fas fa-exclamation-triangle fa-3x" style="margin-bottom: 1rem; display: block;"></i>
-                            Erreur lors du chargement des données.
-                        </td>
-                    </tr>
-                `;
+                console.error("Erreur lors du chargement des données:", error);
+                corps.innerHTML = '<tr><td colspan="6" class="etat-vide"><i class="fas fa-exclamation-triangle"></i> Erreur de chargement.</td></tr>';
             }
         }
 
-        function switchPromo(btn) {
-            const promo = btn.dataset.promo;
-            currentPromo = promo;
-
-            // Update URL without reloading page
-            const newUrl = promo ? `/students/${promo}` : '/students';
-            window.history.pushState({ promo: promo }, '', newUrl);
-
-            loadData(promo);
-        }
-
-        // Handle back/forward navigation
-        window.onpopstate = function (event) {
-            const promo = event.state ? event.state.promo : '';
-            loadData(promo);
-        };
-
-        function filterTable() {
-            const input = document.getElementById("searchInput");
+        function rechercher() {
+            const input = document.getElementById("rechercheInput");
             const filter = input.value.toUpperCase();
-            const table = document.getElementById("studentsTable");
+            const table = document.querySelector("table");
             const tr = table.getElementsByTagName("tr");
 
             for (let i = 1; i < tr.length; i++) {
                 let found = false;
-                const tds = tr[i].getElementsByTagName("td");
-                for (let j = 0; j < tds.length; j++) {
-                    const td = tds[j];
-                    if (td) {
-                        const txtValue = td.textContent || td.innerText;
+                const td = tr[i].getElementsByTagName("td");
+                for (let j = 0; j < td.length; j++) {
+                    if (td[j]) {
+                        const txtValue = td[j].textContent || td[j].innerText;
                         if (txtValue.toUpperCase().indexOf(filter) > -1) {
                             found = true;
                             break;
@@ -873,7 +643,7 @@
         }
 
         // Load data on page load
-        window.onload = () => loadData();
+        window.onload = () => fetchStudents();
     </script>
     <!-- Reset Modal -->
     <div id="resetModal" class="superposition-modale">
