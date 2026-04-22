@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -48,6 +49,7 @@
             max-width: 1100px;
             margin: 0 auto 35px auto;
         }
+
         .header h1 {
             margin: 0;
             color: var(--primary);
@@ -58,7 +60,11 @@
             align-items: center;
             gap: 12px;
         }
-        .header h1 i { color: var(--accent); }
+
+        .header h1 i {
+            color: var(--accent);
+        }
+
         .back-btn {
             display: inline-flex;
             align-items: center;
@@ -74,7 +80,9 @@
             box-shadow: var(--shadow-sm);
             transition: all 0.2s ease;
         }
-        .back-btn:hover { /* Clicable avec animation */
+
+        .back-btn:hover {
+            /* Clicable avec animation */
             background: var(--neutral-bg);
             border-color: #cbd5e1;
             box-shadow: var(--shadow-md);
@@ -92,6 +100,7 @@
             gap: 20px;
             margin-bottom: 30px;
         }
+
         .faculty-card {
             background: var(--surface);
             border-radius: 16px;
@@ -99,6 +108,7 @@
             border: 1px solid var(--border);
             box-shadow: var(--shadow-sm);
         }
+
         .faculty-label {
             font-size: 0.75rem;
             font-weight: 700;
@@ -110,16 +120,19 @@
             align-items: center;
             gap: 6px;
         }
+
         .tabs-row {
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
         }
+
         .grid-tech {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 12px;
         }
+
         .year-row {
             display: flex;
             align-items: center;
@@ -129,11 +142,13 @@
             border-radius: 12px;
             border: 1px solid var(--border);
         }
+
         .year-label {
             font-size: 0.85rem;
             font-weight: 700;
             color: var(--primary);
         }
+
         .inner-tabs {
             display: flex;
             gap: 6px;
@@ -152,10 +167,12 @@
             cursor: pointer;
             transition: all 0.2s ease;
         }
+
         .tab-btn:hover {
             border-color: #cbd5e1;
             background: var(--neutral-bg);
         }
+
         .tab-btn.active {
             background: var(--primary);
             color: #ffffff;
@@ -175,6 +192,7 @@
             gap: 16px;
             align-items: center;
         }
+
         .search-input {
             flex: 1;
             padding: 12px 18px;
@@ -187,11 +205,13 @@
             transition: border-color 0.2s ease, box-shadow 0.2s ease;
             background: var(--neutral-bg);
         }
+
         .search-input:focus {
             border-color: var(--accent);
             background: var(--surface);
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
         }
+
         .refresh-btn {
             padding: 12px 24px;
             background: var(--accent);
@@ -207,9 +227,11 @@
             gap: 8px;
             align-items: center;
         }
+
         .refresh-btn:hover {
             background: var(--accent-hover);
         }
+
         .refresh-btn:active {
             transform: scale(0.98);
         }
@@ -222,6 +244,7 @@
             border: 1px solid var(--border);
             overflow: hidden;
         }
+
         .table-header {
             padding: 20px 24px;
             border-bottom: 1px solid var(--border);
@@ -233,15 +256,18 @@
             color: var(--primary);
             background: #ffffff;
         }
+
         .table-wrapper {
             width: 100%;
             overflow-x: auto;
         }
+
         table {
             width: 100%;
             border-collapse: collapse;
             text-align: left;
         }
+
         th {
             background: var(--neutral-bg);
             color: var(--neutral-text);
@@ -252,6 +278,7 @@
             padding: 16px 24px;
             border-bottom: 1px solid var(--border);
         }
+
         td {
             padding: 16px 24px;
             border-bottom: 1px solid var(--border);
@@ -259,17 +286,36 @@
             font-size: 0.95rem;
             vertical-align: middle;
         }
-        tr:last-child td { border-bottom: none; }
-        
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
         /* Styles de Ligne */
-        .row-fraude { background-color: #fffbfa; }
-        .row-hors-zone { background-color: #fffbfa; }
-        
+        .row-fraude {
+            background-color: #fffbfa;
+        }
+
+        .row-hors-zone {
+            background-color: #fffbfa;
+        }
+
         /* Typographie de table */
-        .time-cell { font-weight: 600; color: var(--neutral-text); font-variant-numeric: tabular-nums; }
-        .mat-cell { font-weight: 700; color: var(--primary); }
-        .name-cell { font-weight: 600; }
-        
+        .time-cell {
+            font-weight: 600;
+            color: var(--neutral-text);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .mat-cell {
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .name-cell {
+            font-weight: 600;
+        }
+
         /* Badges Minimalistes (Pas d'animations non plus, design propre) */
         .badge {
             display: inline-flex;
@@ -282,19 +328,64 @@
             text-transform: uppercase;
             letter-spacing: 0.025em;
         }
-        .badge i { font-size: 0.8rem; }
-        
+
+        .badge i {
+            font-size: 0.8rem;
+        }
+
         /* Couleurs de badges par statut */
-        .badge.b-fraude { background: var(--danger-bg); color: var(--danger-text); border: 1px solid #fecaca; }
-        .badge.b-confirme { background: var(--success-bg); color: var(--success-text); border: 1px solid #a7f3d0; }
-        .badge.b-entree { background: var(--info-bg); color: var(--info-text); border: 1px solid #bfdbfe; }
-        .badge.b-sortie { background: var(--neutral-bg); color: var(--neutral-text); border: 1px solid var(--border); }
-        .badge.b-hors-zone { background: #fff1f2; color: #be123c; border: 1px solid #fecdd3; }
+        .badge.b-fraude {
+            background: var(--danger-bg);
+            color: var(--danger-text);
+            border: 1px solid #fecaca;
+        }
+
+        .badge.b-confirme {
+            background: var(--success-bg);
+            color: var(--success-text);
+            border: 1px solid #a7f3d0;
+        }
+
+        .badge.b-entree {
+            background: var(--info-bg);
+            color: var(--info-text);
+            border: 1px solid #bfdbfe;
+        }
+
+        .badge.b-sortie {
+            background: var(--neutral-bg);
+            color: var(--neutral-text);
+            border: 1px solid var(--border);
+        }
+
+        .badge.b-hors-zone {
+            background: #fff1f2;
+            color: #be123c;
+            border: 1px solid #fecdd3;
+        }
 
         /* Colonne de Statut */
-        .status-danger { color: var(--danger-text); font-weight: 700; display: flex; align-items: center; gap: 6px; }
-        .status-muted { color: var(--neutral-text); font-weight: 600; display: flex; align-items: center; gap: 6px; }
-        .details-muted { color: var(--neutral-text); font-size: 0.85rem; font-weight: 500;}
+        .status-danger {
+            color: var(--danger-text);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .status-muted {
+            color: var(--neutral-text);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .details-muted {
+            color: var(--neutral-text);
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
 
         /* Rendu Vide */
         .empty-state {
@@ -302,21 +393,28 @@
             padding: 80px 20px;
             background: var(--surface);
         }
+
         .empty-state i {
             font-size: 3.5rem;
             color: #cbd5e1;
             margin-bottom: 20px;
         }
+
         .empty-state h3 {
             color: var(--primary);
             font-size: 1.25rem;
             font-weight: 700;
             margin: 0 0 8px 0;
         }
-        .empty-state p { margin: 0; color: var(--neutral-text); font-size: 0.95rem; }
 
+        .empty-state p {
+            margin: 0;
+            color: var(--neutral-text);
+            font-size: 0.95rem;
+        }
     </style>
 </head>
+
 <body>
     <div class="header">
         <h1><i class="fa-solid fa-timeline"></i> Vue Chronologique</h1>
@@ -382,15 +480,17 @@
         </div>
 
         <div class="filters-bar">
-            <input type="text" id="search" class="search-input" placeholder="Recherche rapide par nom ou matricule..." onkeyup="filterTimelines()">
-            <button class="refresh-btn" onclick="fetchData()"><i class="fa-solid fa-rotate-right"></i> Actualiser</button>
+            <input type="text" id="search" class="search-input" placeholder="Recherche rapide par nom ou matricule..."
+                onkeyup="filterTimelines()">
+            <button class="refresh-btn" onclick="fetchData()"><i class="fa-solid fa-rotate-right"></i>
+                Actualiser</button>
         </div>
 
         <div class="table-container">
             <div class="table-header">
                 <i class="fa-solid fa-list-check" style="color: var(--accent);"></i> Registre des Mouvements
             </div>
-            
+
             <div class="table-wrapper">
                 <table id="main-table">
                     <thead>
@@ -423,7 +523,7 @@
         function switchTab(btn) {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            
+
             activePromo = btn.dataset.promo || "";
             fetchData();
         }
@@ -435,7 +535,7 @@
             if (status.includes('hors_zone')) return 'b-hors-zone';
             return 'b-sortie'; // Default or 'sortie'
         }
-        
+
         function getIconForEvent(status) {
             if (status.includes('entrée')) return 'fa-arrow-right-to-bracket';
             if (status.includes('sortie')) return 'fa-arrow-right-from-bracket';
@@ -448,7 +548,7 @@
         function fetchData() {
             let url = '/api/admin/timeline';
             if (activePromo) url += '?promotion=' + activePromo;
-            
+
             fetch(url)
                 .then(res => res.json())
                 .then(data => {
@@ -466,13 +566,13 @@
             let allEvents = [];
             const studentsInfo = {};
 
-            if(data.presences) {
+            if (data.presences) {
                 data.presences.forEach(p => {
-                    studentsInfo[p.matricule] = p; 
-                    
+                    studentsInfo[p.matricule] = p;
+
                     let statClass = p.type_presence ? p.type_presence.toLowerCase() : 'inconnu';
                     let isFraud = p.status_geoloc && p.status_geoloc.toLowerCase().includes('fraude');
-                    if(isFraud) statClass = 'fraude';
+                    if (isFraud) statClass = 'fraude';
 
                     allEvents.push({
                         matricule: p.matricule || 'N/A',
@@ -485,12 +585,12 @@
                 });
             }
 
-            if(data.reports) {
+            if (data.reports) {
                 data.reports.forEach(r => {
                     let info = studentsInfo[r.matricule] || { nom: "Inconnu", prenom: "" };
                     let statutClass = (r.result || "inconnu").replace(' ', '_').toLowerCase();
-                    if(statutClass.includes('fraude')) statutClass = 'fraude';
-                    
+                    if (statutClass.includes('fraude')) statutClass = 'fraude';
+
                     allEvents.push({
                         matricule: r.matricule || 'N/A',
                         nom_complet: `${info.nom || ''} ${info.prenom || ''}`.trim(),
@@ -516,29 +616,29 @@
 
             allEvents.forEach(e => {
                 const dateObj = new Date(e.time);
-                const timeStr = isNaN(dateObj) ? "-" : dateObj.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'});
-                
+                const timeStr = isNaN(dateObj) ? "-" : dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
                 const iconClass = getIconForEvent(e.status);
                 const badgeClass = getStyleClassForEvent(e.status);
-                
+
                 // Logique conditionnelle pour la ligne et le statut global
                 let rowClass = "";
                 let statusHtml = "";
-                
-                if(e.status === 'fraude') {
+
+                if (e.status === 'fraude') {
                     rowClass = "row-fraude";
                     statusHtml = `<span class="status-danger"><i class="fa-solid fa-circle-exclamation"></i> Alerte Fraude</span>`;
-                } else if(e.status.includes('hors_zone')) {
+                } else if (e.status.includes('hors_zone')) {
                     rowClass = "row-hors-zone";
                     statusHtml = `<span class="status-muted"><i class="fa-solid fa-circle-info"></i> Hors périmètre</span>`;
                 } else {
                     statusHtml = `<span class="status-muted">${e.status.charAt(0).toUpperCase() + e.status.slice(1)}</span>`;
                 }
-                
+
                 const tr = document.createElement('tr');
                 tr.className = `timeline-row ${rowClass}`;
                 tr.setAttribute('data-search', (e.nom_complet + " " + e.matricule).toLowerCase());
-                
+
                 tr.innerHTML = `
                     <td class="time-cell">${timeStr}</td>
                     <td class="mat-cell">${e.matricule}</td>
@@ -549,15 +649,15 @@
                 `;
                 tbody.appendChild(tr);
             });
-            
-            filterTimelines(); 
+
+            filterTimelines();
         }
 
         function filterTimelines() {
             const query = document.getElementById('search').value.toLowerCase();
             const rows = document.querySelectorAll('.timeline-row');
             rows.forEach(row => {
-                if(row.getAttribute('data-search').includes(query)) {
+                if (row.getAttribute('data-search').includes(query)) {
                     row.style.display = 'table-row';
                 } else {
                     row.style.display = 'none';
@@ -569,4 +669,5 @@
         setInterval(fetchData, 15000); // 15 secondes pour économiser les requêtes réseau
     </script>
 </body>
+
 </html>

@@ -1,38 +1,166 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <title>Suivi des Présences — Admin</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --navy: #000080; --bg: #f8fafc; --white: #ffffff; --text: #1e293b; --muted: #64748b; }
-        body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); padding: 25px; }
-        .container { max-width: 1200px; margin: 0 auto; }
-        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; background: white; padding: 20px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
-        .header-info h1 { color: var(--navy); font-size: 1.6rem; font-weight: 800; }
-        .header-info p { color: var(--muted); font-size: 0.85rem; margin-top: 4px; }
-        
-        .table-wrap { background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 25px rgba(0,0,0,0.06); }
-        table { width: 100%; border-collapse: collapse; text-align: left; }
-        th { background: #f1f5f9; padding: 16px 20px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; color: var(--muted); border-bottom: 2px solid #e2e8f0; }
-        td { padding: 18px 20px; border-bottom: 1px solid #f1f5f9; font-size: 0.9rem; vertical-align: middle; }
-        tr:hover td { background: #f8fafc; }
+        :root {
+            --navy: #000080;
+            --bg: #f8fafc;
+            --white: #ffffff;
+            --text: #1e293b;
+            --muted: #64748b;
+        }
 
-        .student-cell { display: flex; align-items: center; gap: 12px; }
-        .avatar { width: 40px; height: 40px; background: #e0e8ff; color: var(--navy); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; border: 2px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-        .matricule { font-family: monospace; font-weight: 700; color: var(--navy); background: #f1f5f9; padding: 3px 8px; border-radius: 6px; font-size: 0.8rem; }
-        
-        .badge { display: inline-flex; align-items: center; gap: 5px; padding: 5px 14px; border-radius: 20px; font-size: 0.78rem; font-weight: 700; }
-        .badge-entree { background: #dcfce7; color: #15803d; }
-        .badge-sortie { background: #fee2e2; color: #dc2626; }
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            padding: 25px;
+        }
 
-        .btn-back { text-decoration: none; color: var(--muted); font-weight: 700; font-size: 0.9rem; display: flex; align-items: center; gap: 8px; transition: color 0.2s; }
-        .btn-back:hover { color: var(--navy); }
-        
-        .gps-badge { font-size: 0.75rem; color: #64748b; background: #f8fafc; padding: 4px 8px; border-radius: 6px; border: 1px solid #e2e8f0; }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            background: white;
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .header-info h1 {
+            color: var(--navy);
+            font-size: 1.6rem;
+            font-weight: 800;
+        }
+
+        .header-info p {
+            color: var(--muted);
+            font-size: 0.85rem;
+            margin-top: 4px;
+        }
+
+        .table-wrap {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.06);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th {
+            background: #f1f5f9;
+            padding: 16px 20px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--muted);
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        td {
+            padding: 18px 20px;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 0.9rem;
+            vertical-align: middle;
+        }
+
+        tr:hover td {
+            background: #f8fafc;
+        }
+
+        .student-cell {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            background: #e0e8ff;
+            color: var(--navy);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            border: 2px solid #fff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .matricule {
+            font-family: monospace;
+            font-weight: 700;
+            color: var(--navy);
+            background: #f1f5f9;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-size: 0.78rem;
+            font-weight: 700;
+        }
+
+        .badge-entree {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .badge-sortie {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .btn-back {
+            text-decoration: none;
+            color: var(--muted);
+            font-weight: 700;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: color 0.2s;
+        }
+
+        .btn-back:hover {
+            color: var(--navy);
+        }
+
+        .gps-badge {
+            font-size: 0.75rem;
+            color: #64748b;
+            background: #f8fafc;
+            padding: 4px 8px;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+        }
     </style>
 </head>
+
 <body>
     <div class="container">
         <header>
@@ -75,14 +203,16 @@
                         </td>
                         <td>
                             {% if p.type_presence == 'Sortie' %}
-                            <span class="badge badge-sortie"><i class="fas fa-arrow-right-from-bracket"></i> SORTIE</span>
+                            <span class="badge badge-sortie"><i class="fas fa-arrow-right-from-bracket"></i>
+                                SORTIE</span>
                             {% else %}
                             <span class="badge badge-entree"><i class="fas fa-arrow-right-to-bracket"></i> ENTRÉE</span>
                             {% endif %}
                         </td>
                         <td>
                             {% if p.latitude %}
-                            <span class="gps-badge"><i class="fas fa-location-dot"></i> {{ p.latitude|round(4) }}, {{ p.longitude|round(4) }}</span>
+                            <span class="gps-badge"><i class="fas fa-location-dot"></i> {{ p.latitude|round(4) }}, {{
+                                p.longitude|round(4) }}</span>
                             {% else %}
                             <span style="color: #cbd5e1; font-style: italic; font-size: 0.75rem;">Non capturée</span>
                             {% endif %}
@@ -94,4 +224,5 @@
         </div>
     </div>
 </body>
+
 </html>
