@@ -151,7 +151,9 @@ def get_db_connection():
     # Détection de l'environnement : Si on est sur Render, on utilise SQLite par défaut
     if os.environ.get('RENDER') or not host:
         print("BD: Utilisation de SQLite")
-        conn = sqlite3.connect(os.path.join(basedir, 'database', 'database.db'))
+        db_dir = os.path.join(basedir, 'database')
+        os.makedirs(db_dir, exist_ok=True)
+        conn = sqlite3.connect(os.path.join(db_dir, 'database.db'))
         conn.row_factory = sqlite3.Row
         return conn
     
@@ -166,7 +168,9 @@ def get_db_connection():
 
 def init_sqlite_db():
     if os.environ.get('RENDER') or not host:
-        conn = sqlite3.connect(os.path.join(basedir, 'database', 'database.db'))
+        db_dir = os.path.join(basedir, 'database')
+        os.makedirs(db_dir, exist_ok=True)
+        conn = sqlite3.connect(os.path.join(db_dir, 'database.db'))
         cursor = conn.cursor()
         
         # Liste des tables à créer
