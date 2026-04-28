@@ -1,0 +1,20 @@
+{
+  "name": "UPL Attendance",
+  "short_name": "UPL",
+  "start_url": "/attendance",
+  "display": "standalone",
+  "background_color": "#000080",
+  "theme_color": "#000080",
+  "icons": [
+    {
+      "src": "/static/logo_upl.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/static/logo_upl.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
