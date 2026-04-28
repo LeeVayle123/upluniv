@@ -298,7 +298,8 @@
             transition: var(--transition);
         }
         
-        .status-kaki { color: #8B8B00; }
+        .status-kaki { color: #A9A9A9; } /* Gris discret pour recherche */
+        .status-blue { color: #34b7f1; } /* Bleu WhatsApp pour validé */
         .status-green { color: #22c55e; }
 
         .dot-active {
@@ -443,6 +444,7 @@
                 maxDuration: 12000, 
                 highAccuracyThreshold: 60, // Équilibre entre précision et vitesse
                 mediumAccuracyThreshold: 150,
+                isInside: false,
                 isFallbackMode: false,
                 // --- CONFIGURATION ZONE UPL ---
                 univCenter: { lat: -11.6705, lon: 27.4865 }, 
@@ -473,7 +475,7 @@
                     this.startTime = Date.now();
                     this.isFallbackMode = false;
                     this.hideRetry();
-                    this.updateStatus('<i class="fa-solid fa-satellite fa-spin"></i> Recherche satellite...', "waiting");
+                    this.updateStatus('<i class="fa-solid fa-satellite fa-spin"></i> Recherche en cours...', "waiting");
                     
                     const options = { enableHighAccuracy: true, timeout: 6000, maximumAge: 2000 };
 
@@ -506,7 +508,7 @@
                 startFallback: function() {
                     if (this.watchId) navigator.geolocation.clearWatch(this.watchId);
                     this.isFallbackMode = true;
-                    this.updateStatus('<i class="fa-solid fa-tower-broadcast fa-spin"></i> Mode secours (Réseau)...', "waiting");
+                    this.updateStatus('<i class="fa-solid fa-tower-broadcast fa-spin"></i> Mode secours...', "waiting");
                     
                     const options = { enableHighAccuracy: false, timeout: 5000, maximumAge: 5000 };
                     
@@ -554,12 +556,14 @@
 
                     // --- VÉRIFICATION DE ZONE (Verrouillage Silencieux) ---
                     if (dist > this.maxUnivRadius) {
+                        this.isInside = false;
                         this.updateStatus('<i class="fa-solid fa-circle-exmark"></i> Veuillez contacter le service admin.', "error");
                         this.matInput.disabled = true;
                         this.matInput.placeholder = "Accès restreint...";
                         this.submitBtn.disabled = true;
                         console.log(`Étudiant hors zone UPL (${Math.round(dist)}m). Accès refusé.`);
                     } else {
+                        this.isInside = true;
                         if (this.accEl.value > this.highAccuracyThreshold) {
                             this.updateStatus('<i class="fa-solid fa-circle-check"></i> Ok (Zone UPL)', "success");
                         } else {
@@ -942,14 +946,16 @@
                     if (!indicator || !display) return;
                     
                     const audCode = this.auditorium_code || document.getElementById('auditorium_code').value;
+                    const isInside = typeof DiscreetGPSManager !== 'undefined' ? DiscreetGPSManager.isInside : false;
                     
                     if (audCode) {
                         indicator.style.display = 'flex';
                         const hasPos = document.getElementById('latitude').value !== "";
                         
-                        // Kaki (#8B8B00) si on cherche, Green (#22c55e) si trouvé
-                        if (hasPos) {
-                            indicator.className = 'tracking-status status-green';
+                        // Si trouvé ET dans UPL -> Bleu (WhatsApp)
+                        // Si trouvé mais HORS UPL -> Kaki (ou reste gris)
+                        if (hasPos && isInside) {
+                            indicator.className = 'tracking-status status-blue';
                         } else {
                             indicator.className = 'tracking-status status-kaki';
                         }
