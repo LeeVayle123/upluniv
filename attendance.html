@@ -700,14 +700,8 @@
                     submitBtn.disabled = true;
                 }
 
-                // Update auditorium display in indicator if not tracking yet
-                const audCode = document.getElementById('auditorium_code').value;
-                if (audCode && !TrackingEngine.active) {
-                    const indicator = document.getElementById('tracking-indicator');
-                    const display = document.getElementById('display-auditorium');
-                    indicator.style.display = 'flex';
-                    display.textContent = audCode;
-                }
+                // Toujours synchroniser l'indicateur
+                if (typeof TrackingEngine !== 'undefined') TrackingEngine.updateIndicator();
 
                 if (matricule.length < 3) {
                     badge.style.display = 'none';
