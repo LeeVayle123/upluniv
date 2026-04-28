@@ -302,13 +302,32 @@
         .status-green { color: #22c55e; }
 
         .dot-active {
-            font-size: 0.9rem;
-            animation: pulse-simple 1.5s infinite;
+            font-size: 1.1rem;
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
+        
+        .dot-active::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 2px solid currentColor;
+            border-radius: 50%;
+            animation: ripple 1.5s infinite;
+        }
+
+        @keyframes ripple {
+            0% { transform: scale(0.8); opacity: 1; }
+            100% { transform: scale(2.2); opacity: 0; }
+        }
+
         @keyframes pulse-simple {
-            0% { opacity: 0.5; transform: scale(1); }
-            50% { opacity: 1; transform: scale(1.1); }
-            100% { opacity: 0.5; transform: scale(1); }
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
         }
     </style>
 </head>
@@ -326,9 +345,9 @@
         <main class="panneau-formulaire">
             <h2 class="titre-formulaire">Présence</h2>
 
-            <!-- Indicateur de Suivi (WhatsApp Style) -->
+            <!-- Indicateur de Suivi (Satellite Style) -->
             <div id="tracking-indicator" class="tracking-status">
-                <i class="fa-solid fa-check-double dot-active"></i> <span id="display-auditorium"></span>
+                <i class="fa-solid fa-satellite-dish dot-active"></i> <span id="display-auditorium"></span>
             </div>
 
             <!-- Zone d'affichage des infos de l'étudiant trouvées via AJAX -->
@@ -421,9 +440,9 @@
             const DiscreetGPSManager = {
                 watchId: null,
                 startTime: null,
-                maxDuration: 25000, 
-                highAccuracyThreshold: 50,
-                mediumAccuracyThreshold: 150,
+                maxDuration: 12000, 
+                highAccuracyThreshold: 80,
+                mediumAccuracyThreshold: 200,
                 isFallbackMode: false,
                 // --- CONFIGURATION ZONE UPL ---
                 univCenter: { lat: -11.6705, lon: 27.4865 }, 
@@ -452,7 +471,7 @@
                     this.hideRetry();
                     this.updateStatus('<i class="fa-solid fa-satellite fa-spin"></i> Recherche satellite...', "waiting");
 
-                    const options = { enableHighAccuracy: true, timeout: 7000, maximumAge: 0 };
+                    const options = { enableHighAccuracy: true, timeout: 3500, maximumAge: 5000 };
 
                     this.watchId = navigator.geolocation.watchPosition(
                         (pos) => this.handleUpdate(pos),
@@ -464,13 +483,13 @@
                         options
                     );
 
-                    // Timeout pour basculer en fallback si on n'a rien après 7s
+                    // Timeout pour basculer en fallback si on n'a rien après 3.5s
                     setTimeout(() => {
                         if (this.watchId && this.latEl.value === "" && !this.isFallbackMode) {
                             console.log("Switching to GPS Fallback (Low Accuracy)");
                             this.startFallback();
                         }
-                    }, 7500);
+                    }, 4000);
 
                     // Timeout de sécurité final
                     setTimeout(() => this.checkFinalStatus(), this.maxDuration);
@@ -481,7 +500,7 @@
                     this.isFallbackMode = true;
                     this.updateStatus('<i class="fa-solid fa-tower-broadcast fa-spin"></i> Signal faible, passage en mode réseau...', "waiting");
                     
-                    const options = { enableHighAccuracy: false, timeout: 10000, maximumAge: 0 };
+                    const options = { enableHighAccuracy: false, timeout: 5000, maximumAge: 5000 };
                     this.watchId = navigator.geolocation.watchPosition(
                         (pos) => this.handleUpdate(pos),
                         (err) => this.handleError(err),
