@@ -203,7 +203,7 @@
         }
         
         #display-auditorium {
-             text-transform: lowercase;
+             /* Preserve original case (e.g. IF-302) */
         }
 
         .bouton-validation {
@@ -762,6 +762,9 @@
 
                             infoPromo.textContent = statusText;
                             badge.style.display = 'block';
+                            
+                            // Synchronisation immédiate de l'indicateur
+                            if (typeof TrackingEngine !== 'undefined') TrackingEngine.updateIndicator();
 
                             // GESTION DU CONTRÔLE ALÉATOIRE
                             if (data.pending_check) {
