@@ -151,9 +151,7 @@ def get_db_connection():
     # Détection de l'environnement : Si on est sur Render, on utilise SQLite par défaut
     if os.environ.get('RENDER') or not host:
         print("BD: Utilisation de SQLite")
-        db_dir = os.path.join(basedir, 'database')
-        os.makedirs(db_dir, exist_ok=True)
-        conn = sqlite3.connect(os.path.join(db_dir, 'database.db'))
+        conn = sqlite3.connect('database.db')
         conn.row_factory = sqlite3.Row
         return conn
     
@@ -168,9 +166,7 @@ def get_db_connection():
 
 def init_sqlite_db():
     if os.environ.get('RENDER') or not host:
-        db_dir = os.path.join(basedir, 'database')
-        os.makedirs(db_dir, exist_ok=True)
-        conn = sqlite3.connect(os.path.join(db_dir, 'database.db'))
+        conn = sqlite3.connect('database.db')
         cursor = conn.cursor()
         
         # Liste des tables à créer
@@ -1247,14 +1243,21 @@ def api_presences():
         if supabase:
             query = supabase.table("presences").select("*")
             if promo:
-                # Filtrage intelligent par promotion dans la table unique
+                # --- CORRECTION FILTRAGE ---
+                # On analyse le code de promotion pour filtrer par parcours, promotion et filière
                 if "_IAGE" in promo:
-                    query = query.eq("parcours", "IAGE").eq("promotion", promo.replace("_IAGE", "").capitalize())
+                    # Cas IAGE : ex "bac1_IAGE" -> Parcours: IAGE, Promotion: Bac1
+                    p_name = promo.split("_")[0].capitalize()
+                    query = query.eq("parcours", "IAGE").eq("promotion", p_name)
                 elif "_tech_" in promo:
-                    p = promo.replace("_tech_", "").split("_")
-                    if len(p) == 2:
-                        query = query.eq("parcours", "TECHNOLOGIE").eq("promotion", p[0].capitalize()).eq("filiere", p[1].upper())
+                    # Cas Tech : ex "bac1_tech_GL" -> Parcours: TECHNOLOGIE, Promotion: Bac1, Filière: GL
+                    parts = promo.split("_tech_")
+                    if len(parts) == 2:
+                        promo_name = parts[0].capitalize()
+                        filiere_name = parts[1].upper()
+                        query = query.eq("parcours", "TECHNOLOGIE").eq("promotion", promo_name).eq("filiere", filiere_name)
                 else:
+                    # Filtrage standard par promotion
                     query = query.eq("promotion", promo)
             
             result = query.order("date_inscription", desc=True).execute()
@@ -1363,8 +1366,19 @@ def api_presence_stats():
         if supabase:
             query = supabase.table("presences").select("type_presence")
             if promo:
-                # Filtrage simplifié pour les stats
-                query = query.ilike("promotion", f"%{promo.replace('_', ' ')}%")
+                # --- CORRECTION FILTRAGE STATS ---
+                # On utilise la même logique de filtrage pour que les stats correspondent à la liste
+                if "_IAGE" in promo:
+                    p_name = promo.split("_")[0].capitalize()
+                    query = query.eq("parcours", "IAGE").eq("promotion", p_name)
+                elif "_tech_" in promo:
+                    parts = promo.split("_tech_")
+                    if len(parts) == 2:
+                        promo_name = parts[0].capitalize()
+                        filiere_name = parts[1].upper()
+                        query = query.eq("parcours", "TECHNOLOGIE").eq("promotion", promo_name).eq("filiere", filiere_name)
+                else:
+                    query = query.ilike("promotion", f"%{promo.replace('_', ' ')}%")
             
             res = query.execute()
             rows = res.data
@@ -1397,14 +1411,21 @@ def api_students():
         if supabase:
             query = supabase.table("students").select("*")
             if promo:
-                # Si promo contient une table spécifique (ex: bac1_IAGE), on filtre intelligemment
+                # --- CORRECTION FILTRAGE ÉTUDIANTS ---
+                # Analyse précise de la promotion pour un filtrage efficace dans Supabase
                 if "_IAGE" in promo:
-                    query = query.eq("parcours", "IAGE").eq("promotion", promo.replace("_IAGE", "").capitalize())
+                    # Extraction pour IAGE (ex: bac1_IAGE -> Bac1)
+                    p_name = promo.split("_")[0].capitalize()
+                    query = query.eq("parcours", "IAGE").eq("promotion", p_name)
                 elif "_tech_" in promo:
-                    p = promo.replace("_tech_", "").split("_")
-                    if len(p) == 2:
-                        query = query.eq("parcours", "TECHNOLOGIE").eq("promotion", p[0].capitalize()).eq("filiere", p[1].upper())
+                    # Extraction pour Technologie (ex: bac1_tech_GL -> Bac1, GL)
+                    parts = promo.split("_tech_")
+                    if len(parts) == 2:
+                        promo_name = parts[0].capitalize()
+                        filiere_name = parts[1].upper()
+                        query = query.eq("parcours", "TECHNOLOGIE").eq("promotion", promo_name).eq("filiere", filiere_name)
                 else:
+                    # Filtre générique si aucun motif spécial n'est trouvé
                     query = query.eq("promotion", promo)
             
             result = query.order("date_inscription", desc=True).execute()
@@ -1438,8 +1459,16 @@ def api_stats():
         if supabase:
             query = supabase.table("students").select("sexe")
             if promo:
+                # --- CORRECTION FILTRAGE STATS GLOBAL ---
                 if "_IAGE" in promo:
-                    query = query.eq("parcours", "IAGE").eq("promotion", promo.replace("_IAGE", "").capitalize())
+                    p_name = promo.split("_")[0].capitalize()
+                    query = query.eq("parcours", "IAGE").eq("promotion", p_name)
+                elif "_tech_" in promo:
+                    parts = promo.split("_tech_")
+                    if len(parts) == 2:
+                        promo_name = parts[0].capitalize()
+                        filiere_name = parts[1].upper()
+                        query = query.eq("parcours", "TECHNOLOGIE").eq("promotion", promo_name).eq("filiere", filiere_name)
                 else:
                     query = query.ilike("promotion", f"%{promo.replace('_', ' ')}%")
             
