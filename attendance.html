@@ -816,9 +816,11 @@
                 }, 500);
             });
 
-            document.getElementById('auditorium_code').addEventListener('change', function() {
-                TrackingEngine.updateIndicator();
-            });
+            const audSelect = document.getElementById('auditorium_code');
+            if (audSelect) {
+                audSelect.addEventListener('change', () => TrackingEngine.updateIndicator());
+                audSelect.addEventListener('input', () => TrackingEngine.updateIndicator());
+            }
 
             // 4. Envoi du formulaire en AJAX pour rester sur la page (Ticket + Cooldown)
             form.addEventListener('submit', function (e) {
@@ -939,23 +941,26 @@
                     const display = document.getElementById('display-auditorium');
                     if (!indicator || !display) return;
                     
-                    const audCode = this.auditorium_code || document.getElementById('auditorium_code').value;
+                    const audSelect = document.getElementById('auditorium_code');
+                    const audCode = this.auditorium_code || (audSelect ? audSelect.value : "");
                     const isInside = typeof DiscreetGPSManager !== 'undefined' ? DiscreetGPSManager.isInside : false;
                     
-                    if (audCode) {
-                        indicator.style.display = 'flex';
-                        const hasPos = document.getElementById('latitude').value !== "";
-                        
-                        // Si trouvé ET dans UPL -> Bleu (WhatsApp)
-                        // Si trouvé mais HORS UPL -> Kaki (ou reste gris)
-                        if (hasPos && isInside) {
-                            indicator.className = 'tracking-status status-blue';
-                        } else {
-                            indicator.className = 'tracking-status status-kaki';
-                        }
-                        display.innerHTML = audCode;
+                    // L'indicateur est visible dès qu'on a un signal ou qu'on cherche
+                    indicator.style.display = 'flex';
+                    
+                    const hasPos = document.getElementById('latitude').value !== "";
+                    
+                    if (hasPos && isInside) {
+                        indicator.className = 'tracking-status status-blue';
                     } else {
-                        indicator.style.display = 'none';
+                        indicator.className = 'tracking-status status-kaki';
+                    }
+
+                    // Affiche le numéro seulement si sélectionné
+                    if (audCode && audCode !== "") {
+                        display.innerHTML = "<strong>" + audCode + "</strong>";
+                    } else {
+                        display.innerHTML = "";
                     }
                 },
 
