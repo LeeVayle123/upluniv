@@ -236,18 +236,21 @@
             box-shadow: 0 15px 30px -10px rgba(0,0,0,0.15);
             border: 1px solid #e2e8f0;
             z-index: 1000;
-            max-height: 0;
-            overflow: hidden;
-            transform: scaleY(0);
+            overflow-y: auto;
+            /* Animation de Rouleau Symétrique */
             transform-origin: top;
-            transition: max-height 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: scaleY(0);
             opacity: 0;
+            visibility: hidden;
+            transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1), 
+                        opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1),
+                        visibility 0.7s;
+            max-height: 250px;
         }
         .custom-select-container.open .custom-select-options {
-            max-height: 280px;
-            overflow-y: auto;
             transform: scaleY(1);
             opacity: 1;
+            visibility: visible;
         }
         .custom-select-option {
             padding: 12px 20px;
