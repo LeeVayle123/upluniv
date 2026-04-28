@@ -231,12 +231,12 @@
             top: calc(100% + 8px);
             left: 0;
             right: 0;
-            background: rgba(239, 246, 255, 0.85); /* Bleu translucide */
-            backdrop-filter: blur(12px); /* Effet "invisible" / flou */
-            -webkit-backdrop-filter: blur(12px);
+            background: rgba(239, 246, 255, 0.4); /* Encore plus invisible (40%) */
+            backdrop-filter: blur(15px); /* Flou plus prononcé */
+            -webkit-backdrop-filter: blur(15px);
             border-radius: 20px;
-            box-shadow: 0 15px 30px -10px rgba(0, 0, 128, 0.1);
-            border: 1px solid rgba(30, 58, 138, 0.1);
+            box-shadow: 0 15px 30px -10px rgba(0, 0, 128, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.3);
             z-index: 1000;
             overflow-y: auto;
             /* Animation de Rouleau Symétrique */
@@ -838,10 +838,10 @@
                                 submitBtn.innerHTML = "Limite atteinte";
                             } else {
                                 if (data.last_type === 'Entrée') {
-                                    typeSelect.value = 'Sortie';
+                                    setPointageType('Sortie');
                                     statusText += " | Currently in class";
                                 } else {
-                                    typeSelect.value = 'Entrée';
+                                    setPointageType('Entrée');
                                     statusText += " | Outside class";
                                 }
                                 submitBtn.disabled = false;
@@ -945,11 +945,19 @@
                 typeContainer.classList.toggle('open');
             });
 
-            typeOptions.forEach(opt => {
-                opt.addEventListener('click', function() {
-                    const val = this.getAttribute('data-value');
+            // Helper pour mettre à jour le type de pointage (Texte + Hidden)
+            function setPointageType(val) {
+                const typeHidden = document.getElementById('type_presence');
+                const typeText = document.getElementById('type-selected-text');
+                if (typeHidden && typeText) {
                     typeHidden.value = val;
                     typeText.textContent = val;
+                }
+            }
+
+            typeOptions.forEach(opt => {
+                opt.addEventListener('click', function() {
+                    setPointageType(this.getAttribute('data-value'));
                     typeContainer.classList.remove('open');
                 });
             });
@@ -1185,9 +1193,9 @@
                     if (!typeSelect) return;
 
                     if (currentTime >= this.config.morning_exit_open && currentTime < "13:00") {
-                        typeSelect.value = 'Sortie';
+                        setPointageType('Sortie');
                     } else if (currentTime >= this.config.afternoon_exit_open) {
-                        typeSelect.value = 'Sortie';
+                        setPointageType('Sortie');
                     }
                 },
 
