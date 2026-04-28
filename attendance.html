@@ -238,11 +238,16 @@
             z-index: 1000;
             max-height: 0;
             overflow: hidden;
-            transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: scaleY(0);
+            transform-origin: top;
+            transition: max-height 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0;
         }
         .custom-select-container.open .custom-select-options {
-            max-height: 240px;
+            max-height: 280px;
             overflow-y: auto;
+            transform: scaleY(1);
+            opacity: 1;
         }
         .custom-select-option {
             padding: 12px 20px;
@@ -363,6 +368,11 @@
         .status-kaki { color: #A9A9A9; } /* Gris discret pour recherche */
         .status-blue { color: #34b7f1; } /* Bleu WhatsApp pour validé */
         .status-green { color: #22c55e; }
+        
+        .placeholder-text {
+            opacity: 0.4;
+            font-weight: 400;
+        }
 
         .dot-active {
             font-size: 1.1rem;
@@ -1048,20 +1058,20 @@
                     const isInside = typeof DiscreetGPSManager !== 'undefined' ? DiscreetGPSManager.isInside : false;
                     const hasPos = document.getElementById('latitude').value !== "";
                     
-                    // N'afficher l'indicateur QUE si un auditoire est choisi
+                    // N'afficher l'indicateur QUE si un auditoire est choisi OU pour le placeholder
+                    indicator.style.display = 'flex';
+                    
+                    if (hasPos && isInside) {
+                        indicator.className = 'tracking-status status-blue';
+                    } else {
+                        indicator.className = 'tracking-status status-kaki';
+                    }
+
                     if (currentChoice && currentChoice !== "") {
-                        indicator.style.display = 'flex';
-                        
-                        if (hasPos && isInside) {
-                            indicator.className = 'tracking-status status-blue';
-                        } else {
-                            indicator.className = 'tracking-status status-kaki';
-                        }
                         display.innerHTML = "<strong>" + currentChoice + "</strong>";
                     } else {
-                        // Cacher tout (antenne + numéro) si rien n'est choisi
-                        indicator.style.display = 'none';
-                        display.innerHTML = "";
+                        // Placeholder IF-102
+                        display.innerHTML = '<span class="placeholder-text">IF-102</span>';
                     }
                 },
 
