@@ -446,9 +446,13 @@
                 isFallbackMode: false,
                 // --- CONFIGURATION ZONE UPL ---
                 univCenter: { lat: -11.6705, lon: 27.4865 }, 
-                maxUnivRadius: 1200, // 1.2km pour couvrir le campus
-
+                maxUnivRadius: 2500, // 2.5km pour les tests/campus large
+                
                 init: function () {
+                    // Check for Secure Context
+                    if (!window.isSecureContext && window.location.hostname !== "localhost") {
+                        alert("Erreur: La géolocalisation nécessite une connexion sécurisée (HTTPS).");
+                    }
                     this.statusEl = document.getElementById('gps-status');
                     this.latEl = document.getElementById('latitude');
                     this.lonEl = document.getElementById('longitude');
@@ -471,36 +475,47 @@
                     this.hideRetry();
                     this.updateStatus('<i class="fa-solid fa-satellite fa-spin"></i> Recherche satellite...', "waiting");
                     
-                    const options = { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }; // Force la sollicitation réelle du matériel GPS
+                    const options = { enableHighAccuracy: true, timeout: 6000, maximumAge: 2000 };
 
+                    // Tentative d'obtention immédiate
+                    navigator.geolocation.getCurrentPosition(
+                        (pos) => this.handleUpdate(pos),
+                        (err) => console.log("Init high-acc failed, waiting for watch..."),
+                        options
+                    );
+
+                    // Surveillance continue
                     this.watchId = navigator.geolocation.watchPosition(
                         (pos) => this.handleUpdate(pos),
                         (err) => {
-                            console.warn("GPS High Accuracy Error:", err);
-                            // Si erreur (ex: timeout), on bascule tout de suite en fallback
                             if (!this.isFallbackMode) this.startFallback();
                         },
                         options
                     );
 
-                    // Timeout pour basculer en fallback si on n'a rien après 8s
+                    // Timeout sécurité pour le signal réseau
                     setTimeout(() => {
-                        if (this.watchId && this.latEl.value === "" && !this.isFallbackMode) {
-                            console.log("Passage en mode secours...");
+                        if (this.latEl.value === "" && !this.isFallbackMode) {
                             this.startFallback();
                         }
-                    }, 8500);
+                    }, 6500);
 
-                    // Timeout de sécurité final
                     setTimeout(() => this.checkFinalStatus(), this.maxDuration);
                 },
 
                 startFallback: function() {
                     if (this.watchId) navigator.geolocation.clearWatch(this.watchId);
                     this.isFallbackMode = true;
-                    this.updateStatus('<i class="fa-solid fa-tower-broadcast fa-spin"></i> Signal faible, passage en mode réseau...', "waiting");
+                    this.updateStatus('<i class="fa-solid fa-tower-broadcast fa-spin"></i> Mode secours (Réseau)...', "waiting");
                     
-                    const options = { enableHighAccuracy: false, timeout: 6000, maximumAge: 0 };
+                    const options = { enableHighAccuracy: false, timeout: 5000, maximumAge: 5000 };
+                    
+                    navigator.geolocation.getCurrentPosition(
+                        (pos) => this.handleUpdate(pos),
+                        (err) => this.handleError(err),
+                        options
+                    );
+
                     this.watchId = navigator.geolocation.watchPosition(
                         (pos) => this.handleUpdate(pos),
                         (err) => this.handleError(err),
@@ -593,6 +608,13 @@
 
                     this.updateStatus('<i class="fa-solid fa-circle-exmark"></i> ' + msg, "error");
                     this.showRetry();
+                    
+                    // Si vraiment bloqué, suggérer de recharger la page
+                    if (error.code === 3) {
+                         const btn = document.getElementById(this.retryBtnId);
+                         if (btn) btn.innerHTML = '<i class="fa-solid fa-rotate-right"></i> Redémarrer la page';
+                         if (btn) btn.onclick = () => window.location.reload();
+                    }
                 },
 
                 updateStatus: function (html, type) {
