@@ -201,6 +201,68 @@
             outline: none;
             border-color: var(--accent);
         }
+
+        /* CUSTOM SELECT "ROULEAU" */
+        .custom-select-container {
+            position: relative;
+            width: 100%;
+        }
+        .custom-select-trigger {
+            width: 100%;
+            padding: 12px 20px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: var(--transition);
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+        .custom-select-trigger.has-value {
+            color: var(--text-main);
+            font-weight: 700;
+        }
+        .custom-select-options {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            right: 0;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 30px -10px rgba(0,0,0,0.15);
+            border: 1px solid #e2e8f0;
+            z-index: 1000;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .custom-select-container.open .custom-select-options {
+            max-height: 240px;
+            overflow-y: auto;
+        }
+        .custom-select-option {
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 0.9rem;
+            border-bottom: 1px solid #f8fafc;
+        }
+        .custom-select-option:last-child { border-bottom: none; }
+        .custom-select-option:hover {
+            background: #f1f5f9;
+            color: var(--primary);
+        }
+        .custom-select-trigger i {
+            transition: transform 0.4s;
+            font-size: 0.8rem;
+        }
+        .custom-select-container.open .custom-select-trigger i {
+            transform: rotate(180deg);
+        }
         
         #display-auditorium {
              /* Preserve original case (e.g. IF-302) */
@@ -394,19 +456,24 @@
                 <input type="hidden" name="accuracy_meters" id="accuracy_meters">
 
                 <div class="groupe-formulaire">
-                    <label class="etiquette-formulaire" for="auditorium_code">numero auditoire</label>
-                    <select id="auditorium_code" name="auditorium_code" class="champ-formulaire" 
-                        style="appearance: none; background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2364748b%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 15px top 50%; background-size: 10px auto;" required>
-                        <option value="" disabled selected>Choisir l'auditoire...</option>
-                        <option value="EC-101">EC-101</option>
-                        <option value="D-101">D-101</option>
-                        <option value="B-101">B-101</option>
-                        <option value="IF-301">IF-301</option>
-                        <option value="IF-101">IF-101</option>
-                        <option value="IF-302">IF-302</option>
-                        <option value="IF-102">IF-102</option>
-                        <option value="IF-304">IF-304</option>
-                    </select>
+                    <label class="etiquette-formulaire">numero auditoire</label>
+                    <div class="custom-select-container" id="custom-aud-container">
+                        <div class="custom-select-trigger" id="aud-trigger">
+                            <span id="aud-selected-text">Choisir l'auditoire...</span>
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </div>
+                        <div class="custom-select-options">
+                            <div class="custom-select-option" data-value="EC-101">EC-101</div>
+                            <div class="custom-select-option" data-value="D-101">D-101</div>
+                            <div class="custom-select-option" data-value="B-101">B-101</div>
+                            <div class="custom-select-option" data-value="IF-301">IF-301</div>
+                            <div class="custom-select-option" data-value="IF-101">IF-101</div>
+                            <div class="custom-select-option" data-value="IF-302">IF-302</div>
+                            <div class="custom-select-option" data-value="IF-102">IF-102</div>
+                            <div class="custom-select-option" data-value="IF-304">IF-304</div>
+                        </div>
+                        <input type="hidden" name="auditorium_code" id="auditorium_code" required>
+                    </div>
                 </div>
 
                 <div class="groupe-formulaire">
@@ -819,11 +886,36 @@
                 }, 500);
             });
 
-            const audSelect = document.getElementById('auditorium_code');
-            if (audSelect) {
-                audSelect.addEventListener('change', () => TrackingEngine.updateIndicator());
-                audSelect.addEventListener('input', () => TrackingEngine.updateIndicator());
-            }
+            // GESTION DU ROULEAU (Custom Select)
+            const audContainer = document.getElementById('custom-aud-container');
+            const audTrigger = document.getElementById('aud-trigger');
+            const audOptions = document.querySelectorAll('.custom-select-option');
+            const audHidden = document.getElementById('auditorium_code');
+            const audText = document.getElementById('aud-selected-text');
+
+            audTrigger.addEventListener('click', () => {
+                audContainer.classList.toggle('open');
+            });
+
+            audOptions.forEach(opt => {
+                opt.addEventListener('click', function() {
+                    const val = this.getAttribute('data-value');
+                    audHidden.value = val;
+                    audText.textContent = val;
+                    audTrigger.classList.add('has-value');
+                    audContainer.classList.remove('open');
+                    
+                    // Update immediate indicator
+                    if (typeof TrackingEngine !== 'undefined') TrackingEngine.updateIndicator();
+                });
+            });
+
+            // Fermer si on clique ailleurs
+            document.addEventListener('click', (e) => {
+                if (!audContainer.contains(e.target)) {
+                    audContainer.classList.remove('open');
+                }
+            });
 
             // 4. Envoi du formulaire en AJAX pour rester sur la page (Ticket + Cooldown)
             form.addEventListener('submit', function (e) {
