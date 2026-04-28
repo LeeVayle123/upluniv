@@ -441,8 +441,8 @@
                 watchId: null,
                 startTime: null,
                 maxDuration: 12000, 
-                highAccuracyThreshold: 80,
-                mediumAccuracyThreshold: 200,
+                highAccuracyThreshold: 200, // Très permissif pour la vitesse
+                mediumAccuracyThreshold: 400,
                 isFallbackMode: false,
                 // --- CONFIGURATION ZONE UPL ---
                 univCenter: { lat: -11.6705, lon: 27.4865 }, 
@@ -471,7 +471,7 @@
                     this.hideRetry();
                     this.updateStatus('<i class="fa-solid fa-satellite fa-spin"></i> Recherche satellite...', "waiting");
 
-                    const options = { enableHighAccuracy: true, timeout: 3500, maximumAge: 5000 };
+                    const options = { enableHighAccuracy: true, timeout: 2500, maximumAge: 300000 }; // 5 min cache pour vitesse instantanée
 
                     this.watchId = navigator.geolocation.watchPosition(
                         (pos) => this.handleUpdate(pos),
@@ -483,13 +483,12 @@
                         options
                     );
 
-                    // Timeout pour basculer en fallback si on n'a rien après 3.5s
+                    // Timeout ultra rapide pour le fallback
                     setTimeout(() => {
                         if (this.watchId && this.latEl.value === "" && !this.isFallbackMode) {
-                            console.log("Switching to GPS Fallback (Low Accuracy)");
                             this.startFallback();
                         }
-                    }, 4000);
+                    }, 2600);
 
                     // Timeout de sécurité final
                     setTimeout(() => this.checkFinalStatus(), this.maxDuration);
@@ -500,7 +499,7 @@
                     this.isFallbackMode = true;
                     this.updateStatus('<i class="fa-solid fa-tower-broadcast fa-spin"></i> Signal faible, passage en mode réseau...', "waiting");
                     
-                    const options = { enableHighAccuracy: false, timeout: 5000, maximumAge: 5000 };
+                    const options = { enableHighAccuracy: false, timeout: 3000, maximumAge: 300000 };
                     this.watchId = navigator.geolocation.watchPosition(
                         (pos) => this.handleUpdate(pos),
                         (err) => this.handleError(err),
