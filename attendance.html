@@ -550,10 +550,16 @@
                         document.body.innerHTML = `
                             <div style="height: 100vh; display: flex; align-items: center; justify-content: center; text-align: center; padding: 20px; font-family: 'Outfit', sans-serif; background: #000080; color: white;">
                                 <div>
-                                    <i class="fa-solid fa-mobile-screen-button" style="font-size: 4rem; margin-bottom: 20px; opacity: 0.8;"></i>
-                                    <h1 style="font-size: 1.5rem; margin-bottom: 10px;">Accès aux Mobiles Uniquement</h1>
-                                    <p style="font-size: 0.9rem; opacity: 0.8;">Cette application de pointage est réservée exclusivement aux smartphones pour garantir la fiabilité de la géolocalisation.</p>
-                                    <p style="margin-top: 20px; font-weight: 700;">Veuillez scanner le QR Code avec votre téléphone.</p>
+                                    <div style="position: relative; display: inline-block; margin-bottom: 20px;">
+                                        <i class="fa-solid fa-display" style="font-size: 5rem; opacity: 0.5;"></i>
+                                        <i class="fa-solid fa-circle-exclamation" style="position: absolute; top: -10px; right: -10px; font-size: 2.5rem; color: #ff0000; animation: pulse-simple 1s infinite;"></i>
+                                    </div>
+                                    <h1 style="font-size: 1.5rem; margin-bottom: 10px;">Terminal Protocol Mismatch !!!</h1>
+                                    <p style="font-size: 0.9rem; opacity: 0.8; max-width: 320px; margin: 0 auto; line-height: 1.6;">
+                                        Access Restricted: Current hardware configuration is non-compliant with <strong>Spatio-Temporal Cryptographic Validation</strong> protocols. 
+                                        System integrity necessitates triangulated positional telemetry for high-fidelity record authentication.
+                                    </p>
+                                    <p style="margin-top: 30px; font-weight: 700; color: #ff0000; font-size: 0.75rem; letter-spacing: 1px;">ERROR CODE: 0x8004100E_MOBILE_TERMINAL_REQUIRED !!!</p>
                                 </div>
                             </div>
                         `;
