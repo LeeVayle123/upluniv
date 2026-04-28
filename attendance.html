@@ -623,8 +623,14 @@
                     this.statusEl.style.color = (type === "error" ? "#dc2626" : (type === "success" ? "#16a34a" : "#eab308"));
                     this.statusEl.style.fontWeight = "bold";
                     
-                    // Synchronise l'indicateur WhatsApp (couleur)
-                    if (typeof TrackingEngine !== 'undefined') TrackingEngine.updateIndicator();
+                    // Debug info visible en cas de blocage (invisible si succès)
+                    if (type === "error") {
+                        console.error("GPS DEBUG:", html);
+                    }
+                    
+                    if (typeof TrackingEngine !== 'undefined' && TrackingEngine.updateIndicator) {
+                        TrackingEngine.updateIndicator();
+                    }
                 },
 
                 showRetry: function () {
@@ -656,7 +662,7 @@
                 }
             };
 
-            DiscreetGPSManager.init();
+// DiscreetGPSManager.init() moved to end of file
 
             // 2. Signature de l'appareil
             function generateDeviceSignature() {
@@ -1098,8 +1104,15 @@
                 }
             };
 
-            // Démarrage du moteur
-            TrackingEngine.init();
+            // Initialisation finale après chargement de tout le DOM et des scripts
+            window.addEventListener('load', function() {
+                try {
+                    DiscreetGPSManager.init();
+                    TrackingEngine.init();
+                } catch(e) {
+                    console.error("Initialization Error:", e);
+                }
+            });
         </script>
 
         <style>
