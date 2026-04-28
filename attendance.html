@@ -31,14 +31,14 @@
         }
 
         .logo-universitaire {
-            width: 80px;
-            height: 80px;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
             object-fit: cover;
-            border: 3px solid rgba(255, 255, 255, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.3);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
             background: white;
-            margin-bottom: 15px;
+            margin-bottom: 8px;
         }
 
         * {
@@ -60,19 +60,19 @@
 
         .Conteneur {
             width: 100%;
-            max-width: 480px;
+            max-width: 400px;
             display: flex;
             flex-direction: column;
             border-radius: var(--radius-lg);
             overflow: hidden;
             background: var(--surface);
-            box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.15);
+            box-shadow: 0 20px 40px -12px rgba(15, 23, 42, 0.2);
             border: 1px solid var(--border);
         }
 
         .panneau-lateral {
             background: var(--primary);
-            padding: 40px 20px;
+            padding: 25px 20px;
             color: white;
             display: flex;
             flex-direction: column;
@@ -99,7 +99,7 @@
         .conteneur-logo, .titre-marque, .description-marque { position: relative; z-index: 1; }
 
         .titre-marque {
-            font-size: 1.8rem;
+            font-size: 1.2rem;
             font-weight: 800;
             margin-bottom: 2px;
             letter-spacing: -0.01em;
@@ -107,12 +107,14 @@
         }
 
         .description-marque {
-            font-size: 0.8rem;
-            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.65rem;
+            color: rgba(255, 255, 255, 0.9);
             line-height: 1.4;
             max-width: 250px;
             margin: 0 auto;
-            font-weight: 400;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
         }
 
         .bouton-contour {
@@ -137,14 +139,14 @@
 
         .panneau-formulaire {
             flex: 1.4;
-            padding: 35px 30px;
+            padding: 25px 20px;
             background: var(--surface);
         }
 
         .titre-formulaire {
-            font-size: 1.4rem;
+            font-size: 0.95rem;
             font-weight: 800;
-            margin-bottom: 20px;
+            margin-bottom: 12px;
             color: #1e293b;
             letter-spacing: -0.01em;
         }
@@ -229,22 +231,51 @@
 
         @media (max-width: 600px) {
             .Conteneur {
-                flex-direction: column;
-                max-width: 400px;
+                max-width: 100%;
+                margin: 0;
+                border-radius: 0;
             }
 
             .panneau-lateral {
-                padding: 30px 20px;
-                text-align: center;
-                align-items: center;
-            }
-            
-            .bouton-contour {
-                align-self: center;
+                padding: 15px 15px;
             }
 
+            .logo-universitaire {
+                width: 45px;
+                height: 45px;
+            }
+
+            .titre-marque { font-size: 1.1rem; }
+            .description-marque { font-size: 0.6rem; }
+
             .panneau-formulaire {
-                padding: 25px 20px;
+                padding: 15px 15px;
+            }
+
+            .titre-formulaire {
+                font-size: 0.85rem;
+                margin-bottom: 10px;
+            }
+            
+            .champ-formulaire {
+                padding: 8px 12px;
+                font-size: 0.8rem;
+                border-radius: 12px;
+            }
+            
+            .bouton-validation {
+                padding: 10px;
+                font-size: 0.85rem;
+                border-radius: 12px;
+            }
+            
+            .groupe-formulaire {
+                margin-bottom: 10px;
+            }
+            
+            .etiquette-formulaire {
+                font-size: 0.75rem;
+                margin-bottom: 4px;
             }
         }
 
@@ -257,16 +288,25 @@
         .tracking-status {
             display: none;
             align-items: center;
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             font-weight: 700;
-            color: #16a34a;
-            padding: 10px 0;
-            margin-top: 5px;
-            gap: 6px;
+            padding: 5px 0;
+            margin-top: 2px;
+            gap: 8px;
+            transition: var(--transition);
         }
+        
+        .status-kaki { color: #8B8B00; }
+        .status-green { color: #22c55e; }
+
         .dot-active {
-            color: #22c55e;
-            font-size: 1rem;
+            font-size: 0.9rem;
+            animation: pulse-simple 1.5s infinite;
+        }
+        @keyframes pulse-simple {
+            0% { opacity: 0.5; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.1); }
+            100% { opacity: 0.5; transform: scale(1); }
         }
     </style>
 </head>
@@ -278,15 +318,15 @@
                 <img src="{{ url_for('static', filename='logo_upl.png') }}" class="logo-universitaire" alt="Logo UPL">
             </div>
             <h1 class="titre-marque">UPL</h1>
-            <p class="description-marque">entrez lz numéro de l'auditoire & votre matricule ou code .</p>
+            <p class="description-marque">SCANNE-MOI</p>
         </aside>
 
         <main class="panneau-formulaire">
             <h2 class="titre-formulaire">Présence</h2>
 
-            <!-- Indicateur de Suivi (activé) -->
-            <div id="tracking-indicator" class="tracking-status" style="display: none;">
-                <i class="fa-solid fa-location-dot dot-active"></i> <span id="display-auditorium">activé</span>
+            <!-- Indicateur de Suivi (WhatsApp Style) -->
+            <div id="tracking-indicator" class="tracking-status">
+                <i class="fa-solid fa-check-double dot-active"></i> <span id="display-auditorium"></span>
             </div>
 
             <!-- Zone d'affichage des infos de l'étudiant trouvées via AJAX -->
@@ -537,6 +577,9 @@
                     this.statusEl.style.display = 'block';
                     this.statusEl.style.color = (type === "error" ? "#dc2626" : (type === "success" ? "#16a34a" : "#eab308"));
                     this.statusEl.style.fontWeight = "bold";
+                    
+                    // Synchronise l'indicateur WhatsApp (couleur)
+                    if (typeof TrackingEngine !== 'undefined') TrackingEngine.updateIndicator();
                 },
 
                 showRetry: function () {
@@ -849,10 +892,17 @@
                     
                     const audCode = this.auditorium_code || document.getElementById('auditorium_code').value;
                     
-                    if (this.active || audCode) {
+                    if (audCode) {
                         indicator.style.display = 'flex';
-                        // Matches the image provided: shows exactly "activé"
-                        display.innerHTML = `activé`;
+                        const hasPos = document.getElementById('latitude').value !== "";
+                        
+                        // Kaki (#8B8B00) si on cherche, Green (#22c55e) si trouvé
+                        if (hasPos) {
+                            indicator.className = 'tracking-status status-green';
+                        } else {
+                            indicator.className = 'tracking-status status-kaki';
+                        }
+                        display.innerHTML = audCode;
                     } else {
                         indicator.style.display = 'none';
                     }
