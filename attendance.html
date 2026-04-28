@@ -942,24 +942,30 @@
                     if (!indicator || !display) return;
                     
                     const audSelect = document.getElementById('auditorium_code');
-                    const audCode = this.auditorium_code || (audSelect ? audSelect.value : "");
+                    // Priorité au choix actuel de l'étudiant dans la liste
+                    let currentChoice = audSelect ? audSelect.value : "";
+                    
+                    // Si on est déjà en cours de suivi (après validation), on utilise le code de session
+                    if (this.active && this.auditorium_code) {
+                        currentChoice = this.auditorium_code;
+                    }
+                    
                     const isInside = typeof DiscreetGPSManager !== 'undefined' ? DiscreetGPSManager.isInside : false;
-                    
-                    // L'indicateur est visible dès qu'on a un signal ou qu'on cherche
-                    indicator.style.display = 'flex';
-                    
                     const hasPos = document.getElementById('latitude').value !== "";
                     
-                    if (hasPos && isInside) {
-                        indicator.className = 'tracking-status status-blue';
+                    // N'afficher l'indicateur QUE si un auditoire est choisi
+                    if (currentChoice && currentChoice !== "") {
+                        indicator.style.display = 'flex';
+                        
+                        if (hasPos && isInside) {
+                            indicator.className = 'tracking-status status-blue';
+                        } else {
+                            indicator.className = 'tracking-status status-kaki';
+                        }
+                        display.innerHTML = "<strong>" + currentChoice + "</strong>";
                     } else {
-                        indicator.className = 'tracking-status status-kaki';
-                    }
-
-                    // Affiche le numéro seulement si sélectionné
-                    if (audCode && audCode !== "") {
-                        display.innerHTML = "<strong>" + audCode + "</strong>";
-                    } else {
+                        // Cacher tout (antenne + numéro) si rien n'est choisi
+                        indicator.style.display = 'none';
                         display.innerHTML = "";
                     }
                 },
