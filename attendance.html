@@ -11,9 +11,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #1e3a8a; /* Navy modern */
+            --primary: #000080; /* Navy Pure as in image */
             --primary-light: #1e40af;
-            --accent: #dc2626; /* Dynamic Red */
+            --accent: #ff0000; /* Pure Red as in image */
             --text-main: #334155;
             --text-muted: #64748b;
             --border: #e2e8f0;
@@ -26,18 +26,19 @@
 
         .conteneur-logo {
             display: flex;
-            justify-content: flex-start;
-            margin-bottom: 20px;
+            justify-content: center;
+            margin-bottom: 10px;
         }
 
         .logo-universitaire {
-            width: 60px;
-            height: 60px;
+            width: 80px;
+            height: 80px;
             border-radius: 50%;
             object-fit: cover;
-            border: 2px solid rgba(255, 255, 255, 0.2);
+            border: 3px solid rgba(255, 255, 255, 0.3);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
             background: white;
+            margin-bottom: 15px;
         }
 
         * {
@@ -71,15 +72,15 @@
 
         .panneau-lateral {
             background: var(--primary);
-            padding: 25px 30px;
+            padding: 40px 20px;
             color: white;
             display: flex;
-            flex-direction: row;
+            flex-direction: column;
             align-items: center;
-            gap: 20px;
+            justify-content: center;
+            text-align: center;
             position: relative;
             overflow: hidden;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         /* Petit effet décoratif pour le panneau latéral */
@@ -98,18 +99,20 @@
         .conteneur-logo, .titre-marque, .description-marque { position: relative; z-index: 1; }
 
         .titre-marque {
-            font-size: 1.6rem;
+            font-size: 1.8rem;
             font-weight: 800;
-            margin-bottom: 6px;
-            letter-spacing: -0.025em;
+            margin-bottom: 2px;
+            letter-spacing: -0.01em;
+            color: white;
         }
 
         .description-marque {
-            font-size: 0.85rem;
-            color: #94a3b8;
-            line-height: 1.5;
-            margin-bottom: 25px;
-            font-weight: 500;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.4;
+            max-width: 250px;
+            margin: 0 auto;
+            font-weight: 400;
         }
 
         .bouton-contour {
@@ -139,11 +142,11 @@
         }
 
         .titre-formulaire {
-            font-size: 1.25rem;
+            font-size: 1.4rem;
             font-weight: 800;
             margin-bottom: 20px;
-            color: var(--primary);
-            letter-spacing: -0.025em;
+            color: #1e293b;
+            letter-spacing: -0.01em;
         }
 
         .groupe-formulaire {
@@ -160,10 +163,10 @@
 
         .champ-formulaire {
             width: 100%;
-            padding: 12px 16px;
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-md);
+            padding: 12px 20px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
             font-size: 0.95rem;
             font-family: inherit;
             color: var(--text-main);
@@ -172,9 +175,8 @@
 
         .champ-formulaire:focus {
             outline: none;
-            border-color: var(--accent);
-            background: var(--surface);
-            box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.1);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(30, 58, 138, 0.05);
         }
 
         .champ-formulaire-discret {
@@ -197,6 +199,10 @@
             outline: none;
             border-color: var(--accent);
         }
+        
+        #display-auditorium {
+             text-transform: lowercase;
+        }
 
         .bouton-validation {
             width: 100%;
@@ -204,22 +210,21 @@
             color: white;
             border: none;
             padding: 14px;
-            border-radius: var(--radius-md);
-            font-size: 0.95rem;
+            border-radius: 50px;
+            font-size: 1rem;
             font-weight: 700;
             cursor: pointer;
             transition: var(--transition);
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            margin-top: 10px;
+            gap: 10px;
+            margin-top: 15px;
         }
 
         .bouton-validation:hover {
-            background: #2563eb;
+            opacity: 0.9;
             transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
         }
 
         @media (max-width: 600px) {
@@ -252,17 +257,16 @@
         .tracking-status {
             display: none;
             align-items: center;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             font-weight: 700;
             color: #16a34a;
-            padding: 4px 0;
-            margin-bottom: 10px;
-            gap: 10px;
+            padding: 10px 0;
+            margin-top: 5px;
+            gap: 6px;
         }
         .dot-active {
-            width: 8px; height: 8px; background: #22c55e; border-radius: 50%;
-            display: inline-block; margin-right: 8px;
-            animation: pulse-green 2s infinite;
+            color: #22c55e;
+            font-size: 1rem;
         }
     </style>
 </head>
@@ -270,28 +274,26 @@
 <body>
     <div class="Conteneur">
         <aside class="panneau-lateral">
-            <div class="conteneur-logo" style="margin-bottom: 0;">
+            <div class="conteneur-logo">
                 <img src="{{ url_for('static', filename='logo_upl.png') }}" class="logo-universitaire" alt="Logo UPL">
             </div>
-            <div class="branding-text">
-                <h1 class="titre-marque" style="margin-bottom: 0;">UPL Tracker</h1>
-                <p class="description-marque" style="margin-bottom: 0; font-size: 0.75rem;">Système de Présence</p>
-            </div>
+            <h1 class="titre-marque">UPL</h1>
+            <p class="description-marque">entrez lz numéro de l'auditoire & votre matricule ou code .</p>
         </aside>
 
         <main class="panneau-formulaire">
-            <h2 class="titre-formulaire"><i class="fa-solid fa-list-check" style="color: var(--accent);"></i> Fiche de Présence</h2>
+            <h2 class="titre-formulaire">Présence</h2>
 
-            <!-- Indicateur de Suivi GPS (Visibilité demandée) -->
-            <div id="tracking-indicator" class="tracking-status">
-                <span class="dot-active"></span> <span id="display-auditorium"></span>
+            <!-- Indicateur de Suivi (activé) -->
+            <div id="tracking-indicator" class="tracking-status" style="display: none;">
+                <i class="fa-solid fa-location-dot dot-active"></i> <span id="display-auditorium">activé</span>
             </div>
 
             <!-- Zone d'affichage des infos de l'étudiant trouvées via AJAX -->
             <div id="student-info-badge"
-                style="display: none; background: #f1f5f9; padding: 8px 12px; border-radius: 10px; margin-bottom: 10px; border-left: 4px solid navy;">
-                <p id="info-name" style="font-weight: 700; font-size: 0.82rem; color: navy;"></p>
-                <p id="info-promo" style="font-size: 0.7rem; color: #64748b;"></p>
+                style="display: none; background: #f1f5f9; padding: 12px 16px; border-radius: 12px; margin-bottom: 15px; border-left: 5px solid var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                <p id="info-name" style="font-weight: 700; font-size: 1rem; color: var(--primary);"></p>
+                <p id="info-promo" style="font-size: 0.8rem; color: #64748b; line-height: 1.4;"></p>
             </div>
 
             <!-- Message de succès (Ticket) -->
@@ -329,9 +331,10 @@
                 <input type="hidden" name="longitude" id="longitude">
                 <input type="hidden" name="accuracy_meters" id="accuracy_meters">
 
-                <div class="groupe-formulaire" style="margin-bottom: 5px;">
-                    <label class="etiquette-formulaire" for="auditorium_code">Poste / Auditoire</label>
-                    <select id="auditorium_code" name="auditorium_code" class="champ-formulaire-discret" required>
+                <div class="groupe-formulaire">
+                    <label class="etiquette-formulaire" for="auditorium_code">numero auditoire</label>
+                    <select id="auditorium_code" name="auditorium_code" class="champ-formulaire" 
+                        style="appearance: none; background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2364748b%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 15px top 50%; background-size: 10px auto;" required>
                         <option value="" disabled selected>Choisir l'auditoire...</option>
                         <option value="EC-101">EC-101</option>
                         <option value="D-101">D-101</option>
@@ -345,17 +348,17 @@
                 </div>
 
                 <div class="groupe-formulaire">
-                    <label class="etiquette-formulaire" for="matricule">Matricule Étudiant</label>
+                    <label class="etiquette-formulaire" for="matricule">Matricule</label>
                     <input type="text" id="matricule" name="matricule" class="champ-formulaire" required
                         placeholder="Ex: 2024021018" autocomplete="off">
                 </div>
 
                 <div class="groupe-formulaire">
-                    <label class="etiquette-formulaire" for="type_presence">Type de Pointage</label>
+                    <label class="etiquette-formulaire" for="type_presence">Type de pointage</label>
                     <select id="type_presence" name="type_presence" class="champ-formulaire"
                         style="appearance: none; background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2364748b%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 15px top 50%; background-size: 10px auto;">
-                        <option value="Entrée">Entrée (Arrivée en cours)</option>
-                        <option value="Sortie">Sortie (Départ du cours)</option>
+                        <option value="Entrée">Entrée</option>
+                        <option value="Sortie">Sortie</option>
                     </select>
                 </div>
 
@@ -662,7 +665,7 @@
                                     statusText += " | Outside class";
                                 }
                                 submitBtn.disabled = false;
-                                submitBtn.innerHTML = '<i class="fa-solid fa-circle-check"></i> valider votre présance!';
+                                submitBtn.innerHTML = '<i class="fa-solid fa-circle-check"></i> Valider votre présence';
                             }
 
                             infoPromo.textContent = statusText;
@@ -844,18 +847,14 @@
                     const display = document.getElementById('display-auditorium');
                     if (!indicator || !display) return;
                     
-                    if (this.active) {
+                    const audCode = this.auditorium_code || document.getElementById('auditorium_code').value;
+                    
+                    if (this.active || audCode) {
                         indicator.style.display = 'flex';
-                        display.textContent = this.auditorium_code;
+                        // Matches the image provided: shows exactly "activé"
+                        display.innerHTML = `activé`;
                     } else {
-                        // Keep visible if auditorium is selected even if not "tracking" yet
-                        const audCode = document.getElementById('auditorium_code').value;
-                        if (audCode) {
-                            indicator.style.display = 'flex';
-                            display.textContent = audCode;
-                        } else {
-                            indicator.style.display = 'none';
-                        }
+                        indicator.style.display = 'none';
                     }
                 },
 
