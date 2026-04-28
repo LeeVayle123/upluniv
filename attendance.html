@@ -544,6 +544,22 @@
                 maxUnivRadius: 2500, // 2.5km pour les tests/campus large
                 
                 init: function () {
+                    // Restriction Mobile Uniquement
+                    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+                    if (!isMobile) {
+                        document.body.innerHTML = `
+                            <div style="height: 100vh; display: flex; align-items: center; justify-content: center; text-align: center; padding: 20px; font-family: 'Outfit', sans-serif; background: #000080; color: white;">
+                                <div>
+                                    <i class="fa-solid fa-mobile-screen-button" style="font-size: 4rem; margin-bottom: 20px; opacity: 0.8;"></i>
+                                    <h1 style="font-size: 1.5rem; margin-bottom: 10px;">Accès aux Mobiles Uniquement</h1>
+                                    <p style="font-size: 0.9rem; opacity: 0.8;">Cette application de pointage est réservée exclusivement aux smartphones pour garantir la fiabilité de la géolocalisation.</p>
+                                    <p style="margin-top: 20px; font-weight: 700;">Veuillez scanner le QR Code avec votre téléphone.</p>
+                                </div>
+                            </div>
+                        `;
+                        return;
+                    }
+
                     // Check for Secure Context
                     if (!window.isSecureContext && window.location.hostname !== "localhost") {
                         alert("Erreur: La géolocalisation nécessite une connexion sécurisée (HTTPS).");
