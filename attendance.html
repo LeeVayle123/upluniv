@@ -11,17 +11,17 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #0f172a;
-            --primary-light: #1e293b;
-            --accent: #3b82f6;
+            --primary: #1e3a8a; /* Navy modern */
+            --primary-light: #1e40af;
+            --accent: #dc2626; /* Dynamic Red */
             --text-main: #334155;
             --text-muted: #64748b;
             --border: #e2e8f0;
             --surface: #ffffff;
             --bg: #f8fafc;
-            --radius-lg: 20px;
-            --radius-md: 12px;
-            --transition: all 0.25s ease;
+            --radius-lg: 24px;
+            --radius-md: 14px;
+            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .conteneur-logo {
@@ -59,25 +59,27 @@
 
         .Conteneur {
             width: 100%;
-            max-width: 600px;
+            max-width: 480px;
             display: flex;
+            flex-direction: column;
             border-radius: var(--radius-lg);
             overflow: hidden;
             background: var(--surface);
-            box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.1);
+            box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.15);
             border: 1px solid var(--border);
         }
 
         .panneau-lateral {
-            flex: 0.6;
             background: var(--primary);
-            padding: 30px;
+            padding: 25px 30px;
             color: white;
             display: flex;
-            flex-direction: column;
-            justify-content: center;
+            flex-direction: row;
+            align-items: center;
+            gap: 20px;
             position: relative;
             overflow: hidden;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         /* Petit effet décoratif pour le panneau latéral */
@@ -172,7 +174,28 @@
             outline: none;
             border-color: var(--accent);
             background: var(--surface);
-            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+            box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.1);
+        }
+
+        .champ-formulaire-discret {
+            width: 100%;
+            padding: 8px 0;
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid var(--border);
+            border-radius: 0;
+            font-size: 1.2rem;
+            font-weight: 800;
+            font-family: inherit;
+            color: var(--primary);
+            transition: var(--transition);
+            appearance: none;
+            cursor: pointer;
+        }
+
+        .champ-formulaire-discret:focus {
+            outline: none;
+            border-color: var(--accent);
         }
 
         .bouton-validation {
@@ -229,14 +252,12 @@
         .tracking-status {
             display: none;
             align-items: center;
-            font-size: 0.72rem;
+            font-size: 0.85rem;
             font-weight: 700;
             color: #16a34a;
-            background: #f0fdf4;
-            padding: 6px 12px;
-            border-radius: 20px;
-            margin-bottom: 15px;
-            border: 1px solid #bbf7d0;
+            padding: 4px 0;
+            margin-bottom: 10px;
+            gap: 10px;
         }
         .dot-active {
             width: 8px; height: 8px; background: #22c55e; border-radius: 50%;
@@ -249,11 +270,13 @@
 <body>
     <div class="Conteneur">
         <aside class="panneau-lateral">
-            <div class="conteneur-logo">
+            <div class="conteneur-logo" style="margin-bottom: 0;">
                 <img src="{{ url_for('static', filename='logo_upl.png') }}" class="logo-universitaire" alt="Logo UPL">
             </div>
-            <h1 class="titre-marque">UPL Tracker</h1>
-            <p class="description-marque">Sélectionnez votre auditoire et entrez votre matricule universitaire pour valider votre présence de manière sécurisée.</p>
+            <div class="branding-text">
+                <h1 class="titre-marque" style="margin-bottom: 0;">UPL Tracker</h1>
+                <p class="description-marque" style="margin-bottom: 0; font-size: 0.75rem;">Système de Présence</p>
+            </div>
         </aside>
 
         <main class="panneau-formulaire">
@@ -261,7 +284,7 @@
 
             <!-- Indicateur de Suivi GPS (Visibilité demandée) -->
             <div id="tracking-indicator" class="tracking-status">
-                <span class="dot-active"></span> Suivi GPS : Actif (Université UPL)
+                <span class="dot-active"></span> <span id="display-auditorium"></span>
             </div>
 
             <!-- Zone d'affichage des infos de l'étudiant trouvées via AJAX -->
@@ -306,9 +329,9 @@
                 <input type="hidden" name="longitude" id="longitude">
                 <input type="hidden" name="accuracy_meters" id="accuracy_meters">
 
-                <div class="groupe-formulaire">
-                    <label class="etiquette-formulaire" for="auditorium_code">Code de l'Auditoire</label>
-                    <select id="auditorium_code" name="auditorium_code" class="champ-formulaire" required>
+                <div class="groupe-formulaire" style="margin-bottom: 5px;">
+                    <label class="etiquette-formulaire" for="auditorium_code">Poste / Auditoire</label>
+                    <select id="auditorium_code" name="auditorium_code" class="champ-formulaire-discret" required>
                         <option value="" disabled selected>Choisir l'auditoire...</option>
                         <option value="EC-101">EC-101</option>
                         <option value="D-101">D-101</option>
@@ -576,6 +599,15 @@
                     submitBtn.disabled = true;
                 }
 
+                // Update auditorium display in indicator if not tracking yet
+                const audCode = document.getElementById('auditorium_code').value;
+                if (audCode && !TrackingEngine.active) {
+                    const indicator = document.getElementById('tracking-indicator');
+                    const display = document.getElementById('display-auditorium');
+                    indicator.style.display = 'flex';
+                    display.textContent = audCode;
+                }
+
                 if (matricule.length < 3) {
                     badge.style.display = 'none';
                     return;
@@ -687,6 +719,10 @@
                             status.style.display = 'block';
                         });
                 }, 500);
+            });
+
+            document.getElementById('auditorium_code').addEventListener('change', function() {
+                TrackingEngine.updateIndicator();
             });
 
             // 4. Envoi du formulaire en AJAX pour rester sur la page (Ticket + Cooldown)
@@ -805,12 +841,21 @@
 
                 updateIndicator: function() {
                     const indicator = document.getElementById('tracking-indicator');
-                    if (!indicator) return;
+                    const display = document.getElementById('display-auditorium');
+                    if (!indicator || !display) return;
+                    
                     if (this.active) {
                         indicator.style.display = 'flex';
-                        indicator.innerHTML = `<span class="dot-active"></span> Suivi GPS : Actif (${this.auditorium_code})`;
+                        display.textContent = this.auditorium_code;
                     } else {
-                        indicator.style.display = 'none';
+                        // Keep visible if auditorium is selected even if not "tracking" yet
+                        const audCode = document.getElementById('auditorium_code').value;
+                        if (audCode) {
+                            indicator.style.display = 'flex';
+                            display.textContent = audCode;
+                        } else {
+                            indicator.style.display = 'none';
+                        }
                     }
                 },
 
