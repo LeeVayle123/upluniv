@@ -441,8 +441,8 @@
                 watchId: null,
                 startTime: null,
                 maxDuration: 12000, 
-                highAccuracyThreshold: 200, // Très permissif pour la vitesse
-                mediumAccuracyThreshold: 400,
+                highAccuracyThreshold: 60, // Équilibre entre précision et vitesse
+                mediumAccuracyThreshold: 150,
                 isFallbackMode: false,
                 // --- CONFIGURATION ZONE UPL ---
                 univCenter: { lat: -11.6705, lon: 27.4865 }, 
@@ -470,8 +470,8 @@
                     this.isFallbackMode = false;
                     this.hideRetry();
                     this.updateStatus('<i class="fa-solid fa-satellite fa-spin"></i> Recherche satellite...', "waiting");
-
-                    const options = { enableHighAccuracy: true, timeout: 2500, maximumAge: 300000 }; // 5 min cache pour vitesse instantanée
+                    
+                    const options = { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }; // Force la sollicitation réelle du matériel GPS
 
                     this.watchId = navigator.geolocation.watchPosition(
                         (pos) => this.handleUpdate(pos),
@@ -483,12 +483,13 @@
                         options
                     );
 
-                    // Timeout ultra rapide pour le fallback
+                    // Timeout pour basculer en fallback si on n'a rien après 8s
                     setTimeout(() => {
                         if (this.watchId && this.latEl.value === "" && !this.isFallbackMode) {
+                            console.log("Passage en mode secours...");
                             this.startFallback();
                         }
-                    }, 2600);
+                    }, 8500);
 
                     // Timeout de sécurité final
                     setTimeout(() => this.checkFinalStatus(), this.maxDuration);
@@ -499,7 +500,7 @@
                     this.isFallbackMode = true;
                     this.updateStatus('<i class="fa-solid fa-tower-broadcast fa-spin"></i> Signal faible, passage en mode réseau...', "waiting");
                     
-                    const options = { enableHighAccuracy: false, timeout: 3000, maximumAge: 300000 };
+                    const options = { enableHighAccuracy: false, timeout: 6000, maximumAge: 0 };
                     this.watchId = navigator.geolocation.watchPosition(
                         (pos) => this.handleUpdate(pos),
                         (err) => this.handleError(err),
@@ -585,10 +586,12 @@
                     if (this.watchId) navigator.geolocation.clearWatch(this.watchId);
                     this.watchId = null;
 
-                    let msg = "Veuillez actualiser encore";
-                    if (error.code === 1) msg = "Attention : autoriser cet appareil";
+                    let msg = "Veuillez activer votre localisation";
+                    if (error.code === 1) msg = "Accès refusé. Veuillez autoriser l'UPL.";
+                    if (error.code === 2) msg = "Signal GPS introuvable. Vérifiez vos réglages.";
+                    if (error.code === 3) msg = "Délai dépassé. Veuillez réessayer.";
 
-                    this.updateStatus('<i class="fa-solid fa-circle-xmark"></i> ' + msg, "error");
+                    this.updateStatus('<i class="fa-solid fa-circle-exmark"></i> ' + msg, "error");
                     this.showRetry();
                 },
 
