@@ -231,12 +231,12 @@
             top: calc(100% + 8px);
             left: 0;
             right: 0;
-            background: rgba(239, 246, 255, 0.4); /* Encore plus invisible (40%) */
-            backdrop-filter: blur(15px); /* Flou plus prononcé */
-            -webkit-backdrop-filter: blur(15px);
+            background: rgba(30, 58, 138, 0.08); /* Bleu extrêmement léger */
+            backdrop-filter: blur(20px) saturate(180%); /* Invisible / Flou prononcé */
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
             border-radius: 20px;
-            box-shadow: 0 15px 30px -10px rgba(0, 0, 128, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 15px 30px -10px rgba(0, 0, 128, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             z-index: 1000;
             overflow-y: auto;
             /* Animation de Rouleau Symétrique */
@@ -907,10 +907,9 @@
                 }, 500);
             });
 
-            // GESTION DU ROULEAU (Custom Select)
             const audContainer = document.getElementById('custom-aud-container');
             const audTrigger = document.getElementById('aud-trigger');
-            const audOptions = document.querySelectorAll('.custom-select-option');
+            const audOptions = audContainer.querySelectorAll('.custom-select-option');
             const audHidden = document.getElementById('auditorium_code');
             const audText = document.getElementById('aud-selected-text');
 
@@ -1111,8 +1110,8 @@
                     if (currentChoice && currentChoice !== "") {
                         display.innerHTML = "<strong>" + currentChoice + "</strong>";
                     } else {
-                        // Placeholder IF-102
-                        display.innerHTML = '<span class="placeholder-text">IF-102</span>';
+                        // Placeholder minimaliste
+                        display.innerHTML = '<span class="placeholder-text">...</span>';
                     }
                 },
 
