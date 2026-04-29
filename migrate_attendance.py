@@ -130,7 +130,7 @@ def setup_attendance_system():
         ('IF-301', 'Auditoire IF-301', -11.655, 27.485, 20.0, 3, 5.0), # COORDINATES TO BE MODIFIED LATER
         ('IF-101', 'Auditoire IF-101', -11.656, 27.486, 20.0, 1, 5.0), # COORDINATES TO BE MODIFIED LATER
         ('IF-302', 'Auditoire IF-302', -11.657, 27.487, 20.0, 3, 5.0), # COORDINATES TO BE MODIFIED LATER
-        ('IF-102', 'Auditoire IF-102', -11.673, 27.489, 20.0, 1, 40.0), # COORDINATES UPDATED TO MATCH APP.PY
+        ('IF-102', 'Auditoire IF-102', -11.6529086, 27.48359, 22.0, 1, 400.0), # COORDINATES AND RADIUS UPDATED
         ('IF-304', 'Auditoire IF-304', -11.659, 27.489, 20.0, 3, 5.0)  # COORDINATES TO BE MODIFIED LATER
     ]
     
