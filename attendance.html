@@ -16,9 +16,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #000080; /* Navy Pure as in image */
+            --primary: #000080;
+            /* Navy Pure as in image */
             --primary-light: #1e40af;
-            --accent: #ff0000; /* Pure Red as in image */
+            --accent: #ff0000;
+            /* Pure Red as in image */
             --text-main: #334155;
             --text-muted: #64748b;
             --border: #e2e8f0;
@@ -87,7 +89,7 @@
             position: relative;
             overflow: hidden;
         }
-        
+
         /* Petit effet décoratif pour le panneau latéral */
         .panneau-lateral::after {
             content: '';
@@ -100,8 +102,13 @@
             background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(59, 130, 246, 0.0) 100%);
             z-index: 0;
         }
-        
-        .conteneur-logo, .titre-marque, .description-marque { position: relative; z-index: 1; }
+
+        .conteneur-logo,
+        .titre-marque,
+        .description-marque {
+            position: relative;
+            z-index: 1;
+        }
 
         .titre-marque {
             font-size: 1.2rem;
@@ -212,6 +219,7 @@
             position: relative;
             width: 100%;
         }
+
         .custom-select-trigger {
             width: 100%;
             padding: 12px 20px;
@@ -227,17 +235,21 @@
             color: var(--text-muted);
             font-weight: 500;
         }
+
         .custom-select-trigger.has-value {
             color: var(--text-main);
             font-weight: 700;
         }
+
         .custom-select-options {
             position: absolute;
             top: calc(100% + 8px);
             left: 0;
             right: 0;
-            background: rgba(30, 58, 138, 0.08); /* Bleu extrêmement léger */
-            backdrop-filter: blur(20px) saturate(180%); /* Invisible / Flou prononcé */
+            background: rgba(30, 58, 138, 0.08);
+            /* Bleu extrêmement léger */
+            backdrop-filter: blur(20px) saturate(180%);
+            /* Invisible / Flou prononcé */
             -webkit-backdrop-filter: blur(20px) saturate(180%);
             border-radius: 20px;
             box-shadow: 0 15px 30px -10px rgba(0, 0, 128, 0.03);
@@ -249,16 +261,18 @@
             transform: scaleY(0);
             opacity: 0;
             visibility: hidden;
-            transition: transform 1.2s cubic-bezier(0.4, 0, 0.2, 1), 
-                        opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1),
-                        visibility 1.2s;
+            transition: transform 1.2s cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1),
+                visibility 1.2s;
             max-height: 250px;
         }
+
         .custom-select-container.open .custom-select-options {
             transform: scaleY(1);
             opacity: 1;
             visibility: visible;
         }
+
         .custom-select-option {
             padding: 12px 20px;
             cursor: pointer;
@@ -266,21 +280,27 @@
             font-size: 0.9rem;
             border-bottom: 1px solid #f8fafc;
         }
-        .custom-select-option:last-child { border-bottom: none; }
+
+        .custom-select-option:last-child {
+            border-bottom: none;
+        }
+
         .custom-select-option:hover {
             background: #f1f5f9;
             color: var(--primary);
         }
+
         .custom-select-trigger i {
             transition: transform 0.4s;
             font-size: 0.8rem;
         }
+
         .custom-select-container.open .custom-select-trigger i {
             transform: rotate(180deg);
         }
-        
+
         #display-auditorium {
-             /* Preserve original case (e.g. IF-302) */
+            /* Preserve original case (e.g. IF-302) */
         }
 
         .bouton-validation {
@@ -324,8 +344,13 @@
                 height: 45px;
             }
 
-            .titre-marque { font-size: 1.1rem; }
-            .description-marque { font-size: 0.6rem; }
+            .titre-marque {
+                font-size: 1.1rem;
+            }
+
+            .description-marque {
+                font-size: 0.6rem;
+            }
 
             .panneau-formulaire {
                 padding: 15px 15px;
@@ -335,23 +360,23 @@
                 font-size: 0.85rem;
                 margin-bottom: 10px;
             }
-            
+
             .champ-formulaire {
                 padding: 8px 12px;
                 font-size: 0.8rem;
                 border-radius: 12px;
             }
-            
+
             .bouton-validation {
                 padding: 10px;
                 font-size: 0.85rem;
                 border-radius: 12px;
             }
-            
+
             .groupe-formulaire {
                 margin-bottom: 10px;
             }
-            
+
             .etiquette-formulaire {
                 font-size: 0.75rem;
                 margin-bottom: 4px;
@@ -360,10 +385,22 @@
 
         /* Indicateur de suivi GPS actif */
         @keyframes pulse-green {
-            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
-            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
-            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+            0% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+            }
+
+            70% {
+                transform: scale(1);
+                box-shadow: 0 0 0 6px rgba(34, 197, 94, 0);
+            }
+
+            100% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+            }
         }
+
         .tracking-status {
             display: none;
             align-items: center;
@@ -374,11 +411,21 @@
             gap: 8px;
             transition: var(--transition);
         }
-        
-        .status-kaki { color: #A9A9A9; } /* Gris discret pour recherche */
-        .status-blue { color: #34b7f1; } /* Bleu WhatsApp pour validé */
-        .status-green { color: #22c55e; }
-        
+
+        .status-kaki {
+            color: #A9A9A9;
+        }
+
+        /* Gris discret pour recherche */
+        .status-blue {
+            color: #34b7f1;
+        }
+
+        /* Bleu WhatsApp pour validé */
+        .status-green {
+            color: #22c55e;
+        }
+
         .placeholder-text {
             opacity: 0.4;
             font-weight: 400;
@@ -391,7 +438,7 @@
             align-items: center;
             justify-content: center;
         }
-        
+
         .dot-active::after {
             content: '';
             position: absolute;
@@ -403,14 +450,29 @@
         }
 
         @keyframes ripple {
-            0% { transform: scale(0.8); opacity: 1; }
-            100% { transform: scale(2.2); opacity: 0; }
+            0% {
+                transform: scale(0.8);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(2.2);
+                opacity: 0;
+            }
         }
 
         @keyframes pulse-simple {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+
+            100% {
+                transform: scale(1);
+            }
         }
     </style>
 </head>
@@ -422,7 +484,7 @@
                 <img src="{{ url_for('static', filename='logo_upl.png') }}" class="logo-universitaire" alt="Logo UPL">
             </div>
             <h1 class="titre-marque">UPL</h1>
-            <p class="description-marque">SCANNE-MOI</p>
+            <p class="description-marque">POINTEZ LA PRESENCE</p>
         </aside>
 
         <main class="panneau-formulaire">
@@ -534,15 +596,15 @@
             const DiscreetGPSManager = {
                 watchId: null,
                 startTime: null,
-                maxDuration: 12000, 
+                maxDuration: 12000,
                 highAccuracyThreshold: 60, // Équilibre entre précision et vitesse
                 mediumAccuracyThreshold: 150,
                 isInside: false,
                 isFallbackMode: false,
                 // --- CONFIGURATION ZONE UPL ---
-                univCenter: { lat: -11.652075, lon: 27.4862517 }, 
+                univCenter: { lat: -11.652075, lon: 27.4862517 },
                 maxUnivRadius: 2500, // 2.5km pour les tests/campus large
-                
+
                 init: function () {
                     // Restriction Mobile Uniquement
                     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
@@ -591,7 +653,7 @@
                     this.isFallbackMode = false;
                     this.hideRetry();
                     this.updateStatus('<i class="fa-solid fa-satellite fa-spin"></i> Recherche en cours...', "waiting");
-                    
+
                     const options = { enableHighAccuracy: true, timeout: 6000, maximumAge: 2000 };
 
                     // Tentative d'obtention immédiate
@@ -620,13 +682,13 @@
                     setTimeout(() => this.checkFinalStatus(), this.maxDuration);
                 },
 
-                startFallback: function() {
+                startFallback: function () {
                     if (this.watchId) navigator.geolocation.clearWatch(this.watchId);
                     this.isFallbackMode = true;
                     this.updateStatus('<i class="fa-solid fa-tower-broadcast fa-spin"></i> Mode secours...', "waiting");
-                    
+
                     const options = { enableHighAccuracy: false, timeout: 5000, maximumAge: 5000 };
-                    
+
                     navigator.geolocation.getCurrentPosition(
                         (pos) => this.handleUpdate(pos),
                         (err) => this.handleError(err),
@@ -657,14 +719,14 @@
                         this.stopAndSuccess();
                     }
                     else if (acc <= this.mediumAccuracyThreshold) {
-                         this.updateStatus(`<i class="fa-solid fa-signal"></i> Signal moyen (${Math.round(acc)}m)...`, "waiting");
+                        this.updateStatus(`<i class="fa-solid fa-signal"></i> Signal moyen (${Math.round(acc)}m)...`, "waiting");
                     }
                 },
 
                 stopAndSuccess: function () {
                     if (this.watchId) navigator.geolocation.clearWatch(this.watchId);
                     this.watchId = null;
-                    
+
                     const lat = parseFloat(this.latEl.value);
                     const lon = parseFloat(this.lonEl.value);
                     const dist = this.calculateDistance(lat, lon, this.univCenter.lat, this.univCenter.lon);
@@ -692,17 +754,17 @@
                 },
 
                 // Aide au calcul de distance (Haversine)
-                calculateDistance: function(lat1, lon1, lat2, lon2) {
-                    const R = 6371e3; 
-                    const phi1 = lat1 * Math.PI/180;
-                    const phi2 = lat2 * Math.PI/180;
-                    const dPhi = (lat2-lat1) * Math.PI/180;
-                    const dLambda = (lon2-lon1) * Math.PI/180;
-                    const a = Math.sin(dPhi/2) * Math.sin(dPhi/2) +
-                              Math.cos(phi1) * Math.cos(phi2) *
-                              Math.sin(dLambda/2) * Math.sin(dLambda/2);
-                    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-                    return R * c; 
+                calculateDistance: function (lat1, lon1, lat2, lon2) {
+                    const R = 6371e3;
+                    const phi1 = lat1 * Math.PI / 180;
+                    const phi2 = lat2 * Math.PI / 180;
+                    const dPhi = (lat2 - lat1) * Math.PI / 180;
+                    const dLambda = (lon2 - lon1) * Math.PI / 180;
+                    const a = Math.sin(dPhi / 2) * Math.sin(dPhi / 2) +
+                        Math.cos(phi1) * Math.cos(phi2) *
+                        Math.sin(dLambda / 2) * Math.sin(dLambda / 2);
+                    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+                    return R * c;
                 },
 
                 checkFinalStatus: function () {
@@ -727,12 +789,12 @@
 
                     this.updateStatus('<i class="fa-solid fa-circle-exmark"></i> ' + msg, "error");
                     this.showRetry();
-                    
+
                     // Si vraiment bloqué, suggérer de recharger la page
                     if (error.code === 3) {
-                         const btn = document.getElementById(this.retryBtnId);
-                         if (btn) btn.innerHTML = '<i class="fa-solid fa-rotate-right"></i> Redémarrer la page';
-                         if (btn) btn.onclick = () => window.location.reload();
+                        const btn = document.getElementById(this.retryBtnId);
+                        if (btn) btn.innerHTML = '<i class="fa-solid fa-rotate-right"></i> Redémarrer la page';
+                        if (btn) btn.onclick = () => window.location.reload();
                     }
                 },
 
@@ -741,12 +803,12 @@
                     this.statusEl.style.display = 'block';
                     this.statusEl.style.color = (type === "error" ? "#dc2626" : (type === "success" ? "#16a34a" : "#eab308"));
                     this.statusEl.style.fontWeight = "bold";
-                    
+
                     // Debug info visible en cas de blocage (invisible si succès)
                     if (type === "error") {
                         console.error("GPS DEBUG:", html);
                     }
-                    
+
                     if (typeof TrackingEngine !== 'undefined' && TrackingEngine.updateIndicator) {
                         TrackingEngine.updateIndicator();
                     }
@@ -781,7 +843,7 @@
                 }
             };
 
-// DiscreetGPSManager.init() moved to end of file
+            // DiscreetGPSManager.init() moved to end of file
 
             // 2. Signature de l'appareil
             function generateDeviceSignature() {
@@ -877,7 +939,7 @@
 
                             infoPromo.textContent = statusText;
                             badge.style.display = 'block';
-                            
+
                             // Synchronisation immédiate de l'indicateur
                             if (typeof TrackingEngine !== 'undefined') TrackingEngine.updateIndicator();
 
@@ -945,13 +1007,13 @@
             });
 
             audOptions.forEach(opt => {
-                opt.addEventListener('click', function() {
+                opt.addEventListener('click', function () {
                     const val = this.getAttribute('data-value');
                     audHidden.value = val;
                     audText.textContent = val;
                     audTrigger.classList.add('has-value');
                     audContainer.classList.remove('open');
-                    
+
                     // Force update indicator
                     if (typeof TrackingEngine !== 'undefined') {
                         TrackingEngine.auditorium_code = val;
@@ -982,7 +1044,7 @@
             }
 
             typeOptions.forEach(opt => {
-                opt.addEventListener('click', function() {
+                opt.addEventListener('click', function () {
                     setPointageType(this.getAttribute('data-value'));
                     typeContainer.classList.remove('open');
                 });
@@ -1108,26 +1170,26 @@
                         });
                 },
 
-                updateIndicator: function() {
+                updateIndicator: function () {
                     const indicator = document.getElementById('tracking-indicator');
                     const display = document.getElementById('display-auditorium');
                     if (!indicator || !display) return;
-                    
+
                     const audSelect = document.getElementById('auditorium_code');
                     // Priorité au choix actuel de l'étudiant dans la liste
                     let currentChoice = audSelect ? audSelect.value : "";
-                    
+
                     // Si on est déjà en cours de suivi (après validation), on utilise le code de session
                     if (this.active && this.auditorium_code) {
                         currentChoice = this.auditorium_code;
                     }
-                    
+
                     const isInside = typeof DiscreetGPSManager !== 'undefined' ? DiscreetGPSManager.isInside : false;
                     const hasPos = document.getElementById('latitude').value !== "";
-                    
+
                     // N'afficher l'indicateur QUE si un auditoire est choisi OU pour le placeholder
                     indicator.style.display = 'flex';
-                    
+
                     if (hasPos && isInside) {
                         indicator.className = 'tracking-status status-blue';
                     } else {
@@ -1142,7 +1204,7 @@
                     }
                 },
 
-                showToast: function(message) {
+                showToast: function (message) {
                     const toast = document.createElement('div');
                     toast.innerHTML = `<i class="fa-solid fa-satellite-dish"></i> ${message}`;
                     toast.style.cssText = "position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(15, 23, 42, 0.9); color: white; padding: 10px 20px; border-radius: 99px; font-size: 0.75rem; font-weight: 600; z-index: 9999; animation: fadeIn 0.3s ease-out;";
@@ -1242,7 +1304,7 @@
                     }, { enableHighAccuracy: true, timeout: 10000 });
                 },
 
-                submitCapturedReport: function(pos, scheduledTime) {
+                submitCapturedReport: function (pos, scheduledTime) {
                     const report = {
                         matricule: this.matricule,
                         auditorium_code: this.auditorium_code,
@@ -1288,11 +1350,11 @@
             };
 
             // Initialisation finale après chargement de tout le DOM et des scripts
-            window.addEventListener('load', function() {
+            window.addEventListener('load', function () {
                 try {
                     DiscreetGPSManager.init();
                     TrackingEngine.init();
-                } catch(e) {
+                } catch (e) {
                     console.error("Initialization Error:", e);
                 }
             });
