@@ -16,7 +16,7 @@ def update_database():
             cursor = conn.cursor()
             cursor.execute("""
                 UPDATE auditoriums 
-                SET radius_m = 20, tolerance_m = 40, latitude = -11.673, longitude = 27.489
+                SET radius_m = 20, tolerance_m = 40, latitude = -11.652075, longitude = 27.4862517
                 WHERE code = 'IF-102'
             """)
             if cursor.rowcount > 0:
@@ -42,7 +42,7 @@ def update_database():
             cursor = conn.cursor()
             cursor.execute("""
                 UPDATE auditoriums 
-                SET radius_m = 20, tolerance_m = 40, latitude = -11.673, longitude = 27.489
+                SET radius_m = 20, tolerance_m = 40, latitude = -11.652075, longitude = 27.4862517
                 WHERE code = 'IF-102'
             """)
             if cursor.rowcount > 0:
@@ -66,8 +66,8 @@ def update_database():
             res = supabase.table("auditoriums").update({
                 "radius_m": 20, 
                 "tolerance_m": 40,
-                "latitude": -11.673,
-                "longitude": 27.489
+                "latitude": -11.652075,
+                "longitude": 27.4862517
             }).eq("code", "IF-102").execute()
             
             if res.data:
