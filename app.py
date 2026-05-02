@@ -918,6 +918,12 @@ def get_student_info(matricule):
             found_data['last_type'] = types[0] if types else None
             found_data['count_today'] = len(types)
             
+            # Si le dernier pointage est une Entrée, on récupère l'auditoire
+            if found_data['last_type'] == 'Entrée':
+                res_aud = supabase.table("attendance_attempts").select("auditorium_code").eq("student_external_id", matricule).eq("result", "Accepté").gte("timestamp", today).order("timestamp", desc=True).limit(1).execute()
+                if res_aud.data:
+                    found_data['last_auditorium_code'] = res_aud.data[0]['auditorium_code']
+
             # Vérification de contrôle aléatoire en attente
             check_res = supabase.table("random_checks").select("id, type").eq("matricule", matricule).eq("status", "PENDING").order("created_at", desc=True).limit(1).execute()
             found_data['pending_check'] = check_res.data[0] if check_res.data else None

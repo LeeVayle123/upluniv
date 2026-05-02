@@ -603,7 +603,12 @@
                 isFallbackMode: false,
                 // --- CONFIGURATION ZONE UPL ---
                 univCenter: { lat: -11.652075, lon: 27.4862517 },
-                maxUnivRadius: 150, // 150m pour le campus strict
+                
+                // === DEBUT ZONE A MODIFIER APRES LE TEST ===
+                // J'ai mis 10 millions de mètres temporairement pour que vous puissiez tester 
+                // depuis chez vous. Quand vous aurez fini, il faudra remettre cette valeur à 150.
+                maxUnivRadius: 10000000, // Temporaire pour le test (Avant c'était 150)
+                // === FIN ZONE A MODIFIER ===
 
                 init: function () {
                     // Restriction Mobile Uniquement
@@ -864,6 +869,23 @@
             const timerSpan = document.getElementById('cooldown-timer');
 
             let lookupTimeout;
+            let lockedAuditoriumCode = null;
+
+            // Helper pour mettre à jour l'auditoire programmatiquement
+            function setAuditoriumCode(val) {
+                const audHidden = document.getElementById('auditorium_code');
+                const audText = document.getElementById('aud-selected-text');
+                const audTrigger = document.getElementById('aud-trigger');
+                if (audHidden && audText) {
+                    audHidden.value = val;
+                    audText.textContent = val;
+                    audTrigger.classList.add('has-value');
+                    if (typeof TrackingEngine !== 'undefined') {
+                        TrackingEngine.auditorium_code = val;
+                        TrackingEngine.updateIndicator();
+                    }
+                }
+            }
 
             matriculeInput.addEventListener('input', function () {
                 const matricule = this.value.trim();
@@ -929,9 +951,14 @@
                                 if (data.last_type === 'Entrée') {
                                     setPointageType('Sortie');
                                     statusText += " | Currently in class";
+                                    if (data.last_auditorium_code) {
+                                        lockedAuditoriumCode = data.last_auditorium_code;
+                                        setAuditoriumCode(lockedAuditoriumCode);
+                                    }
                                 } else {
                                     setPointageType('Entrée');
                                     statusText += " | Outside class";
+                                    lockedAuditoriumCode = null;
                                 }
                                 submitBtn.disabled = false;
                                 submitBtn.innerHTML = '<i class="fa-solid fa-circle-check"></i> Valider votre présence';
@@ -1009,10 +1036,28 @@
             audOptions.forEach(opt => {
                 opt.addEventListener('click', function () {
                     const val = this.getAttribute('data-value');
+                    
                     audHidden.value = val;
                     audText.textContent = val;
                     audTrigger.classList.add('has-value');
                     audContainer.classList.remove('open');
+
+                    // Vérification stricte: Si on est en "Sortie" et que l'auditoire sélectionné 
+                    // est différent de celui de l'entrée (lockedAuditoriumCode), on bloque le bouton valider
+                    const typePres = document.getElementById('type_presence').value;
+                    if (typePres === 'Sortie' && lockedAuditoriumCode && val !== lockedAuditoriumCode) {
+                        submitBtn.disabled = true;
+                        submitBtn.innerHTML = "Auditoire incorrect";
+                        submitBtn.style.background = "#94a3b8"; // Gris pour indiquer que c'est bloqué
+                    } else {
+                        // Remettre le bouton à la normale si tout va bien
+                        const isReady = document.getElementById('latitude').value !== "";
+                        if (matriculeInput.value.length >= 3 && isReady) {
+                            submitBtn.disabled = false;
+                            submitBtn.innerHTML = '<i class="fa-solid fa-circle-check"></i> Valider votre présence';
+                            submitBtn.style.background = "var(--accent)";
+                        }
+                    }
 
                     // Force update indicator
                     if (typeof TrackingEngine !== 'undefined') {
