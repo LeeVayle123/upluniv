@@ -887,17 +887,38 @@
                 }
             }
 
+            // Centralized button validation
+            function validateButtonState() {
+                const matricule = matriculeInput.value.trim();
+                const isReady = document.getElementById('latitude').value !== "";
+                const typePres = document.getElementById('type_presence').value;
+                const selectedAud = document.getElementById('auditorium_code').value;
+
+                if (typePres === 'Sortie' && lockedAuditoriumCode && selectedAud !== lockedAuditoriumCode) {
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = "Auditoire incorrect";
+                    submitBtn.style.background = "#94a3b8"; // Gris
+                    return;
+                }
+                
+                // On check la limite atteinte
+                if (submitBtn.innerHTML === "Limite atteinte") return;
+
+                if (matricule.length >= 3 && isReady) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fa-solid fa-circle-check"></i> Valider votre présence';
+                    submitBtn.style.background = "var(--accent)";
+                } else {
+                    submitBtn.disabled = true;
+                }
+            }
+
             matriculeInput.addEventListener('input', function () {
                 const matricule = this.value.trim();
                 clearTimeout(lookupTimeout);
 
                 // Activer le bouton seulement si matricule est long ET position acquise
-                const isReady = document.getElementById('latitude').value !== "";
-                if (matricule.length >= 3 && isReady) {
-                    submitBtn.disabled = false;
-                } else {
-                    submitBtn.disabled = true;
-                }
+                validateButtonState();
 
                 // Toujours synchroniser l'indicateur
                 if (typeof TrackingEngine !== 'undefined') TrackingEngine.updateIndicator();
@@ -960,8 +981,7 @@
                                     statusText += " | Outside class";
                                     lockedAuditoriumCode = null;
                                 }
-                                submitBtn.disabled = false;
-                                submitBtn.innerHTML = '<i class="fa-solid fa-circle-check"></i> Valider votre présence';
+                                validateButtonState();
                             }
 
                             infoPromo.textContent = statusText;
@@ -1042,22 +1062,7 @@
                     audTrigger.classList.add('has-value');
                     audContainer.classList.remove('open');
 
-                    // Vérification stricte: Si on est en "Sortie" et que l'auditoire sélectionné 
-                    // est différent de celui de l'entrée (lockedAuditoriumCode), on bloque le bouton valider
-                    const typePres = document.getElementById('type_presence').value;
-                    if (typePres === 'Sortie' && lockedAuditoriumCode && val !== lockedAuditoriumCode) {
-                        submitBtn.disabled = true;
-                        submitBtn.innerHTML = "Auditoire incorrect";
-                        submitBtn.style.background = "#94a3b8"; // Gris pour indiquer que c'est bloqué
-                    } else {
-                        // Remettre le bouton à la normale si tout va bien
-                        const isReady = document.getElementById('latitude').value !== "";
-                        if (matriculeInput.value.length >= 3 && isReady) {
-                            submitBtn.disabled = false;
-                            submitBtn.innerHTML = '<i class="fa-solid fa-circle-check"></i> Valider votre présence';
-                            submitBtn.style.background = "var(--accent)";
-                        }
-                    }
+                    validateButtonState();
 
                     // Force update indicator
                     if (typeof TrackingEngine !== 'undefined') {
@@ -1104,6 +1109,15 @@
             // 4. Envoi du formulaire en AJAX pour rester sur la page (Ticket + Cooldown)
             form.addEventListener('submit', function (e) {
                 e.preventDefault();
+
+                // DÉFENSE ULTIME: Empêcher la soumission si l'auditoire de sortie ne correspond pas
+                const typePres = document.getElementById('type_presence').value;
+                const selectedAud = document.getElementById('auditorium_code').value;
+                if (typePres === 'Sortie' && lockedAuditoriumCode && selectedAud !== lockedAuditoriumCode) {
+                    alert("Impossible d'envoyer la présence : Auditoire de sortie différent de l'entrée.");
+                    return;
+                }
+
                 submitBtn.disabled = true;
                 submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending...';
 
