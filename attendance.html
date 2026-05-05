@@ -560,6 +560,7 @@
 
                 <div class="groupe-formulaire">
                     <label class="etiquette-formulaire" for="matricule">Matricule</label>
+                    <!-- champs matricule gps -->
                     <input type="text" id="matricule" name="matricule" class="champ-formulaire" required
                         placeholder="Ex: 2024021018" autocomplete="off">
                 </div>
@@ -603,7 +604,7 @@
                 isFallbackMode: false,
                 // --- CONFIGURATION ZONE UPL ---
                 univCenter: { lat: -11.652075, lon: 27.4862517 },
-                maxUnivRadius: 150, // 150m pour le campus strict
+                maxUnivRadius: 500, // 500m pour le campus (élargi pour éviter les blocages intempestifs)
 
                 init: function () {
                     // Restriction Mobile Uniquement
@@ -735,7 +736,7 @@
                     if (dist > this.maxUnivRadius) {
                         this.isInside = false;
                         this.updateStatus('<i class="fa-solid fa-circle-exmark"></i> Veuillez contacter le service admin.', "error");
-                        this.matInput.disabled = true;
+                        this.matInput.disabled = true; // champs matricule gps
                         this.matInput.placeholder = "Accès restreint...";
                         this.submitBtn.disabled = true;
                         console.log(`Étudiant hors zone UPL (${Math.round(dist)}m). Accès refusé.`);
