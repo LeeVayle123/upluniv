@@ -125,13 +125,16 @@ def login_required(f):
 
 @app.route('/admin/login', methods=['GET', 'POST'])
 def admin_login():
+    if 'admin_logged_in' in session:
+        return redirect(url_for('admin_general_dashboard'))
+        
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
         
         if username == ADMIN_USERNAME and password == ADMIN_PASSWORD:
             session['admin_logged_in'] = True
-            return redirect(url_for('admin_dashboard'))
+            return redirect(url_for('admin_general_dashboard'))
         else:
             return render_template('admin_login.html', error='Identifiants incorrects')
     
@@ -853,7 +856,7 @@ def check_report():
                  result = "non vérifié"
                  reason = f"Précision GPS insuffisante ({int(accuracy)}m)"
 
-            # 4. Enregistrement de la vérification
+            # 4. Enregistrement de la vérification des auditoire entrant et sortant
             check_data = {
                 "matricule": matricule,
                 "auditorium_code": auditorium_code,
@@ -1730,7 +1733,7 @@ def reset_all():
     except Exception as err:
         return f"Erreur critique lors de la réinitialisation globale : {err}"
 
-@app.route('/admin/general_dashboard')
+@app.route('/general-dashboard')
 @login_required
 def admin_general_dashboard():
     """
@@ -1805,5 +1808,3 @@ def api_admin_stats_summary():
 # Lancement du serveur
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=5000, debug=False, threaded=True)
-
-#deuxième système de : refelxion en cours: 
