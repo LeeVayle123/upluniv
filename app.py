@@ -1734,6 +1734,7 @@ def reset_all():
         return f"Erreur critique lors de la réinitialisation globale : {err}"
 
 @app.route('/general-dashboard')
+@app.route('/admin/general_dashboard')
 @login_required
 def admin_general_dashboard():
     """
