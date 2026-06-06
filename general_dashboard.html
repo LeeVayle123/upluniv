@@ -58,8 +58,9 @@
     <main class="main-content">
         <!-- En-tête -->
         <header class="header">
-            <div>
+            <div class="header-title-section">
                 <h1>Tableau de Bord</h1>
+                <span class="university-title">Protestant University of Lubumbashi</span>
             </div>
             <div class="header-right">
                 <!-- Compteur de rafraîchissement au coin en haut à droite -->
@@ -74,7 +75,7 @@
             </div>
         </header>
 
-        <!-- Cartes Statistiques en Haut (4 Colonnes avec Icônes originales) -->
+        <!-- Cartes Statistiques en Haut (4 Colonnes) -->
         <section class="stats-grid">
             <div class="stat-card">
                 <div class="stat-header">
@@ -135,7 +136,7 @@
             </div>
         </section>
 
-        <!-- Grille du bas (Progression, Activité et Actions) -->
+        <!-- Grille du bas (Progression et Activité - Largeur partagée à 50% chacune) -->
         <section class="bottom-grid">
             <!-- Graphique de Progression (Colonnes) -->
             <div class="grid-card">
@@ -147,42 +148,6 @@
             <div class="grid-card">
                 <h2 class="card-title">Activité</h2>
                 <canvas id="attendanceChart" height="200"></canvas>
-            </div>
-
-            <!-- Actions Rapides (Taille réduite) -->
-            <div class="grid-card">
-                <h2 class="card-title">Ajouter au Scrutin!</h2>
-                <div class="action-box">
-                    <p class="action-description">Ajouter un électeur ou un candidat pour le scrutin.</p>
-                    <select class="action-select" id="action-selector">
-                        <option value="">Sélectionner une action</option>
-                        <option value="student">Ajouter un étudiant</option>
-                        <option value="qr">Générer QR Code</option>
-                        <option value="timeline">Consulter la Timeline</option>
-                        <option value="refresh">Forcer la mise à jour</option>
-                    </select>
-
-                    <div class="action-buttons-grid">
-                        <button class="action-btn" onclick="window.location.href='{{ url_for('index') }}'">
-                            <i class="fa-solid fa-user-plus"></i>
-                            <span>Ajouter Électeur</span>
-                        </button>
-                        <button class="action-btn" onclick="window.location.href='{{ url_for('official_qr') }}'">
-                            <i class="fa-solid fa-user-shield"></i>
-                            <span>Ajouter Candidat</span>
-                        </button>
-                        <button class="action-btn" onclick="window.location.href='{{ url_for('admin_timeline') }}'">
-                            <i class="fa-solid fa-bullhorn"></i>
-                            <span>Publier Résultats</span>
-                        </button>
-                        <button class="action-btn" onclick="updateStats()">
-                            <i class="fa-solid fa-rotate-left"></i>
-                            <span>Réinitialiser</span>
-                        </button>
-                    </div>
-
-                    <button class="execute-btn" onclick="executeQuickAction()">Exécuter l'action</button>
-                </div>
             </div>
         </section>
     </main>
@@ -345,14 +310,6 @@
                 sessionStorage.setItem('dashboard_time_left', timeLeft);
                 timerDisplay.textContent = timeLeft + "s";
             }, 1000);
-        }
-
-        function executeQuickAction() {
-            const val = document.getElementById('action-selector').value;
-            if (val === 'student') window.location.href = "{{ url_for('index') }}";
-            else if (val === 'qr') window.location.href = "{{ url_for('official_qr') }}";
-            else if (val === 'timeline') window.location.href = "{{ url_for('admin_timeline') }}";
-            else if (val === 'refresh') updateStats();
         }
 
         // Initialiser
