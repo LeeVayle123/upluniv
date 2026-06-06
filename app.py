@@ -5,10 +5,10 @@ import io
 import traceback
 from flask import Flask, request, render_template, redirect, url_for, jsonify, send_file, session
 from datetime import datetime, timedelta, timezone
-try:
+try: 
     from db_config import host, user, password, database
 except ImportError:
-    # Paramètres par défaut si db_config.py est absent (cas de Render)
+    # definition d'une paramettre par defaut, si db_confing est absent cas de render qui n'a pas une base de données 
     host = user = password = database = None
 
 import os
@@ -36,7 +36,7 @@ def execute_sql(cursor, query, params=None):
     is_mysql = 'mysql' in cursor_type
     
     actual_query = query
-    if not is_mysql:
+    if not is_mysql:   
         actual_query = query.replace('%s', '?')
         
     if params is None:
@@ -1021,10 +1021,19 @@ def register():
         }
 
         # --- MODIFICATION SUPABASE : Insertion dans la table unique 'students' ---
+        # Tentative Supabase avec fallback automatique sur la base locale
+        saved_to_cloud = False
         if supabase:
-            result = supabase.table("students").insert(student_data).execute()
-        else:
-            # Fallback local pour la sécurité
+            try:
+                result = supabase.table("students").insert(student_data).execute()
+                saved_to_cloud = True
+                print(f"INFO: Étudiant {matricule} enregistré sur Supabase Cloud.")
+            except Exception as e_supa:
+                print(f"AVERTISSEMENT: Supabase inaccessible ({e_supa}). Fallback vers la base locale.")
+                saved_to_cloud = False
+
+        if not saved_to_cloud:
+            # Fallback local (SQLite ou MySQL)
             conn = get_db_connection()
             cursor = conn.cursor()
             table = f"{promotion.lower()}_IAGE" if parcours == 'IAGE' else f"{promotion.lower()}_tech_{filiere.upper()}"
@@ -1032,6 +1041,7 @@ def register():
             execute_sql(cursor, query, (matricule, nom, postnom, prenom, sexe, parcours, promotion, filiere, faculte))
             conn.commit()
             conn.close()
+            print(f"INFO: Étudiant {matricule} enregistré en local (fallback).")
 
         # Redirection vers la liste globale ou spécifique
         return redirect(url_for('view_students', promo=promotion))
