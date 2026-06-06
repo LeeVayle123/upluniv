@@ -1020,8 +1020,34 @@ def register():
             "faculte": faculte
         }
 
-        # --- MODIFICATION SUPABASE : Insertion dans la table unique 'students' ---
-        # Tentative Supabase avec fallback automatique sur la base locale
+        # --- Vérification : le matricule existe-t-il déjà ? ---
+        already_exists = False
+        if supabase:
+            try:
+                check_res = supabase.table("students").select("matricule").eq("matricule", matricule).execute()
+                if check_res.data:
+                    already_exists = True
+            except Exception:
+                pass  # Supabase inaccessible, on vérifiera en local
+
+        if not already_exists:
+            # Vérification en local aussi
+            try:
+                conn_check = get_db_connection()
+                cursor_check = conn_check.cursor()
+                table = f"{promotion.lower()}_IAGE" if parcours == 'IAGE' else f"{promotion.lower()}_tech_{filiere.upper()}"
+                execute_sql(cursor_check, f"SELECT matricule FROM {table} WHERE matricule = %s", (matricule,))
+                if cursor_check.fetchone():
+                    already_exists = True
+                cursor_check.close()
+                conn_check.close()
+            except Exception:
+                pass
+
+        if already_exists:
+            return f"Erreur : Le matricule {matricule} est déjà inscrit. Veuillez utiliser un autre matricule."
+
+        # --- Insertion : Supabase avec fallback local ---
         saved_to_cloud = False
         if supabase:
             try:
@@ -1033,21 +1059,15 @@ def register():
                 saved_to_cloud = False
 
         if not saved_to_cloud:
-            # Fallback local (SQLite ou MySQL) — Upsert : mise à jour si le matricule existe déjà
+            # Fallback local (SQLite ou MySQL)
             conn = get_db_connection()
             cursor = conn.cursor()
             table = f"{promotion.lower()}_IAGE" if parcours == 'IAGE' else f"{promotion.lower()}_tech_{filiere.upper()}"
-            if isinstance(conn, sqlite3.Connection):
-                query = f"INSERT OR REPLACE INTO {table} (matricule, nom, postnom, prenom, sexe, parcours, promotion, filiere, faculte) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
-            else:
-                query = f"INSERT INTO {table} (matricule, nom, postnom, prenom, sexe, parcours, promotion, filiere, faculte) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) ON DUPLICATE KEY UPDATE nom=%s, postnom=%s, prenom=%s, sexe=%s, parcours=%s, promotion=%s, filiere=%s, faculte=%s"
-            if isinstance(conn, sqlite3.Connection):
-                execute_sql(cursor, query, (matricule, nom, postnom, prenom, sexe, parcours, promotion, filiere, faculte))
-            else:
-                execute_sql(cursor, query, (matricule, nom, postnom, prenom, sexe, parcours, promotion, filiere, faculte, nom, postnom, prenom, sexe, parcours, promotion, filiere, faculte))
+            query = f"INSERT INTO {table} (matricule, nom, postnom, prenom, sexe, parcours, promotion, filiere, faculte) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
+            execute_sql(cursor, query, (matricule, nom, postnom, prenom, sexe, parcours, promotion, filiere, faculte))
             conn.commit()
             conn.close()
-            print(f"INFO: Étudiant {matricule} enregistré/mis à jour en local.")
+            print(f"INFO: Étudiant {matricule} enregistré en local.")
 
         # Redirection vers la liste globale ou spécifique
         return redirect(url_for('view_students', promo=promotion))
