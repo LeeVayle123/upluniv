@@ -314,15 +314,15 @@ table {
 }
 
 th {
-    background: #f8fafc;
-    color: var(--text-muted);
+    background: var(--primary-blue);
+    color: white;
     font-size: 0.72rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     padding: 14px 16px;
     text-align: left;
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: none;
 }
 
 th:first-child {
