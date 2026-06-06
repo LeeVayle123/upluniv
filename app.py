@@ -1033,15 +1033,21 @@ def register():
                 saved_to_cloud = False
 
         if not saved_to_cloud:
-            # Fallback local (SQLite ou MySQL)
+            # Fallback local (SQLite ou MySQL) — Upsert : mise à jour si le matricule existe déjà
             conn = get_db_connection()
             cursor = conn.cursor()
             table = f"{promotion.lower()}_IAGE" if parcours == 'IAGE' else f"{promotion.lower()}_tech_{filiere.upper()}"
-            query = f"INSERT INTO {table} (matricule, nom, postnom, prenom, sexe, parcours, promotion, filiere, faculte) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
-            execute_sql(cursor, query, (matricule, nom, postnom, prenom, sexe, parcours, promotion, filiere, faculte))
+            if isinstance(conn, sqlite3.Connection):
+                query = f"INSERT OR REPLACE INTO {table} (matricule, nom, postnom, prenom, sexe, parcours, promotion, filiere, faculte) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
+            else:
+                query = f"INSERT INTO {table} (matricule, nom, postnom, prenom, sexe, parcours, promotion, filiere, faculte) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) ON DUPLICATE KEY UPDATE nom=%s, postnom=%s, prenom=%s, sexe=%s, parcours=%s, promotion=%s, filiere=%s, faculte=%s"
+            if isinstance(conn, sqlite3.Connection):
+                execute_sql(cursor, query, (matricule, nom, postnom, prenom, sexe, parcours, promotion, filiere, faculte))
+            else:
+                execute_sql(cursor, query, (matricule, nom, postnom, prenom, sexe, parcours, promotion, filiere, faculte, nom, postnom, prenom, sexe, parcours, promotion, filiere, faculte))
             conn.commit()
             conn.close()
-            print(f"INFO: Étudiant {matricule} enregistré en local (fallback).")
+            print(f"INFO: Étudiant {matricule} enregistré/mis à jour en local.")
 
         # Redirection vers la liste globale ou spécifique
         return redirect(url_for('view_students', promo=promotion))
