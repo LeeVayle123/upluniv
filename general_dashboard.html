@@ -61,48 +61,48 @@
             <div>
                 <h1>Tableau de Bord</h1>
             </div>
-            <div class="user-profile">
-                <span>Bienvenue, Admin UPL</span>
-                <div class="profile-avatar">U</div>
+            <div class="header-right">
+                <!-- Compteur de rafraîchissement au coin en haut à droite -->
+                <div class="timer-badge">
+                    <i class="fa-solid fa-sync fa-spin"></i>
+                    <span id="refresh-timer">15s</span>
+                </div>
+                <div class="user-profile">
+                    <span>Bienvenue, Admin UPL</span>
+                    <div class="profile-avatar">U</div>
+                </div>
             </div>
         </header>
 
-        <!-- Cartes Statistiques en Haut (5 Colonnes) -->
+        <!-- Cartes Statistiques en Haut (4 Colonnes avec Icônes originales) -->
         <section class="stats-grid">
             <div class="stat-card">
                 <div class="stat-header">
                     <i class="fa-solid fa-user-group"></i>
-                    <span>Étudiants inscrits</span>
+                    <span>Students Registered</span>
                 </div>
                 <div class="stat-value" id="stat-total-students">...</div>
             </div>
             <div class="stat-card">
                 <div class="stat-header">
                     <i class="fa-solid fa-door-open"></i>
-                    <span>Arrivées ce jour</span>
+                    <span>Today's Arrivals</span>
                 </div>
                 <div class="stat-value" id="stat-entrees">...</div>
             </div>
             <div class="stat-card">
                 <div class="stat-header">
                     <i class="fa-solid fa-location-dot"></i>
-                    <span>Hors zone</span>
+                    <span>Outside Zone</span>
                 </div>
-                <div class="stat-value" id="stat-hors-zone" style="color: #b91c1c;">...</div>
+                <div class="stat-value" id="stat-hors-zone" style="color: #ef4444;">...</div>
             </div>
             <div class="stat-card">
                 <div class="stat-header">
-                    <i class="fa-solid fa-warning"></i>
-                    <span>Fraudes détectées</span>
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <span>Detected Frauds</span>
                 </div>
-                <div class="stat-value" id="stat-fraudes" style="color: #b91c1c;">...</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-header">
-                    <i class="fa-solid fa-clock"></i>
-                    <span>Prochain rafraîchissement</span>
-                </div>
-                <div class="stat-value" id="refresh-timer" style="font-size: 1.4rem;">15s</div>
+                <div class="stat-value" id="stat-fraudes" style="color: #ef4444;">...</div>
             </div>
         </section>
 
@@ -110,7 +110,7 @@
         <section class="dashboard-grid">
             <!-- Suivi des Étudiants -->
             <div class="grid-card">
-                <h2 class="card-title">Suivi des Étudiants (Récents)</h2>
+                <h2 class="card-title">Suivi des Étudiants</h2>
                 <table>
                     <thead>
                         <tr>
@@ -126,9 +126,9 @@
                 </table>
             </div>
 
-            <!-- Classement Évolution -->
+            <!-- Classement Evolution -->
             <div class="grid-card">
-                <h2 class="card-title">Classement & Évolution</h2>
+                <h2 class="card-title">Classement Evolution</h2>
                 <ul class="ranking-list" id="ranking-list-container">
                     <!-- Rempli dynamiquement -->
                 </ul>
@@ -140,20 +140,20 @@
             <!-- Graphique de Progression (Colonnes) -->
             <div class="grid-card">
                 <h2 class="card-title">Progression</h2>
-                <canvas id="statusPieChart" height="220"></canvas>
+                <canvas id="statusPieChart" height="200"></canvas>
             </div>
 
             <!-- Graphique d'Activité (Ligne) -->
             <div class="grid-card">
                 <h2 class="card-title">Activité</h2>
-                <canvas id="attendanceChart" height="220"></canvas>
+                <canvas id="attendanceChart" height="200"></canvas>
             </div>
 
-            <!-- Actions Rapides -->
+            <!-- Actions Rapides (Taille réduite) -->
             <div class="grid-card">
                 <h2 class="card-title">Ajouter au Scrutin!</h2>
                 <div class="action-box">
-                    <p class="action-description">Sélectionner une action ou lancer une opération rapide.</p>
+                    <p class="action-description">Ajouter un électeur ou un candidat pour le scrutin.</p>
                     <select class="action-select" id="action-selector">
                         <option value="">Sélectionner une action</option>
                         <option value="student">Ajouter un étudiant</option>
@@ -165,18 +165,18 @@
                     <div class="action-buttons-grid">
                         <button class="action-btn" onclick="window.location.href='{{ url_for('index') }}'">
                             <i class="fa-solid fa-user-plus"></i>
-                            <span>Ajouter Étudiant</span>
+                            <span>Ajouter Électeur</span>
                         </button>
                         <button class="action-btn" onclick="window.location.href='{{ url_for('official_qr') }}'">
-                            <i class="fa-solid fa-qrcode"></i>
-                            <span>Générer QR Code</span>
+                            <i class="fa-solid fa-user-shield"></i>
+                            <span>Ajouter Candidat</span>
                         </button>
                         <button class="action-btn" onclick="window.location.href='{{ url_for('admin_timeline') }}'">
-                            <i class="fa-solid fa-clock-rotate-left"></i>
-                            <span>Voir Timeline</span>
+                            <i class="fa-solid fa-bullhorn"></i>
+                            <span>Publier Résultats</span>
                         </button>
                         <button class="action-btn" onclick="updateStats()">
-                            <i class="fa-solid fa-rotate"></i>
+                            <i class="fa-solid fa-rotate-left"></i>
                             <span>Réinitialiser</span>
                         </button>
                     </div>
@@ -215,11 +215,11 @@
                             backgroundColor: 'rgba(0, 11, 118, 0.05)',
                             fill: true,
                             tension: 0.4,
-                            borderWidth: 2.5,
+                            borderWidth: 2,
                             pointBackgroundColor: '#000b76',
                             pointBorderColor: 'white',
-                            pointBorderWidth: 2,
-                            pointRadius: 4
+                            pointBorderWidth: 1.5,
+                            pointRadius: 3
                         }]
                     },
                     options: {
@@ -227,8 +227,8 @@
                         maintainAspectRatio: false,
                         plugins: { legend: { display: false } },
                         scales: {
-                            y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { font: { family: 'Outfit' } } },
-                            x: { grid: { display: false }, ticks: { font: { family: 'Outfit' } } }
+                            y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { font: { family: 'Outfit', size: 10 } } },
+                            x: { grid: { display: false }, ticks: { font: { family: 'Outfit', size: 10 } } }
                         }
                     }
                 });
@@ -243,9 +243,9 @@
                         datasets: [{
                             data: [data.total_students, data.entrees_today, data.hors_zone_today, data.fraudes_today],
                             backgroundColor: ['#000b76', '#3b82f6', '#93c5fd', '#bfdbfe'],
-                            borderRadius: 6,
+                            borderRadius: 4,
                             borderWidth: 0,
-                            barThickness: 25
+                            barThickness: 18
                         }]
                     },
                     options: {
@@ -253,8 +253,8 @@
                         maintainAspectRatio: false,
                         plugins: { legend: { display: false } },
                         scales: {
-                            y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { font: { family: 'Outfit' } } },
-                            x: { grid: { display: false }, ticks: { font: { family: 'Outfit', weight: '500' } } }
+                            y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { font: { family: 'Outfit', size: 10 } } },
+                            x: { grid: { display: false }, ticks: { font: { family: 'Outfit', size: 10, weight: '500' } } }
                         }
                     }
                 });
