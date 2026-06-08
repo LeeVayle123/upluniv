@@ -423,7 +423,17 @@ tr:hover td {
 .bottom-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 24px;
+    gap: 16px;
+}
+
+/* Keep charts compact: fixed max height so they don't expand */
+.bottom-grid .grid-card {
+    padding: 12px;
+}
+.bottom-grid .grid-card canvas {
+    width: 100% !important;
+    max-height: 160px !important;
+    height: 160px !important;
 }
 
 /* Responsive */

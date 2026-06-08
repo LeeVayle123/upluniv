@@ -936,11 +936,10 @@
                     submitBtn.disabled = true;
                     submitBtn.innerHTML = '<i class="fa-solid fa-magnifying-glass fa-spin"></i> Searching...';
 
-                    // Reset status to avoid confusion
+                    // Reset status to avoid confusion (clear previous icons/messages)
                     const status = document.getElementById('gps-status');
-                    if (status.innerHTML.includes("fa-circle-xmark")) {
-                        status.style.display = 'none';
-                    }
+                    status.style.display = 'none';
+                    status.innerHTML = '';
                     fetch(`/api/student/${encodeURIComponent(matricule)}`)
                         .then(async res => {
                             const data = await res.json();
@@ -982,6 +981,14 @@
 
                             infoPromo.textContent = statusText;
                             badge.style.display = 'block';
+
+                            // Show a simple green check icon when student is found
+                            status.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
+                            status.style.color = "#16a34a";
+                            status.style.background = "#dcfce7";
+                            status.style.padding = "6px";
+                            status.style.borderRadius = "8px";
+                            status.style.display = 'block';
 
                             // Synchronisation immédiate de l'indicateur
                             if (typeof TrackingEngine !== 'undefined') TrackingEngine.updateIndicator();
@@ -1029,10 +1036,11 @@
 
                             // Affichage de l'erreur dans la zone de statut
                             const status = document.getElementById('gps-status');
-                            status.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> Recherche échouée : ' + (error.message || "Erreur inconnue");
+                            // Show a simple red cross icon on failure
+                            status.innerHTML = '<i class="fa-solid fa-circle-xmark"></i>';
                             status.style.color = "#dc2626";
                             status.style.background = "#fee2e2";
-                            status.style.padding = "10px";
+                            status.style.padding = "6px";
                             status.style.borderRadius = "8px";
                             status.style.display = 'block';
                         });
