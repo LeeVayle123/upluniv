@@ -43,6 +43,17 @@ def execute_sql(cursor, query, params=None):
         return cursor.execute(actual_query)
     return cursor.execute(actual_query, params)
 
+
+def safe_supabase_delete(table_name):
+    """Supprime les lignes d'une table Supabase si elle existe."""
+    try:
+        supabase.table(table_name).delete().neq("id", 0).execute()
+    except Exception as err:
+        err_msg = str(err)
+        if "Could not find the table" in err_msg or "PGRST205" in err_msg:
+            return
+        raise
+
 def calculate_distance(lat1, lon1, lat2, lon2):
     """
     Calcule la distance en mètres entre deux points (Haversine formula).
@@ -1746,11 +1757,11 @@ def reset_all():
     try:
         if supabase:
             # Ne supprime pas l'historique RLS mais vide les données
-            supabase.table("presences").delete().neq("id", 0).execute()
-            supabase.table("students").delete().neq("id", 0).execute()
-            supabase.table("attendance_attempts").delete().neq("id", 0).execute()
-            supabase.table("attendance_checks").delete().neq("id", 0).execute()
-            supabase.table("random_check_responses").delete().neq("id", 0).execute()
+            safe_supabase_delete("presences")
+            safe_supabase_delete("students")
+            safe_supabase_delete("attendance_attempts")
+            safe_supabase_delete("attendance_checks")
+            safe_supabase_delete("random_check_responses")
             
         # Fallback local
         conn = get_db_connection()
