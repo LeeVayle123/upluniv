@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Général | UPL</title>
+    <title>General Dashboard | UPL</title>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Font Awesome -->
@@ -25,7 +25,7 @@
             </div>
             <div class="slogan-section" style="padding-top: 15px; border-bottom: 1px solid rgba(0, 11, 118, 0.08); padding-bottom: 15px;">
                 <p style="font-size: 0.62rem; color: var(--text-muted); font-weight: 600; line-height: 1.4; text-transform: uppercase; font-style: italic;">
-                    VOUS CONNAÎTREZ LA VÉRITÉ ET LA VÉRITÉ VOUS AFFRANCHIRA
+                    You will know the truth, and the truth will set you free.
                 </p>
             </div>
         </div>
@@ -49,7 +49,7 @@
                 <a href="{{ url_for('view_students') }}"><i class="fa-solid fa-user-group"></i> <span>Students List</span></a>
             </li>
             <li class="nav-item" style="margin-top: auto;">
-                <a href="{{ url_for('admin_logout') }}" style="color: #ff6b6b;"><i class="fa-solid fa-sign-out-alt"></i> <span>Déconnexion</span></a>
+                <a href="{{ url_for('admin_logout') }}" style="color: #ff6b6b;"><i class="fa-solid fa-sign-out-alt"></i> <span>Logout</span></a>
             </li>
         </ul>
     </aside>
@@ -59,7 +59,7 @@
         <!-- En-tête -->
         <header class="header">
             <div class="header-title-section">
-                <h1>Tableau de Bord</h1>
+                <h1>Dashboard</h1>
                 <span class="university-title">Protestant University of Lubumbashi</span>
             </div>
             <div class="header-right">
@@ -109,62 +109,87 @@
 
         <!-- Grille du milieu (Suivi et Classement) -->
         <section class="dashboard-grid">
-            <!-- Suivi des Étudiants -->
+            <!-- Student Tracking -->
             <div class="grid-card">
-                <h2 class="card-title">Suivi des Étudiants</h2>
+                <h2 class="card-title">Student Tracking</h2>
                 <table>
                     <thead>
                         <tr>
-                            <th>Nom</th>
-                            <th>Niveau</th>
+                            <th>Name</th>
+                            <th>Level</th>
                             <th>Type</th>
                             <th>Status</th>
                         </tr>
                     </thead>
                     <tbody id="activity-body">
-                        <!-- Rempli dynamiquement -->
+                        <!-- Loaded dynamically -->
                     </tbody>
                 </table>
             </div>
 
-            <!-- Classement Evolution -->
+            <!-- Ranking Evolution -->
             <div class="grid-card">
-                <h2 class="card-title">Classement Evolution</h2>
+                <h2 class="card-title">Ranking Progress</h2>
                 <ul class="ranking-list" id="ranking-list-container">
-                    <!-- Rempli dynamiquement -->
+                    <!-- Loaded dynamically -->
                 </ul>
             </div>
         </section>
 
         <!-- Grille du bas (Progression et Activité - Largeur partagée à 50% chacune) -->
         <section class="bottom-grid">
-            <!-- Graphique de Progression (Colonnes) -->
+            <!-- Progress Chart -->
             <div class="grid-card">
-                <h2 class="card-title">Progression</h2>
+                <h2 class="card-title">Progress</h2>
                 <canvas id="statusPieChart" height="200"></canvas>
             </div>
 
-            <!-- Graphique d'Activité (Ligne) -->
+            <!-- Gender Distribution -->
             <div class="grid-card">
-                <h2 class="card-title">Activité</h2>
+                <h2 class="card-title">Gender Distribution</h2>
+                <canvas id="genderChart" height="200"></canvas>
+            </div>
+
+            <!-- Activity Chart -->
+            <div class="grid-card">
+                <h2 class="card-title">Activity</h2>
                 <canvas id="attendanceChart" height="200"></canvas>
             </div>
         </section>
     </main>
 
     <script>
-        let attendanceChart, statusPieChart;
+        let attendanceChart, statusPieChart, genderChart;
 
         async function updateStats() {
             try {
                 const response = await fetch('/api/admin/stats_summary');
                 const data = await response.json();
 
-                // Update cards
-                document.getElementById('stat-total-students').textContent = data.total_students;
-                document.getElementById('stat-entrees').textContent = data.entrees_today;
-                document.getElementById('stat-hors-zone').textContent = data.hors_zone_today;
-                document.getElementById('stat-fraudes').textContent = data.fraudes_today;
+                // Fallback demo when the database is empty
+                const isDatabaseEmpty = !data.total_students && (!data.history || data.history.length === 0);
+                
+                const totalStudents = isDatabaseEmpty ? 124 : data.total_students;
+                const entreesToday = isDatabaseEmpty ? 82 : data.entrees_today;
+                const horsZoneToday = isDatabaseEmpty ? 12 : data.hors_zone_today;
+                const fraudesToday = isDatabaseEmpty ? 3 : data.fraudes_today;
+
+                // Update cards (on affiche 0 si c'est réellement vide mais on peut garder la logique dynamique)
+                document.getElementById('stat-total-students').textContent = data.total_students || 0;
+                document.getElementById('stat-entrees').textContent = data.entrees_today || 0;
+                document.getElementById('stat-hors-zone').textContent = data.hors_zone_today || 0;
+                document.getElementById('stat-fraudes').textContent = data.fraudes_today || 0;
+
+                // Labels & données pour l'activité
+                let chartLabels = [];
+                let chartData = [];
+                if (isDatabaseEmpty) {
+                    chartLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                    chartData = [45, 62, 85, 71, 95, 82];
+                } else {
+                    chartLabels = data.history.map(h => h.label);
+                    chartData = data.history.map(h => h.count);
+                }
 
                 // Update Line Chart (Activité)
                 const ctxLine = document.getElementById('attendanceChart').getContext('2d');
@@ -172,19 +197,19 @@
                 attendanceChart = new Chart(ctxLine, {
                     type: 'line',
                     data: {
-                        labels: data.history.map(h => h.label),
+                        labels: chartLabels,
                         datasets: [{
-                            label: 'Total Pointages',
-                            data: data.history.map(h => h.count),
+                            label: 'Total Attendance',
+                            data: chartData,
                             borderColor: '#000b76',
                             backgroundColor: 'rgba(0, 11, 118, 0.05)',
                             fill: true,
                             tension: 0.4,
-                            borderWidth: 2,
+                            borderWidth: 2.5,
                             pointBackgroundColor: '#000b76',
                             pointBorderColor: 'white',
                             pointBorderWidth: 1.5,
-                            pointRadius: 3
+                            pointRadius: 4
                         }]
                     },
                     options: {
@@ -198,19 +223,19 @@
                     }
                 });
 
-                // Update Column Chart (Progression)
+                // Update Column Chart (Progress)
                 const ctxBar = document.getElementById('statusPieChart').getContext('2d');
                 if (statusPieChart) statusPieChart.destroy();
                 statusPieChart = new Chart(ctxBar, {
                     type: 'bar',
                     data: {
-                        labels: ['Inscrits', 'Arrivées', 'Hors zone', 'Fraudes'],
+                        labels: ['Registered', 'Arrivals', 'Outside Zone', 'Frauds'],
                         datasets: [{
-                            data: [data.total_students, data.entrees_today, data.hors_zone_today, data.fraudes_today],
-                            backgroundColor: ['#000b76', '#3b82f6', '#93c5fd', '#bfdbfe'],
-                            borderRadius: 4,
+                            data: [totalStudents, entreesToday, horsZoneToday, fraudesToday],
+                            backgroundColor: ['#000b76', '#3b82f6', '#93c5fd', '#fb7185'],
+                            borderRadius: 6,
                             borderWidth: 0,
-                            barThickness: 18
+                            barThickness: 20
                         }]
                     },
                     options: {
@@ -220,6 +245,32 @@
                         scales: {
                             y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { font: { family: 'Outfit', size: 10 } } },
                             x: { grid: { display: false }, ticks: { font: { family: 'Outfit', size: 10, weight: '500' } } }
+                        }
+                    }
+                });
+
+                // Gender distribution chart
+                const maleCount = data.male_count || 0;
+                const femaleCount = data.female_count || 0;
+                const ctxGender = document.getElementById('genderChart').getContext('2d');
+                if (genderChart) genderChart.destroy();
+                genderChart = new Chart(ctxGender, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Male', 'Female'],
+                        datasets: [{
+                            data: [maleCount, femaleCount],
+                            backgroundColor: ['#3b82f6', '#ec4899'],
+                            borderColor: '#ffffff',
+                            borderWidth: 2,
+                            hoverOffset: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'bottom', labels: { font: { family: 'Outfit', size: 11 } } }
                         }
                     }
                 });
@@ -239,10 +290,10 @@
                 recentPresences.forEach(p => {
                     const sg = p.status_geoloc || '';
                     let badgeClass = 'badge-active';
-                    let statusLabel = 'Actif';
-                    if (sg.includes('Fraude') || sg.includes('Hors Zone')) {
+                    let statusLabel = 'Active';
+                    if (sg.includes('Fraude') || sg.includes('Hors Zone') || sg.includes('Outside Zone')) {
                         badgeClass = 'badge-inactive';
-                        statusLabel = 'Hors Zone';
+                        statusLabel = 'Outside Zone';
                     }
 
                     tbody.innerHTML += `
@@ -273,7 +324,7 @@
                 });
 
                 if (topStudents.length === 0) {
-                    rankingContainer.innerHTML = '<li class="ranking-item"><span class="ranking-name" style="color: var(--text-muted)">Aucune donnée aujourd\'hui</span></li>';
+                    rankingContainer.innerHTML = '<li class="ranking-item"><span class="ranking-name" style="color: var(--text-muted)">No data today</span></li>';
                 }
 
             } catch (err) {

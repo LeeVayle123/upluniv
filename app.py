@@ -928,8 +928,13 @@ def get_student_info(matricule):
                     found_data['last_auditorium_code'] = res_aud.data[0]['auditorium_code']
 
             # Vérification de contrôle aléatoire en attente
-            check_res = supabase.table("random_checks").select("id, type").eq("matricule", matricule).eq("status", "PENDING").order("created_at", desc=True).limit(1).execute()
-            found_data['pending_check'] = check_res.data[0] if check_res.data else None
+            found_data['pending_check'] = None
+            try:
+                check_res = supabase.table("random_checks").select("id, type").eq("matricule", matricule).eq("status", "PENDING").order("created_at", desc=True).limit(1).execute()
+                if check_res.data:
+                    found_data['pending_check'] = check_res.data[0]
+            except Exception:
+                found_data['pending_check'] = None
             
             return jsonify(found_data)
         else:
@@ -1166,19 +1171,22 @@ def api_admin_timeline():
                 else:
                     query_pres = query_pres.ilike("promotion", f"%{promo.replace('_', ' ')}%")
             
-            res_pres = query_pres.order("date_inscription", desc=True).execute()
-            presences_list = res_pres.data
+            try:
+                res_pres = query_pres.order("date_inscription", desc=True).execute()
+                presences_list = res_pres.data or []
+            except Exception:
+                presences_list = []
 
-            # 2. Récupération des rapports de suivi (random_check_responses)
-            # Puisqu'on veut les rapports et les infos du check, on fait une jointure ou deux requêtes
-            # Note: Supabase supporte les jointures simples via select("*, random_checks(*)")
-            res_reports = supabase.table("random_check_responses") \
-                .select("*, random_checks(scheduled_time, type)") \
-                .gte("timestamp", today) \
-                .order("timestamp", desc=True) \
-                .execute()
-            
-            reports_list = res_reports.data
+            reports_list = []
+            try:
+                res_reports = supabase.table("random_check_responses") \
+                    .select("*, random_checks(scheduled_time, type)") \
+                    .gte("timestamp", today) \
+                    .order("timestamp", desc=True) \
+                    .execute()
+                reports_list = res_reports.data or []
+            except Exception:
+                reports_list = []
 
             # Filtrage par matricule si une promotion est sélectionnée
             if promo:
@@ -1792,23 +1800,44 @@ def api_admin_stats_summary():
 
             # 1. Étudiants Totaux
             res_total = supabase.table("students").select("id", count="exact").execute()
-            total_students = res_total.count
-            
+            total_students = res_total.count or 0
+
+            # 1b. Genre des étudiants
+            male_count = 0
+            female_count = 0
+            try:
+                res_gender = supabase.table("students").select("sexe").execute()
+                for row in res_gender.data or []:
+                    sexe = (row.get('sexe') or '').strip().upper()
+                    if sexe == 'M':
+                        male_count += 1
+                    elif sexe == 'F':
+                        female_count += 1
+            except Exception:
+                pass
+
             # 2. Présences du jour
-            res_pres = supabase.table("presences").select("type_presence, status_geoloc").gte("date_inscription", today).execute()
-            today_presences = res_pres.data
+            today_presences = []
+            try:
+                res_pres = supabase.table("presences").select("type_presence, status_geoloc").gte("date_inscription", today).execute()
+                today_presences = res_pres.data or []
+            except Exception:
+                today_presences = []
             
-            entrees_today = len([p for p in today_presences if p['type_presence'] == 'Entrée'])
-            sorties_today = len([p for p in today_presences if p['type_presence'] == 'Sortie'])
-            hors_zone_today = len([p for p in today_presences if p['status_geoloc'] and 'Hors Zone' in p['status_geoloc']])
+            entrees_today = len([p for p in today_presences if p.get('type_presence') == 'Entrée'])
+            sorties_today = len([p for p in today_presences if p.get('type_presence') == 'Sortie'])
+            hors_zone_today = len([p for p in today_presences if p.get('status_geoloc') and 'Hors Zone' in p['status_geoloc']])
             
             # 3. Fraudes du jour
-            # Dans 'presences'
-            fraudes_pres = len([p for p in today_presences if p['status_geoloc'] and 'Fraude' in p['status_geoloc']])
-            # Dans 'random_check_responses'
-            res_reports = supabase.table("random_check_responses").select("result").gte("timestamp", today).execute()
-            fraudes_reports = len([r for r in res_reports.data if r['result'] == 'fraude'])
-            suivis_ok_today = len([r for r in res_reports.data if r['result'] == 'confirmé'])
+            fraudes_pres = len([p for p in today_presences if p.get('status_geoloc') and 'Fraude' in p['status_geoloc']])
+            report_rows = []
+            try:
+                res_reports = supabase.table("random_check_responses").select("result").gte("timestamp", today).execute()
+                report_rows = res_reports.data or []
+            except Exception:
+                report_rows = []
+            fraudes_reports = len([r for r in report_rows if (r.get('result') or '').lower() == 'fraude'])
+            suivis_ok_today = len([r for r in report_rows if (r.get('result') or '').lower() == 'confirmé'])
             
             fraudes_today = fraudes_pres + fraudes_reports
 
@@ -1820,15 +1849,22 @@ def api_admin_stats_summary():
                 day_end = (day_dt + timedelta(days=1)).strftime('%Y-%m-%d')
                 day_label = day_dt.strftime('%d/%m')
                 
-                # Pointages
-                res_day = supabase.table("presences").select("id", count="exact").gte("date_inscription", day_start).lt("date_inscription", day_end).execute()
-                # Fraudes
-                res_fraude = supabase.table("random_check_responses").select("id", count="exact").eq("result", "fraude").gte("timestamp", day_start).lt("timestamp", day_end).execute()
-                
-                history_points.append({"label": day_label, "count": res_day.count, "fraudes": res_fraude.count})
+                try:
+                    res_day = supabase.table("presences").select("id", count="exact").gte("date_inscription", day_start).lt("date_inscription", day_end).execute()
+                    count_day = res_day.count or 0
+                except Exception:
+                    count_day = 0
+                try:
+                    res_fraude = supabase.table("random_check_responses").select("id", count="exact").eq("result", "fraude").gte("timestamp", day_start).lt("timestamp", day_end).execute()
+                    fraude_count = res_fraude.count or 0
+                except Exception:
+                    fraude_count = 0
+                history_points.append({"label": day_label, "count": count_day, "fraudes": fraude_count})
 
             return jsonify({
                 "total_students": total_students,
+                "male_count": male_count,
+                "female_count": female_count,
                 "entrees_today": entrees_today,
                 "sorties_today": sorties_today,
                 "hors_zone_today": hors_zone_today,

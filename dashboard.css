@@ -419,10 +419,10 @@ tr:hover td {
     color: #16a34a;
 }
 
-/* Grille du bas (2 colonnes) */
+/* Grille du bas (3 colonnes) */
 .bottom-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(3, 1fr);
     gap: 24px;
 }
 
