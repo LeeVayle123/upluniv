@@ -41,12 +41,14 @@
             background: var(--bg);
             color: var(--text);
             min-height: 100vh;
-            padding: 24px 20px;
+            padding: 0;
+            margin: 0;
         }
 
         .Conteneur {
-            max-width: 1180px;
-            margin: 0 auto;
+            max-width: 100%;
+            margin: 0;
+            padding: 0 10px;
         }
 
         /* ===== EN-TÊTE ===== */
@@ -55,10 +57,10 @@
             justify-content: space-between;
             align-items: center;
             background: var(--white);
-            padding: 18px 24px;
-            border-radius: var(--radius-lg);
+            padding: 15px 20px;
+            border-radius: 0;
             box-shadow: var(--shadow);
-            margin-bottom: 22px;
+            margin-bottom: 20px;
             flex-wrap: wrap;
             gap: 14px;
         }
@@ -179,6 +181,35 @@
             gap: 8px;
         }
 
+        .tech-grid {
+            grid-template-columns: repeat(4, minmax(150px, 1fr));
+            gap: 10px;
+        }
+
+        .fac-info-grid {
+            display: grid;
+            grid-template-columns: minmax(160px, auto) minmax(420px, 1fr);
+            gap: 12px;
+            align-items: start;
+        }
+
+        .fac-info-col {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .fac-info-col:first-child {
+            min-width: 160px;
+            max-width: 220px;
+        }
+
+        @media (max-width: 1120px) {
+            .fac-info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
         .ligne-annee {
             display: flex;
             align-items: center;
@@ -237,7 +268,7 @@
 
         .carte-stat {
             background: var(--white);
-            border-radius: var(--radius-md);
+            border-radius: 0;
             box-shadow: var(--shadow);
             padding: 18px 20px;
             display: flex;
@@ -274,9 +305,12 @@
         /* ===== TABLEAU ===== */
         .carte-table {
             background: var(--white);
-            border-radius: var(--radius-lg);
+            border-radius: 0;
             box-shadow: var(--shadow);
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 20px;
         }
 
         .barre-outils {
@@ -520,54 +554,234 @@
         </header>
 
         <!-- ===== ONGLET FILTRAGE ===== -->
+        <!-- ===== ONGLET FILTRAGE (RADIO FACULTÉS) ===== -->
         <div class="enveloppe-onglets">
-            <div class="section-faculte">
-                <div class="etiquette-faculte">IAGE PATH</div>
-                <div class="rangee-onglets">
-                    <button class="onglet-promo actif" data-promo="" onclick="switchTab(this)">GLOBAL VIEW</button>
-                    <button class="onglet-promo" data-promo="bac1_IAGE" onclick="switchTab(this)">BAC 1</button>
-                    <button class="onglet-promo" data-promo="bac2_IAGE" onclick="switchTab(this)">BAC 2</button>
-                    <button class="onglet-promo" data-promo="bac3_IAGE" onclick="switchTab(this)">BAC 3</button>
+            <!-- Niveau 1 : Choix de la faculté -->
+            <div class="section-faculte" style="padding-bottom: 8px;">
+                <div class="etiquette-faculte">Choisir un domaine / faculté</div>
+                <div class="rangee-onglets" id="facultes-radio">
+                    <button class="onglet-promo actif" id="btn-fac-global" onclick="selectFaculte('global')">VUE GLOBALE</button>
+                    <button class="onglet-promo" id="btn-fac-info" onclick="selectFaculte('info')">SCIENCES INFORMATIQUES</button>
+                    <button class="onglet-promo" id="btn-fac-poly" onclick="selectFaculte('poly')">POLYTECHNIQUE</button>
+                    <button class="onglet-promo" id="btn-fac-eco" onclick="selectFaculte('eco')">SCIENCES ÉCONOMIQUES</button>
+                    <button class="onglet-promo" id="btn-fac-sic" onclick="selectFaculte('sic')">SCIENCES DE L'INFO (SIC)</button>
+                    <button class="onglet-promo" id="btn-fac-autres" onclick="selectFaculte('autres')">AUTRES FACULTÉS</button>
                 </div>
             </div>
 
-            <div class="section-faculte">
-                <div class="etiquette-faculte">TECHNOLOGY PATH</div>
-                <div class="grille-technique">
-                    <div class="ligne-annee">
-                        <span class="etiquette-annee">BAC 1 :</span>
-                        <div class="onglets-internes">
-                            <button class="onglet-promo" data-promo="bac1_tech_IA" onclick="switchTab(this)">IA</button>
-                            <button class="onglet-promo" data-promo="bac1_tech_GL" onclick="switchTab(this)">GL</button>
-                            <button class="onglet-promo" data-promo="bac1_tech_SI" onclick="switchTab(this)">SI</button>
+            <!-- Niveau 2 : Contenus par faculté -->
+            <div id="contenu-facultes">
+
+                <!-- VUE GLOBALE -->
+                <div id="fac-global" class="contenu-fac" style="display: block;">
+                    <!-- Vide, le chargement global se fait automatiquement -->
+                </div>
+
+                <!-- Section SCIENCES INFORMATIQUES -->
+                <div id="fac-info" class="contenu-fac" style="display: none;">
+                    <div class="section-faculte">
+                        <div class="etiquette-faculte">IAGE</div>
+                        <div class="rangee-onglets" style="margin-top: 12px;">
+                            <button class="onglet-promo sous-onglet" data-promo="bac1_IAGE" data-parcours="SCIENCES INFORMATIQUES" data-promotion="Bac1" onclick="switchTab(this)">BAC 1</button>
+                            <button class="onglet-promo sous-onglet" data-promo="bac2_IAGE" data-parcours="SCIENCES INFORMATIQUES" data-promotion="Bac2" onclick="switchTab(this)">BAC 2</button>
+                            <button class="onglet-promo sous-onglet" data-promo="bac3_IAGE" data-parcours="SCIENCES INFORMATIQUES" data-promotion="Bac3" onclick="switchTab(this)">BAC 3</button>
                         </div>
-                    </div>
-                    <div class="ligne-annee">
-                        <span class="etiquette-annee">BAC 2 :</span>
-                        <div class="onglets-internes">
-                            <button class="onglet-promo" data-promo="bac2_tech_IA" onclick="switchTab(this)">IA</button>
-                            <button class="onglet-promo" data-promo="bac2_tech_GL" onclick="switchTab(this)">GL</button>
-                            <button class="onglet-promo" data-promo="bac2_tech_SI" onclick="switchTab(this)">SI</button>
-                        </div>
-                    </div>
-                    <div class="ligne-annee">
-                        <span class="etiquette-annee">BAC 3 :</span>
-                        <div class="onglets-internes">
-                            <button class="onglet-promo" data-promo="bac3_tech_IA" onclick="switchTab(this)">IA</button>
-                            <button class="onglet-promo" data-promo="bac3_tech_GL" onclick="switchTab(this)">GL</button>
-                            <button class="onglet-promo" data-promo="bac3_tech_SI" onclick="switchTab(this)">SI</button>
-                        </div>
-                    </div>
-                    <div class="ligne-annee">
-                        <span class="etiquette-annee">BAC 4 :</span>
-                        <div class="onglets-internes">
-                            <button class="onglet-promo" data-promo="bac4_tech_IA" onclick="switchTab(this)">IA</button>
-                            <button class="onglet-promo" data-promo="bac4_tech_GL" onclick="switchTab(this)">GL</button>
-                            <button class="onglet-promo" data-promo="bac4_tech_SI" onclick="switchTab(this)">SI</button>
+                        <div class="etiquette-faculte" style="margin-top: 18px;">TECHNOLOGIE</div>
+                        <div class="grille-technique tech-grid" style="margin-top: 8px;">
+                            <div class="ligne-annee">
+                                <span class="etiquette-annee">BAC 1 :</span>
+                                <div class="onglets-internes">
+                                    <button class="onglet-promo" data-promo="bac1_tech_IA" data-parcours="SCIENCES INFORMATIQUES" data-promotion="Bac1" onclick="switchTab(this)">IA</button>
+                                    <button class="onglet-promo" data-promo="bac1_tech_GL" data-parcours="SCIENCES INFORMATIQUES" data-promotion="Bac1" onclick="switchTab(this)">GL</button>
+                                    <button class="onglet-promo" data-promo="bac1_tech_SI" data-parcours="SCIENCES INFORMATIQUES" data-promotion="Bac1" onclick="switchTab(this)">SI</button>
+                                </div>
+                            </div>
+                            <div class="ligne-annee">
+                                <span class="etiquette-annee">BAC 2 :</span>
+                                <div class="onglets-internes">
+                                    <button class="onglet-promo" data-promo="bac2_tech_IA" data-parcours="SCIENCES INFORMATIQUES" data-promotion="Bac2" onclick="switchTab(this)">IA</button>
+                                    <button class="onglet-promo" data-promo="bac2_tech_GL" data-parcours="SCIENCES INFORMATIQUES" data-promotion="Bac2" onclick="switchTab(this)">GL</button>
+                                    <button class="onglet-promo" data-promo="bac2_tech_SI" data-parcours="SCIENCES INFORMATIQUES" data-promotion="Bac2" onclick="switchTab(this)">SI</button>
+                                </div>
+                            </div>
+                            <div class="ligne-annee">
+                                <span class="etiquette-annee">BAC 3 :</span>
+                                <div class="onglets-internes">
+                                    <button class="onglet-promo" data-promo="bac3_tech_IA" data-parcours="SCIENCES INFORMATIQUES" data-promotion="Bac3" onclick="switchTab(this)">IA</button>
+                                    <button class="onglet-promo" data-promo="bac3_tech_GL" data-parcours="SCIENCES INFORMATIQUES" data-promotion="Bac3" onclick="switchTab(this)">GL</button>
+                                    <button class="onglet-promo" data-promo="bac3_tech_SI" data-parcours="SCIENCES INFORMATIQUES" data-promotion="Bac3" onclick="switchTab(this)">SI</button>
+                                </div>
+                            </div>
+                            <div class="ligne-annee">
+                                <span class="etiquette-annee">BAC 4 :</span>
+                                <div class="onglets-internes">
+                                    <button class="onglet-promo" data-promo="bac4_tech_IA" data-parcours="SCIENCES INFORMATIQUES" data-promotion="Bac4" onclick="switchTab(this)">IA</button>
+                                    <button class="onglet-promo" data-promo="bac4_tech_GL" data-parcours="SCIENCES INFORMATIQUES" data-promotion="Bac4" onclick="switchTab(this)">GL</button>
+                                    <button class="onglet-promo" data-promo="bac4_tech_SI" data-parcours="SCIENCES INFORMATIQUES" data-promotion="Bac4" onclick="switchTab(this)">SI</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+
+                <!-- Section POLYTECHNIQUE -->
+                <div id="fac-poly" class="contenu-fac" style="display: none;">
+                    <div class="section-faculte">
+                        <div class="grille-technique">
+                            <div class="ligne-annee">
+                                <span class="etiquette-annee">Electro :</span>
+                                <div class="onglets-internes">
+                                    <button class="onglet-promo sous-onglet" data-faculte="Faculté de polytechnique" data-parcours="Électromécanique" data-promotion="Bac1" onclick="switchTab(this)">Bac1</button>
+                                    <button class="onglet-promo sous-onglet" data-faculte="Faculté de polytechnique" data-parcours="Électromécanique" data-promotion="Bac2" onclick="switchTab(this)">Bac2</button>
+                                    <button class="onglet-promo sous-onglet" data-faculte="Faculté de polytechnique" data-parcours="Électromécanique" data-promotion="Bac3" onclick="switchTab(this)">Bac3</button>
+                                    <button class="onglet-promo sous-onglet" data-faculte="Faculté de polytechnique" data-parcours="Électromécanique" data-promotion="Bac4" onclick="switchTab(this)">Bac4</button>
+                                </div>
+                            </div>
+                            <div class="ligne-annee">
+                                <span class="etiquette-annee">Géomine :</span>
+                                <div class="onglets-internes">
+                                    <button class="onglet-promo sous-onglet" data-faculte="Faculté de polytechnique" data-parcours="Géomine" data-promotion="Bac1" onclick="switchTab(this)">Bac1</button>
+                                    <button class="onglet-promo sous-onglet" data-faculte="Faculté de polytechnique" data-parcours="Géomine" data-promotion="Bac2" onclick="switchTab(this)">Bac2</button>
+                                    <button class="onglet-promo sous-onglet" data-faculte="Faculté de polytechnique" data-parcours="Géomine" data-promotion="Bac3" onclick="switchTab(this)">Bac3</button>
+                                    <button class="onglet-promo sous-onglet" data-faculte="Faculté de polytechnique" data-parcours="Géomine" data-promotion="Bac4" onclick="switchTab(this)">Bac4</button>
+                                </div>
+                            </div>
+                            <div class="ligne-annee">
+                                <span class="etiquette-annee">GMP :</span>
+                                <div class="onglets-internes">
+                                    <button class="onglet-promo sous-onglet" data-faculte="Faculté de polytechnique" data-parcours="GMP" data-promotion="Bac1" onclick="switchTab(this)">Bac1</button>
+                                    <button class="onglet-promo sous-onglet" data-faculte="Faculté de polytechnique" data-parcours="GMP" data-promotion="Bac2" onclick="switchTab(this)">Bac2</button>
+                                    <button class="onglet-promo sous-onglet" data-faculte="Faculté de polytechnique" data-parcours="GMP" data-promotion="Bac3" onclick="switchTab(this)">Bac3</button>
+                                    <button class="onglet-promo sous-onglet" data-faculte="Faculté de polytechnique" data-parcours="GMP" data-promotion="Bac4" onclick="switchTab(this)">Bac4</button>
+                                </div>
+                            </div>
+                            <div class="ligne-annee">
+                                <span class="etiquette-annee">Archi :</span>
+                                <div class="onglets-internes">
+                                    <button class="onglet-promo sous-onglet" data-faculte="Faculté de polytechnique" data-parcours="Architecture" data-promotion="Bac1" onclick="switchTab(this)">Bac1</button>
+                                    <button class="onglet-promo sous-onglet" data-faculte="Faculté de polytechnique" data-parcours="Architecture" data-promotion="Bac2" onclick="switchTab(this)">Bac2</button>
+                                    <button class="onglet-promo sous-onglet" data-faculte="Faculté de polytechnique" data-parcours="Architecture" data-promotion="Bac3" onclick="switchTab(this)">Bac3</button>
+                                    <button class="onglet-promo sous-onglet" data-faculte="Faculté de polytechnique" data-parcours="Architecture" data-promotion="Bac4" onclick="switchTab(this)">Bac4</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section SCIENCES ECONOMIQUES -->
+                <div id="fac-eco" class="contenu-fac" style="display: none;">
+                    <div class="section-faculte">
+                        <div class="grille-technique">
+                            <div class="ligne-annee">
+                                <span class="etiquette-annee">Finance :</span>
+                                <div class="onglets-internes">
+                                    <button class="onglet-promo sous-onglet" data-faculte="Faculté des sciences economiques" data-parcours="Finance et Banque" data-promotion="Bac1" onclick="switchTab(this)">Bac1</button>
+                                    <button class="onglet-promo sous-onglet" data-faculte="Faculté des sciences economiques" data-parcours="Finance et Banque" data-promotion="Bac2" onclick="switchTab(this)">Bac2</button>
+                                    <button class="onglet-promo sous-onglet" data-faculte="Faculté des sciences economiques" data-parcours="Finance et Banque" data-promotion="Bac3" onclick="switchTab(this)">Bac3</button>
+                                </div>
+                            </div>
+                            <div class="ligne-annee">
+                                <span class="etiquette-annee">Marketing :</span>
+                                <div class="onglets-internes">
+                                    <button class="onglet-promo sous-onglet" data-faculte="Faculté des sciences economiques" data-parcours="Marketing" data-promotion="Bac1" onclick="switchTab(this)">Bac1</button>
+                                    <button class="onglet-promo sous-onglet" data-faculte="Faculté des sciences economiques" data-parcours="Marketing" data-promotion="Bac2" onclick="switchTab(this)">Bac2</button>
+                                    <button class="onglet-promo sous-onglet" data-faculte="Faculté des sciences economiques" data-parcours="Marketing" data-promotion="Bac3" onclick="switchTab(this)">Bac3</button>
+                                </div>
+                            </div>
+                            <div class="ligne-annee">
+                                <span class="etiquette-annee">Management :</span>
+                                <div class="onglets-internes">
+                                    <button class="onglet-promo sous-onglet" data-faculte="Faculté des sciences economiques" data-parcours="Management" data-promotion="Bac1" onclick="switchTab(this)">Bac1</button>
+                                    <button class="onglet-promo sous-onglet" data-faculte="Faculté des sciences economiques" data-parcours="Management" data-promotion="Bac2" onclick="switchTab(this)">Bac2</button>
+                                    <button class="onglet-promo sous-onglet" data-faculte="Faculté des sciences economiques" data-parcours="Management" data-promotion="Bac3" onclick="switchTab(this)">Bac3</button>
+                                </div>
+                            </div>
+                            <div class="ligne-annee">
+                                <span class="etiquette-annee">RH :</span>
+                                <div class="onglets-internes">
+                                    <button class="onglet-promo sous-onglet" data-faculte="Faculté des sciences economiques" data-parcours="Ressources Humaines" data-promotion="Bac1" onclick="switchTab(this)">Bac1</button>
+                                    <button class="onglet-promo sous-onglet" data-faculte="Faculté des sciences economiques" data-parcours="Ressources Humaines" data-promotion="Bac2" onclick="switchTab(this)">Bac2</button>
+                                    <button class="onglet-promo sous-onglet" data-faculte="Faculté des sciences economiques" data-parcours="Ressources Humaines" data-promotion="Bac3" onclick="switchTab(this)">Bac3</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section SIC -->
+                <div id="fac-sic" class="contenu-fac" style="display: none;">
+                    <div class="section-faculte">
+                        <div class="grille-technique">
+                            <div class="ligne-annee">
+                                <span class="etiquette-annee">CO :</span>
+                                <div class="onglets-internes">
+                                    <button class="onglet-promo sous-onglet" data-faculte="Faculté des sciences de l'information et de la communication" data-parcours="CO" data-promotion="Bac1" onclick="switchTab(this)">Bac1</button>
+                                    <button class="onglet-promo sous-onglet" data-faculte="Faculté des sciences de l'information et de la communication" data-parcours="CO" data-promotion="Bac2" onclick="switchTab(this)">Bac2</button>
+                                    <button class="onglet-promo sous-onglet" data-faculte="Faculté des sciences de l'information et de la communication" data-parcours="CO" data-promotion="Bac3" onclick="switchTab(this)">Bac3</button>
+                                </div>
+                            </div>
+                            <div class="ligne-annee">
+                                <span class="etiquette-annee">JM :</span>
+                                <div class="onglets-internes">
+                                    <button class="onglet-promo sous-onglet" data-faculte="Faculté des sciences de l'information et de la communication" data-parcours="JM" data-promotion="Bac1" onclick="switchTab(this)">Bac1</button>
+                                    <button class="onglet-promo sous-onglet" data-faculte="Faculté des sciences de l'information et de la communication" data-parcours="JM" data-promotion="Bac2" onclick="switchTab(this)">Bac2</button>
+                                    <button class="onglet-promo sous-onglet" data-faculte="Faculté des sciences de l'information et de la communication" data-parcours="JM" data-promotion="Bac3" onclick="switchTab(this)">Bac3</button>
+                                </div>
+                            </div>
+                            <div class="ligne-annee">
+                                <span class="etiquette-annee">MCD :</span>
+                                <div class="onglets-internes">
+                                    <button class="onglet-promo sous-onglet" data-faculte="Faculté des sciences de l'information et de la communication" data-parcours="MCD" data-promotion="Bac1" onclick="switchTab(this)">Bac1</button>
+                                    <button class="onglet-promo sous-onglet" data-faculte="Faculté des sciences de l'information et de la communication" data-parcours="MCD" data-promotion="Bac2" onclick="switchTab(this)">Bac2</button>
+                                    <button class="onglet-promo sous-onglet" data-faculte="Faculté des sciences de l'information et de la communication" data-parcours="MCD" data-promotion="Bac3" onclick="switchTab(this)">Bac3</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section AUTRES FACULTÉS -->
+                <div id="fac-autres" class="contenu-fac" style="display: none;">
+                    <div class="section-faculte">
+                        <div class="grille-technique">
+                            <div class="ligne-annee">
+                                <span class="etiquette-annee">Droit :</span>
+                                <div class="onglets-internes">
+                                    <button class="onglet-promo sous-onglet" data-faculte="Faculté de droit" data-promotion="Bac1" onclick="switchTab(this)">Bac1</button>
+                                    <button class="onglet-promo sous-onglet" data-faculte="Faculté de droit" data-promotion="Bac2" onclick="switchTab(this)">Bac2</button>
+                                    <button class="onglet-promo sous-onglet" data-faculte="Faculté de droit" data-promotion="Bac3" onclick="switchTab(this)">Bac3</button>
+                                </div>
+                            </div>
+                            <div class="ligne-annee">
+                                <span class="etiquette-annee">Théologie :</span>
+                                <div class="onglets-internes">
+                                    <button class="onglet-promo sous-onglet" data-faculte="Faculté de theologie" data-promotion="Bac1" onclick="switchTab(this)">Bac1</button>
+                                    <button class="onglet-promo sous-onglet" data-faculte="Faculté de theologie" data-promotion="Bac2" onclick="switchTab(this)">Bac2</button>
+                                    <button class="onglet-promo sous-onglet" data-faculte="Faculté de theologie" data-promotion="Bac3" onclick="switchTab(this)">Bac3</button>
+                                </div>
+                            </div>
+                            <div class="ligne-annee">
+                                <span class="etiquette-annee">Lettres :</span>
+                                <div class="onglets-internes">
+                                    <button class="onglet-promo sous-onglet" data-faculte="Faculté des lettres et sciences humaines" data-promotion="Bac1" onclick="switchTab(this)">Bac1</button>
+                                    <button class="onglet-promo sous-onglet" data-faculte="Faculté des lettres et sciences humaines" data-promotion="Bac2" onclick="switchTab(this)">Bac2</button>
+                                    <button class="onglet-promo sous-onglet" data-faculte="Faculté des lettres et sciences humaines" data-promotion="Bac3" onclick="switchTab(this)">Bac3</button>
+                                </div>
+                            </div>
+                            <div class="ligne-annee">
+                                <span class="etiquette-annee">Archi :</span>
+                                <div class="onglets-internes">
+                                    <button class="onglet-promo sous-onglet" data-faculte="Ecole d'architecture" data-promotion="Bac1" onclick="switchTab(this)">Bac1</button>
+                                    <button class="onglet-promo sous-onglet" data-faculte="Ecole d'architecture" data-promotion="Bac2" onclick="switchTab(this)">Bac2</button>
+                                    <button class="onglet-promo sous-onglet" data-faculte="Ecole d'architecture" data-promotion="Bac3" onclick="switchTab(this)">Bac3</button>
+                                    <button class="onglet-promo sous-onglet" data-faculte="Ecole d'architecture" data-promotion="Bac4" onclick="switchTab(this)">Bac4</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div> <!-- /contenu-facultes -->
         </div>
 
         <!-- ===== STATS ===== -->
@@ -627,15 +841,45 @@
     </div>
 
     <script>
-        let currentPromo = "";
+        let currentFilter = { promo: "", faculte: "", parcours: "", promotion_label: "" };
 
-        async function fetchStudents(promo = "") {
+        // Radio UI function
+        function selectFaculte(facId) {
+            // Cacher tous les contenus
+            document.querySelectorAll('.contenu-fac').forEach(el => el.style.display = 'none');
+            // Retirer la classe actif de tous les boutons radio de niveau 1
+            document.querySelectorAll('#facultes-radio .onglet-promo').forEach(btn => btn.classList.remove('actif'));
+            
+            // Afficher le contenu ciblé
+            document.getElementById('fac-' + facId).style.display = 'block';
+            // Mettre en surbrillance le bouton radio
+            document.getElementById('btn-fac-' + facId).classList.add('actif');
+
+            // Si VUE GLOBALE, on charge tout
+            if(facId === 'global') {
+                currentFilter = { promo: "", faculte: "", parcours: "", promotion_label: "" };
+                // Retirer la surbrillance des sous-onglets
+                document.querySelectorAll('.sous-onglet').forEach(b => b.classList.remove('actif'));
+                fetchStudents();
+            }
+        }
+
+        async function fetchStudents() {
             const corps = document.getElementById('corpsTableau');
             corps.innerHTML = '<tr><td colspan="6" class="etat-chargement"><i class="fas fa-spinner fa-spin"></i> Chargement...</td></tr>';
             
             try {
+                // Build URL params
+                let queryParams = new URLSearchParams();
+                if(currentFilter.promo) queryParams.append('promotion', currentFilter.promo);
+                if(currentFilter.faculte) queryParams.append('faculte', currentFilter.faculte);
+                if(currentFilter.parcours) queryParams.append('parcours', currentFilter.parcours);
+                if(currentFilter.promotion_label) queryParams.append('promotion_label', currentFilter.promotion_label);
+
+                const queryString = queryParams.toString();
+
                 // Fetch Stats
-                const resStats = await fetch(`/api/stats?promotion=${promo}`);
+                const resStats = await fetch(`/api/stats?${queryString}`);
                 const stats = await resStats.json();
                 document.getElementById('statTotal').innerText = stats.total_students || 0;
                 document.getElementById('statMale').innerText = stats.male_count || 0;
@@ -643,7 +887,7 @@
                 document.getElementById('compteurBadge').innerText = stats.total_students || 0;
 
                 // Fetch Students
-                const res = await fetch(`/api/students?promotion=${promo}`);
+                const res = await fetch(`/api/students?${queryString}`);
                 const data = await res.json();
 
                 if(data.length === 0) {
@@ -759,16 +1003,23 @@
         }
 
         function switchTab(btn) {
-            document.querySelectorAll('.onglet-promo').forEach(b => b.classList.remove('actif'));
+            document.querySelectorAll('.sous-onglet').forEach(b => b.classList.remove('actif'));
             btn.classList.add('actif');
-            currentPromo = btn.dataset.promo || "";
-            fetchStudents(currentPromo);
+            
+            currentFilter = {
+                promo: btn.dataset.promo || "",
+                faculte: btn.dataset.faculte || "",
+                parcours: btn.dataset.parcours || "",
+                promotion_label: btn.dataset.promotion || ""
+            };
+            
+            fetchStudents();
         }
 
         function exportToExcel() {
             const table = document.querySelector("table");
             const wb = XLSX.utils.table_to_book(table, { sheet: "Étudiants" });
-            const fileName = currentPromo ? `etudiants_${currentPromo}.xlsx` : "etudiants_global.xlsx";
+            const fileName = currentFilter.promo ? `etudiants_${currentFilter.promo}.xlsx` : (currentFilter.faculte ? `etudiants_${currentFilter.faculte}.xlsx` : "etudiants_global.xlsx");
             XLSX.writeFile(wb, fileName);
         }
 

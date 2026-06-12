@@ -183,54 +183,8 @@ def init_sqlite_db():
         conn = sqlite3.connect('database.db')
         cursor = conn.cursor()
         
-        # Liste des tables à créer
-        student_tables = [
-            'bac1_IAGE', 'bac2_IAGE', 'bac3_IAGE',
-            'bac1_tech_IA', 'bac1_tech_GL', 'bac1_tech_SI',
-            'bac2_tech_IA', 'bac2_tech_GL', 'bac2_tech_SI',
-            'bac3_tech_IA', 'bac3_tech_GL', 'bac3_tech_SI',
-            'bac4_tech_IA', 'bac4_tech_GL', 'bac4_tech_SI'
-        ]
-        
-        for table in student_tables:
-            # Table des étudiants par promotion
-            execute_sql(cursor, f'''
-                CREATE TABLE IF NOT EXISTS {table} (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    matricule TEXT UNIQUE,
-                    nom TEXT,
-                    postnom TEXT,
-                    prenom TEXT,
-                    sexe TEXT,
-                    parcours TEXT,
-                    promotion TEXT,
-                    filiere TEXT,
-                    faculte TEXT,
-                    date_inscription DATETIME DEFAULT CURRENT_TIMESTAMP
-                )
-            ''')
-            
-            # Table de présence spécifique par promotion
-            execute_sql(cursor, f'''
-                CREATE TABLE IF NOT EXISTS presence_{table} (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    matricule TEXT,
-                    nom TEXT,
-                    postnom TEXT,
-                    prenom TEXT,
-                    sexe TEXT,
-                    parcours TEXT,
-                    promotion TEXT,
-                    filiere TEXT,
-                    faculte TEXT,
-                    type_presence TEXT,
-                    device_signature TEXT,
-                    latitude REAL,
-                    longitude REAL,
-                    status_geoloc TEXT DEFAULT 'Inconnu',
-                    date_inscription DATETIME DEFAULT CURRENT_TIMESTAMP
-                )
-            ''')
+        # --- 9. Tables étudiants supprimées ---
+        # --- 10. Tables présences supprimées ---
 
         # Table centrale globale des présences
         execute_sql(cursor, '''
@@ -370,24 +324,47 @@ def init_sqlite_db():
         conn.commit()
         conn.close()
             
-# Initialisation et Migration de la base de données
-def upgrade_db():
+# =============================================================================
+# INITIALISATION MYSQL : Création automatique des tables et colonnes manquantes
+# =============================================================================
+def init_mysql_db():
     """
-    S'assure que toutes les colonnes nécessaires existent dans la base (MySQL ou SQLite).
-    Ajoute dynamiquement latitude, longitude et device_signature si absents.
+    Crée automatiquement toutes les tables MySQL nécessaires si elles n'existent pas.
+    Ne bloque jamais : chaque table est créée dans un try/except indépendant.
     """
+    if os.environ.get('RENDER') or not host:
+        return  # SQLite géré par init_sqlite_db()
+
     try:
-        conn = get_db_connection()
+        conn = mysql.connector.connect(host=host, user=user, password=password, database=database)
         cursor = conn.cursor()
-        
-        # 0. Création des tables de base si absentes
-        # Table 'presences'
-        if isinstance(conn, sqlite3.Connection):
-            # SQLite est géré par init_sqlite_db, mais on peut doubler ici par sécurité
-            pass
-        else:
-             # MySQL version
-             execute_sql(cursor, '''
+        print("MySQL: Vérification et création automatique des tables...")
+
+        # --- 1. Table centrale des étudiants (Supabase fallback local) ---
+        try:
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS students (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    matricule VARCHAR(50) UNIQUE,
+                    nom VARCHAR(100),
+                    postnom VARCHAR(100),
+                    prenom VARCHAR(100),
+                    sexe VARCHAR(10),
+                    parcours VARCHAR(150),
+                    promotion VARCHAR(100),
+                    filiere VARCHAR(150),
+                    faculte VARCHAR(200),
+                    date_inscription TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
+            ''')
+            conn.commit()
+            print("MySQL: Table 'students' OK")
+        except Exception as e:
+            print(f"MySQL: students -> {e}")
+
+        # --- 2. Table centrale des présences ---
+        try:
+            cursor.execute('''
                 CREATE TABLE IF NOT EXISTS presences (
                     id INT AUTO_INCREMENT PRIMARY KEY,
                     matricule VARCHAR(50),
@@ -395,21 +372,26 @@ def upgrade_db():
                     postnom VARCHAR(100),
                     prenom VARCHAR(100),
                     sexe VARCHAR(10),
-                    parcours VARCHAR(100),
+                    parcours VARCHAR(150),
                     promotion VARCHAR(100),
-                    filiere VARCHAR(100),
-                    faculte VARCHAR(100),
+                    filiere VARCHAR(150),
+                    faculte VARCHAR(200),
                     type_presence VARCHAR(20),
                     device_signature VARCHAR(100),
                     latitude DOUBLE,
                     longitude DOUBLE,
-                    status_geoloc VARCHAR(100) DEFAULT 'Inconnu',
+                    status_geoloc VARCHAR(150) DEFAULT 'Inconnu',
                     date_inscription TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                )
+                ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
             ''')
-             
-             # Table 'auditoriums'
-             execute_sql(cursor, '''
+            conn.commit()
+            print("MySQL: Table 'presences' OK")
+        except Exception as e:
+            print(f"MySQL: presences -> {e}")
+
+        # --- 3. Table des auditoires ---
+        try:
+            cursor.execute('''
                 CREATE TABLE IF NOT EXISTS auditoriums (
                     code VARCHAR(50) PRIMARY KEY,
                     nom VARCHAR(100),
@@ -419,11 +401,32 @@ def upgrade_db():
                     floor INT DEFAULT 0,
                     tolerance_m DOUBLE DEFAULT 10,
                     version INT DEFAULT 1
-                )
+                ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
             ''')
-             
-             # Table 'attendance_attempts'
-             execute_sql(cursor, '''
+            conn.commit()
+            # Insertion des auditoires par défaut si vide
+            cursor.execute("SELECT COUNT(*) FROM auditoriums")
+            if cursor.fetchone()[0] == 0:
+                auds = [
+                    ('EC-101', 'Eco-A', -11.667, 27.483, 30, 1, 10, 1),
+                    ('D-101', 'Droit-1', -11.668, 27.484, 25, 0, 10, 1),
+                    ('B-101', 'Biblio', -11.669, 27.485, 40, 0, 15, 1),
+                    ('IF-301', 'Info-301', -11.670, 27.486, 30, 3, 10, 1),
+                    ('IF-101', 'Info-101', -11.671, 27.487, 30, 1, 10, 1),
+                    ('IF-302', 'Info-302', -11.672, 27.488, 30, 3, 10, 1),
+                    ('IF-102', 'Info-102', -11.6529086, 27.48359, 22, 1, 400, 1),
+                    ('IF-304', 'Info-304', -11.674, 27.490, 30, 3, 10, 1)
+                ]
+                for aud in auds:
+                    cursor.execute("INSERT IGNORE INTO auditoriums (code, nom, latitude, longitude, radius_m, floor, tolerance_m, version) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)", aud)
+                conn.commit()
+            print("MySQL: Table 'auditoriums' OK")
+        except Exception as e:
+            print(f"MySQL: auditoriums -> {e}")
+
+        # --- 4. Table des tentatives de présence ---
+        try:
+            cursor.execute('''
                 CREATE TABLE IF NOT EXISTS attendance_attempts (
                     id INT AUTO_INCREMENT PRIMARY KEY,
                     student_external_id VARCHAR(50),
@@ -439,25 +442,36 @@ def upgrade_db():
                     result VARCHAR(50),
                     reason TEXT,
                     auditorium_version INT
-                )
+                ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
             ''')
-             
-             # Table 'attendance_checks'
-             execute_sql(cursor, '''
+            conn.commit()
+            print("MySQL: Table 'attendance_attempts' OK")
+        except Exception as e:
+            print(f"MySQL: attendance_attempts -> {e}")
+
+        # --- 5. Table des contrôles aléatoires (PIN) ---
+        try:
+            cursor.execute('''
                 CREATE TABLE IF NOT EXISTS attendance_checks (
                     id INT AUTO_INCREMENT PRIMARY KEY,
                     attempt_id INT,
                     check_type VARCHAR(20) DEFAULT 'PIN',
                     pin VARCHAR(10),
+                    expected_value VARCHAR(50),
+                    received_value VARCHAR(50),
                     status VARCHAR(20) DEFAULT 'PENDING',
                     sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    responded_at DATETIME,
-                    FOREIGN KEY (attempt_id) REFERENCES attendance_attempts(id)
-                )
+                    responded_at DATETIME
+                ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
             ''')
+            conn.commit()
+            print("MySQL: Table 'attendance_checks' OK")
+        except Exception as e:
+            print(f"MySQL: attendance_checks -> {e}")
 
-             # Table 'auditoriums_versions'
-             execute_sql(cursor, '''
+        # --- 6. Table des versions d'auditoires ---
+        try:
+            cursor.execute('''
                 CREATE TABLE IF NOT EXISTS auditoriums_versions (
                     id INT AUTO_INCREMENT PRIMARY KEY,
                     auditorium_code VARCHAR(50),
@@ -467,11 +481,16 @@ def upgrade_db():
                     tolerance_m DOUBLE,
                     version INT,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                )
+                ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
             ''')
+            conn.commit()
+            print("MySQL: Table 'auditoriums_versions' OK")
+        except Exception as e:
+            print(f"MySQL: auditoriums_versions -> {e}")
 
-             # Table 'random_checks'
-             execute_sql(cursor, '''
+        # --- 7. Table des vérifications programmées ---
+        try:
+            cursor.execute('''
                 CREATE TABLE IF NOT EXISTS random_checks (
                     id INT AUTO_INCREMENT PRIMARY KEY,
                     matricule VARCHAR(50),
@@ -480,11 +499,16 @@ def upgrade_db():
                     scheduled_time VARCHAR(10),
                     status VARCHAR(20) DEFAULT 'PENDING',
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                )
+                ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
             ''')
+            conn.commit()
+            print("MySQL: Table 'random_checks' OK")
+        except Exception as e:
+            print(f"MySQL: random_checks -> {e}")
 
-             # Table 'random_check_responses'
-             execute_sql(cursor, '''
+        # --- 8. Table des rapports de suivi ---
+        try:
+            cursor.execute('''
                 CREATE TABLE IF NOT EXISTS random_check_responses (
                     id INT AUTO_INCREMENT PRIMARY KEY,
                     check_id INT,
@@ -500,35 +524,85 @@ def upgrade_db():
                     ip VARCHAR(45),
                     device_info TEXT,
                     result VARCHAR(50),
-                    reason TEXT,
-                    FOREIGN KEY (check_id) REFERENCES random_checks(id)
-                )
+                    reason TEXT
+                ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
             ''')
-        
-        # 1. Vérification des colonnes pour la table 'presences'
-        columns_to_add = [
-            ('device_signature', 'TEXT' if isinstance(conn, sqlite3.Connection) else 'VARCHAR(100)'),
-            ('latitude', 'REAL' if isinstance(conn, sqlite3.Connection) else 'DOUBLE'),
-            ('longitude', 'REAL' if isinstance(conn, sqlite3.Connection) else 'DOUBLE')
-        ]
-        
-        for col_name, col_type in columns_to_add:
-            try:
-                if isinstance(conn, sqlite3.Connection):
-                    execute_sql(cursor, f"ALTER TABLE presences ADD COLUMN {col_name} {col_type}")
-                else:
-                    execute_sql(cursor, f"ALTER TABLE presences ADD {col_name} {col_type}")
-            except:
-                pass
+            conn.commit()
+            print("MySQL: Table 'random_check_responses' OK")
+        except Exception as e:
+            print(f"MySQL: random_check_responses -> {e}")
 
-        conn.commit()
+        # --- 9. Tables locales supprimées (on utilise la table globale students et presences) ---
+
+        print("MySQL: Toutes les tables vérifiées.")
+        cursor.close()
         conn.close()
     except Exception as e:
-        print(f"Erreur lors de la migration : {e}")
+        print(f"MySQL init_mysql_db() erreur globale (non bloquant) : {e}")
+
+
+def ensure_columns():
+    """
+    Vérifie et ajoute automatiquement les colonnes manquantes dans les tables existantes.
+    Compatible MySQL et SQLite. Ne bloque jamais.
+    """
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        is_sqlite = isinstance(conn, sqlite3.Connection)
+
+        # Dictionnaire : table -> liste de (colonne, type_sqlite, type_mysql)
+        schema = {
+            'presences': [
+                ('device_signature', 'TEXT', 'VARCHAR(100)'),
+                ('latitude',         'REAL', 'DOUBLE'),
+                ('longitude',        'REAL', 'DOUBLE'),
+                ('status_geoloc',    'TEXT', 'VARCHAR(150)'),
+                ('faculte',          'TEXT', 'VARCHAR(200)'),
+                ('parcours',         'TEXT', 'VARCHAR(150)'),
+                ('filiere',          'TEXT', 'VARCHAR(150)'),
+            ],
+            'students': [
+                ('faculte',  'TEXT', 'VARCHAR(200)'),
+                ('parcours', 'TEXT', 'VARCHAR(150)'),
+                ('filiere',  'TEXT', 'VARCHAR(150)'),
+            ],
+            'attendance_checks': [
+                ('expected_value', 'TEXT', 'VARCHAR(50)'),
+                ('received_value', 'TEXT', 'VARCHAR(50)'),
+            ],
+        }
+
+        for table, columns in schema.items():
+            for col_name, sqlite_type, mysql_type in columns:
+                try:
+                    if is_sqlite:
+                        cursor.execute(f"ALTER TABLE {table} ADD COLUMN {col_name} {sqlite_type}")
+                        conn.commit()
+                    else:
+                        # MySQL : vérifie d'abord si la colonne existe
+                        cursor.execute(
+                            "SELECT COUNT(*) FROM information_schema.COLUMNS "
+                            "WHERE TABLE_SCHEMA = %s AND TABLE_NAME = %s AND COLUMN_NAME = %s",
+                            (database, table, col_name)
+                        )
+                        if cursor.fetchone()[0] == 0:
+                            cursor.execute(f"ALTER TABLE `{table}` ADD COLUMN `{col_name}` {mysql_type}")
+                            conn.commit()
+                            print(f"MySQL: Colonne '{col_name}' ajoutée à '{table}'")
+                except Exception:
+                    pass  # Colonne déjà existante ou table absente -> ignoré silencieusement
+
+        cursor.close()
+        conn.close()
+    except Exception as e:
+        print(f"ensure_columns() erreur (non bloquant) : {e}")
+
 
 # Initialisation automatique au démarrage
 init_sqlite_db()
-upgrade_db()
+init_mysql_db()
+ensure_columns()
 
 # --- ROUTES DE NAVIGATION ---
 
@@ -625,24 +699,22 @@ def check_attendance():
             else:
                 found = False
         else:
-            # Fallback tables locales (ancien système)
+            # Fallback table locale (nouvelle table globale)
             found = False
-            tables = ['bac1_IAGE', 'bac2_IAGE', 'bac3_IAGE', 'bac1_tech_IA', 'bac1_tech_GL', 'bac1_tech_SI', 'bac2_tech_IA', 'bac2_tech_GL', 'bac2_tech_SI', 'bac3_tech_IA', 'bac3_tech_GL', 'bac3_tech_SI', 'bac4_tech_IA', 'bac4_tech_GL', 'bac4_tech_SI']
-            for table in tables:
-                try:
-                    query = f"SELECT nom, postnom, prenom, filiere, promotion, sexe, faculte, parcours FROM {table} WHERE matricule = %s"
-                    execute_sql(cursor, query, (matricule,))
-                    res = cursor.fetchone()
-                    if res:
-                        # Convertir res en dictionnaire pour compatibilité
-                        student_data_dict = {
-                            "nom": res[0], "postnom": res[1], "prenom": res[2], 
-                            "filiere": res[3], "promotion": res[4], "sexe": res[5], 
-                            "faculte": res[6], "parcours": res[7]
-                        }
-                        found = True
-                        break
-                except: continue
+            try:
+                query = "SELECT nom, postnom, prenom, filiere, promotion, sexe, faculte, parcours FROM students WHERE matricule = %s"
+                execute_sql(cursor, query, (matricule,))
+                res = cursor.fetchone()
+                if res:
+                    # Convertir res en dictionnaire pour compatibilité
+                    student_data_dict = {
+                        "nom": res[0], "postnom": res[1], "prenom": res[2], 
+                        "filiere": res[3], "promotion": res[4], "sexe": res[5], 
+                        "faculte": res[6], "parcours": res[7]
+                    }
+                    found = True
+            except Exception as e:
+                print(f"Erreur vérification étudiant local: {e}")
         
         if not found:
             reason = "Matricule inconnu"
@@ -776,7 +848,14 @@ def check_attendance():
                 conn.commit()
                 cursor.close()
                 conn.close()
-            return jsonify({"status": "success", "message": "Présence enregistrée avec succès", "auditorium": aud['nom']})
+            # Retour enrichi pour le client: nom de l'auditoire, étiquette de géolocalisation et distance
+            return jsonify({
+                "status": "success",
+                "message": "Présence enregistrée avec succès",
+                "auditorium": aud.get('nom'),
+                "status_geoloc": status_geoloc,
+                "distance_m": int(distance) if isinstance(distance, (int, float)) and distance != float('inf') else None
+            })
         else:
             if not supabase:
                 conn.commit()
@@ -1051,8 +1130,7 @@ def register():
             try:
                 conn_check = get_db_connection()
                 cursor_check = conn_check.cursor()
-                table = f"{promotion.lower()}_IAGE" if parcours == 'IAGE' else f"{promotion.lower()}_tech_{filiere.upper()}"
-                execute_sql(cursor_check, f"SELECT matricule FROM {table} WHERE matricule = %s", (matricule,))
+                execute_sql(cursor_check, "SELECT matricule FROM students WHERE matricule = %s", (matricule,))
                 if cursor_check.fetchone():
                     already_exists = True
                 cursor_check.close()
@@ -1061,7 +1139,19 @@ def register():
                 pass
 
         if already_exists:
-            return f"Erreur : Le matricule {matricule} est déjà inscrit. Veuillez utiliser un autre matricule."
+            return render_template(
+                'register.html',
+                error='ID already used',
+                matricule=matricule,
+                nom=nom,
+                postnom=postnom,
+                prenom=prenom,
+                sexe=sexe,
+                parcours=parcours,
+                promotion=promotion,
+                filiere=filiere,
+                faculte=faculte
+            )
 
         # --- Insertion : Supabase avec fallback local ---
         saved_to_cloud = False
@@ -1078,15 +1168,17 @@ def register():
             # Fallback local (SQLite ou MySQL)
             conn = get_db_connection()
             cursor = conn.cursor()
-            table = f"{promotion.lower()}_IAGE" if parcours == 'IAGE' else f"{promotion.lower()}_tech_{filiere.upper()}"
-            query = f"INSERT INTO {table} (matricule, nom, postnom, prenom, sexe, parcours, promotion, filiere, faculte) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
+            query = "INSERT INTO students (matricule, nom, postnom, prenom, sexe, parcours, promotion, filiere, faculte) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
             execute_sql(cursor, query, (matricule, nom, postnom, prenom, sexe, parcours, promotion, filiere, faculte))
             conn.commit()
             conn.close()
-            print(f"INFO: Étudiant {matricule} enregistré en local.")
+            print(f"INFO: Étudiant {matricule} enregistré en local dans la table students.")
 
-        # Redirection vers la liste globale ou spécifique
-        return redirect(url_for('view_students', promo=promotion))
+        # Rester sur la page d'inscription et afficher le message de confirmation
+        return render_template(
+            'register.html',
+            success='Saved succes!'
+        )
     except Exception as err:
         return f"Erreur lors de l'inscription : {err}"
 
@@ -1099,14 +1191,7 @@ def view_presences():
     Elle rassemble les présences de toutes les promotions pour un affichage global.
     """
     try:
-        # 1. On définit toutes les promotions existantes
-        tables = [
-            'bac1_IAGE', 'bac2_IAGE', 'bac3_IAGE',
-            'bac1_tech_IA', 'bac1_tech_GL', 'bac1_tech_SI',
-            'bac2_tech_IA', 'bac2_tech_GL', 'bac2_tech_SI',
-            'bac3_tech_IA', 'bac3_tech_GL', 'bac3_tech_SI',
-            'bac4_tech_IA', 'bac4_tech_GL', 'bac4_tech_SI'
-        ]
+        # Suppression de la liste des tables (non nécessaire avec la table globale)
         
         conn = get_db_connection()
         if isinstance(conn, sqlite3.Connection):
@@ -1299,41 +1384,91 @@ def view_students(promo=None):
 def api_presences():
     """
     API endpoint qui retourne les présences depuis Supabase Cloud.
-    --- MODIFICATION SUPABASE : Lecture depuis la table unique cloud ---
     """
     promo = request.args.get('promotion')
+    faculte = request.args.get('faculte')
+    filiere = request.args.get('filiere')
+    parcours = request.args.get('parcours')
+    promotion_label = request.args.get('promotion_label')
 
     try:
         if supabase:
             query = supabase.table("presences").select("*")
             if promo:
-                # --- CORRECTION FILTRAGE ---
-                # On analyse le code de promotion pour filtrer par parcours, promotion et filière
                 if "_IAGE" in promo:
-                    # Cas IAGE : ex "bac1_IAGE" -> Parcours: IAGE, Promotion: Bac1
                     p_name = promo.split("_")[0].capitalize()
                     query = query.eq("parcours", "IAGE").eq("promotion", p_name)
                 elif "_tech_" in promo:
-                    # Cas Tech : ex "bac1_tech_GL" -> Parcours: TECHNOLOGIE, Promotion: Bac1, Filière: GL
                     parts = promo.split("_tech_")
                     if len(parts) == 2:
                         promo_name = parts[0].capitalize()
                         filiere_name = parts[1].upper()
                         query = query.eq("parcours", "TECHNOLOGIE").eq("promotion", promo_name).eq("filiere", filiere_name)
                 else:
-                    # Filtrage standard par promotion
                     query = query.eq("promotion", promo)
-            
+            else:
+                if faculte: query = query.eq("faculte", faculte)
+                if filiere: query = query.eq("filiere", filiere)
+                if parcours: query = query.eq("parcours", parcours)
+                if promotion_label: query = query.eq("promotion", promotion_label)
+
             result = query.order("date_inscription", desc=True).execute()
             all_presences = result.data
         else:
             # Fallback local
-            all_presences = []
+            conn = get_db_connection()
+            if isinstance(conn, sqlite3.Connection):
+                cursor = conn.cursor()
+            else:
+                cursor = conn.cursor(dictionary=True)
+
+            sql = "SELECT * FROM presences WHERE 1=1"
+            params = []
+
+            if promo:
+                if "_IAGE" in promo:
+                    p_name = promo.split("_")[0].capitalize()
+                    sql += " AND parcours = %s AND promotion = %s"
+                    params.extend(["IAGE", p_name])
+                elif "_tech_" in promo:
+                    parts = promo.split("_tech_")
+                    if len(parts) == 2:
+                        promo_name = parts[0].capitalize()
+                        filiere_name = parts[1].upper()
+                        sql += " AND parcours = %s AND promotion = %s AND filiere = %s"
+                        params.extend(["TECHNOLOGIE", promo_name, filiere_name])
+                else:
+                    sql += " AND promotion = %s"
+                    params.append(promo)
+            else:
+                if faculte:
+                    sql += " AND faculte = %s"
+                    params.append(faculte)
+                if filiere:
+                    sql += " AND filiere = %s"
+                    params.append(filiere)
+            sql += " ORDER BY date_inscription DESC"
+            
+            if isinstance(conn, sqlite3.Connection):
+                sql = sql.replace("%s", "?")
+                cursor.execute(sql, params)
+                all_presences = [dict(row) for row in cursor.fetchall()]
+            else:
+                cursor.execute(sql, params)
+                all_presences = cursor.fetchall()
+                
+            cursor.close()
+            conn.close()
 
         # Formatage des données pour le frontend
         for row in all_presences:
             dt_str = row.get('date_inscription')
-            if dt_str:
+            if isinstance(dt_str, datetime):
+                dt_str = dt_str.isoformat()
+            elif hasattr(dt_str, 'strftime'):
+                dt_str = dt_str.strftime('%Y-%m-%dT%H:%M:%S')
+                
+            if dt_str and 'T' in dt_str:
                 row['formatted_date'] = dt_str.split('T')[0]
                 row['formatted_time'] = dt_str.split('T')[1].split('+')[0]
             else:
@@ -1423,15 +1558,17 @@ def trigger_check():
 def api_presence_stats():
     """
     API endpoint qui retourne des statistiques sur les présences via Supabase.
-    --- MODIFICATION SUPABASE : Aggrégation Cloud ---
     """
     promo = request.args.get('promotion')
+    faculte = request.args.get('faculte')
+    filiere = request.args.get('filiere')
+    parcours = request.args.get('parcours')
+    promotion_label = request.args.get('promotion_label')
+    
     try:
         if supabase:
             query = supabase.table("presences").select("type_presence")
             if promo:
-                # --- CORRECTION FILTRAGE STATS ---
-                # On utilise la même logique de filtrage pour que les stats correspondent à la liste
                 if "_IAGE" in promo:
                     p_name = promo.split("_")[0].capitalize()
                     query = query.eq("parcours", "IAGE").eq("promotion", p_name)
@@ -1443,6 +1580,11 @@ def api_presence_stats():
                         query = query.eq("parcours", "TECHNOLOGIE").eq("promotion", promo_name).eq("filiere", filiere_name)
                 else:
                     query = query.ilike("promotion", f"%{promo.replace('_', ' ')}%")
+            else:
+                if faculte: query = query.eq("faculte", faculte)
+                if filiere: query = query.eq("filiere", filiere)
+                if parcours: query = query.eq("parcours", parcours)
+                if promotion_label: query = query.eq("promotion", promotion_label)
             
             res = query.execute()
             rows = res.data
@@ -1457,7 +1599,65 @@ def api_presence_stats():
                 "sorties": sorties
             })
         else:
-            return jsonify({"error": "Supabase non configuré"}), 500
+            # Fallback local
+            conn = get_db_connection()
+            if isinstance(conn, sqlite3.Connection):
+                cursor = conn.cursor()
+            else:
+                cursor = conn.cursor(dictionary=True)
+                
+            sql = "SELECT type_presence FROM presences WHERE 1=1"
+            params = []
+            
+            if promo:
+                if "_IAGE" in promo:
+                    p_name = promo.split("_")[0].capitalize()
+                    sql += " AND parcours = %s AND promotion = %s"
+                    params.extend(["IAGE", p_name])
+                elif "_tech_" in promo:
+                    parts = promo.split("_tech_")
+                    if len(parts) == 2:
+                        promo_name = parts[0].capitalize()
+                        filiere_name = parts[1].upper()
+                        sql += " AND parcours = %s AND promotion = %s AND filiere = %s"
+                        params.extend(["TECHNOLOGIE", promo_name, filiere_name])
+                else:
+                    sql += " AND promotion LIKE %s"
+                    params.append(f"%{promo.replace('_', ' ')}%")
+            else:
+                if faculte:
+                    sql += " AND faculte = %s"
+                    params.append(faculte)
+                if filiere:
+                    sql += " AND filiere = %s"
+                    params.append(filiere)
+                if parcours:
+                    sql += " AND parcours = %s"
+                    params.append(parcours)
+                if promotion_label:
+                    sql += " AND promotion = %s"
+                    params.append(promotion_label)
+            
+            if isinstance(conn, sqlite3.Connection):
+                sql = sql.replace("%s", "?")
+                cursor.execute(sql, params)
+                rows = [dict(row) for row in cursor.fetchall()]
+            else:
+                cursor.execute(sql, params)
+                rows = cursor.fetchall()
+                
+            cursor.close()
+            conn.close()
+
+            total = len(rows)
+            entrees = len([r for r in rows if r.get('type_presence') == 'Entrée'])
+            sorties = len([r for r in rows if r.get('type_presence') == 'Sortie'])
+            
+            return jsonify({
+                "total": total,
+                "entrees": entrees,
+                "sorties": sorties
+            })
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -1467,42 +1667,92 @@ def api_presence_stats():
 def api_students():
     """
     API endpoint that returns students in JSON format.
-    --- MODIFICATION SUPABASE : Lecture depuis la table unique cloud ---
     """
     promo = request.args.get('promotion')
+    faculte = request.args.get('faculte')
+    parcours = request.args.get('parcours')
+    promotion_label = request.args.get('promotion_label')
     
     try:
         if supabase:
             query = supabase.table("students").select("*")
             if promo:
-                # --- CORRECTION FILTRAGE ÉTUDIANTS ---
-                # Analyse précise de la promotion pour un filtrage efficace dans Supabase
                 if "_IAGE" in promo:
-                    # Extraction pour IAGE (ex: bac1_IAGE -> Bac1)
                     p_name = promo.split("_")[0].capitalize()
                     query = query.eq("parcours", "IAGE").eq("promotion", p_name)
                 elif "_tech_" in promo:
-                    # Extraction pour Technologie (ex: bac1_tech_GL -> Bac1, GL)
                     parts = promo.split("_tech_")
                     if len(parts) == 2:
                         promo_name = parts[0].capitalize()
                         filiere_name = parts[1].upper()
                         query = query.eq("parcours", "TECHNOLOGIE").eq("promotion", promo_name).eq("filiere", filiere_name)
                 else:
-                    # Filtre générique si aucun motif spécial n'est trouvé
                     query = query.eq("promotion", promo)
+            else:
+                if faculte: query = query.eq("faculte", faculte)
+                if parcours: query = query.eq("parcours", parcours)
+                if promotion_label: query = query.eq("promotion", promotion_label)
             
             result = query.order("date_inscription", desc=True).execute()
             all_students = result.data
         else:
-            # Ancien système local pour compatibilité
-            all_students = []
-            # ... (logique locale existante)
-            all_students = []
+            # Fallback local
+            conn = get_db_connection()
+            if isinstance(conn, sqlite3.Connection):
+                cursor = conn.cursor()
+            else:
+                cursor = conn.cursor(dictionary=True)
+                
+            sql = "SELECT * FROM students WHERE 1=1"
+            params = []
+            
+            if promo:
+                if "_IAGE" in promo:
+                    p_name = promo.split("_")[0].capitalize()
+                    sql += " AND parcours = %s AND promotion = %s"
+                    params.extend(["IAGE", p_name])
+                elif "_tech_" in promo:
+                    parts = promo.split("_tech_")
+                    if len(parts) == 2:
+                        promo_name = parts[0].capitalize()
+                        filiere_name = parts[1].upper()
+                        sql += " AND parcours = %s AND promotion = %s AND filiere = %s"
+                        params.extend(["TECHNOLOGIE", promo_name, filiere_name])
+                else:
+                    sql += " AND promotion = %s"
+                    params.append(promo)
+            else:
+                if faculte:
+                    sql += " AND faculte = %s"
+                    params.append(faculte)
+                if parcours:
+                    sql += " AND parcours = %s"
+                    params.append(parcours)
+                if promotion_label:
+                    sql += " AND promotion = %s"
+                    params.append(promotion_label)
+                    
+            sql += " ORDER BY date_inscription DESC"
+            
+            if isinstance(conn, sqlite3.Connection):
+                sql = sql.replace("%s", "?")
+                cursor.execute(sql, params)
+                all_students = [dict(row) for row in cursor.fetchall()]
+            else:
+                cursor.execute(sql, params)
+                all_students = cursor.fetchall()
+                
+            cursor.close()
+            conn.close()
         
         # Formatage des dates pour l'affichage
         for student in all_students:
             dt_str = student.get('date_inscription')
+            if isinstance(dt_str, datetime):
+                dt_str = dt_str.isoformat()
+            elif hasattr(dt_str, 'strftime'):
+                dt_str = dt_str.strftime('%Y-%m-%dT%H:%M:%S')
+                
             if dt_str:
                 student['formatted_date'] = dt_str.replace('T', ' ').split('.')[0]
             else:
@@ -1516,14 +1766,16 @@ def api_students():
 def api_stats():
     """
     API endpoint that returns student statistics via Supabase.
-    --- MODIFICATION SUPABASE : Comptage Cloud par genre ---
     """
     promo = request.args.get('promotion')
+    faculte = request.args.get('faculte')
+    parcours = request.args.get('parcours')
+    promotion_label = request.args.get('promotion_label')
+
     try:
         if supabase:
             query = supabase.table("students").select("sexe")
             if promo:
-                # --- CORRECTION FILTRAGE STATS GLOBAL ---
                 if "_IAGE" in promo:
                     p_name = promo.split("_")[0].capitalize()
                     query = query.eq("parcours", "IAGE").eq("promotion", p_name)
@@ -1535,6 +1787,10 @@ def api_stats():
                         query = query.eq("parcours", "TECHNOLOGIE").eq("promotion", promo_name).eq("filiere", filiere_name)
                 else:
                     query = query.ilike("promotion", f"%{promo.replace('_', ' ')}%")
+            else:
+                if faculte: query = query.eq("faculte", faculte)
+                if parcours: query = query.eq("parcours", parcours)
+                if promotion_label: query = query.eq("promotion", promotion_label)
             
             res = query.execute()
             rows = res.data
@@ -1549,7 +1805,62 @@ def api_stats():
                 "female_count": female_count
             })
         else:
-            return jsonify({"total_students": 0, "male_count": 0, "female_count": 0})
+            # Fallback local
+            conn = get_db_connection()
+            if isinstance(conn, sqlite3.Connection):
+                cursor = conn.cursor()
+            else:
+                cursor = conn.cursor(dictionary=True)
+                
+            sql = "SELECT sexe FROM students WHERE 1=1"
+            params = []
+            
+            if promo:
+                if "_IAGE" in promo:
+                    p_name = promo.split("_")[0].capitalize()
+                    sql += " AND parcours = %s AND promotion = %s"
+                    params.extend(["IAGE", p_name])
+                elif "_tech_" in promo:
+                    parts = promo.split("_tech_")
+                    if len(parts) == 2:
+                        promo_name = parts[0].capitalize()
+                        filiere_name = parts[1].upper()
+                        sql += " AND parcours = %s AND promotion = %s AND filiere = %s"
+                        params.extend(["TECHNOLOGIE", promo_name, filiere_name])
+                else:
+                    sql += " AND promotion LIKE %s"
+                    params.append(f"%{promo.replace('_', ' ')}%")
+            else:
+                if faculte:
+                    sql += " AND faculte = %s"
+                    params.append(faculte)
+                if parcours:
+                    sql += " AND parcours = %s"
+                    params.append(parcours)
+                if promotion_label:
+                    sql += " AND promotion = %s"
+                    params.append(promotion_label)
+            
+            if isinstance(conn, sqlite3.Connection):
+                sql = sql.replace("%s", "?")
+                cursor.execute(sql, params)
+                rows = [dict(row) for row in cursor.fetchall()]
+            else:
+                cursor.execute(sql, params)
+                rows = cursor.fetchall()
+                
+            cursor.close()
+            conn.close()
+            
+            male_count = len([r for r in rows if r.get('sexe') == 'M'])
+            female_count = len([r for r in rows if r.get('sexe') == 'F'])
+            total_count = len(rows)
+            
+            return jsonify({
+                "total_students": total_count,
+                "male_count": male_count,
+                "female_count": female_count
+            })
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -1601,26 +1912,19 @@ def admin_dashboard():
         conn = get_db_connection()
         cursor = conn.cursor()
         
-        # Compte des étudiants en Bac1 IAGE
-        execute_sql(cursor, "SELECT COUNT(*) FROM bac1_IAGE")
-        bac1_count = cursor.fetchone()[0]
+        # Compte total des étudiants (fallback local)
+        try:
+            execute_sql(cursor, "SELECT COUNT(*) FROM students")
+            bac1_count = cursor.fetchone()[0]
+        except:
+            bac1_count = 0
         
-        # Compte total des présences (somme de toutes les tables)
-        tables = [
-            'bac1_IAGE', 'bac2_IAGE', 'bac3_IAGE',
-            'bac1_tech_IA', 'bac1_tech_GL', 'bac1_tech_SI',
-            'bac2_tech_IA', 'bac2_tech_GL', 'bac2_tech_SI',
-            'bac3_tech_IA', 'bac3_tech_GL', 'bac3_tech_SI',
-            'bac4_tech_IA', 'bac4_tech_GL', 'bac4_tech_SI'
-        ]
-        
-        presence_count = 0
-        for table in tables:
-            try:
-                execute_sql(cursor, f"SELECT COUNT(*) FROM presence_{table}")
-                presence_count += cursor.fetchone()[0]
-            except:
-                continue
+        # Compte total des présences (fallback local)
+        try:
+            execute_sql(cursor, "SELECT COUNT(*) FROM presences")
+            presence_count = cursor.fetchone()[0]
+        except:
+            presence_count = 0
         
         cursor.close()
         conn.close()
@@ -1653,18 +1957,9 @@ def reset_table():
     """
     table_name = request.form.get('table_name')
     
-    # Liste de toutes les tables autorisées pour la réinitialisation
-    student_tables = [
-        'bac1_IAGE', 'bac2_IAGE', 'bac3_IAGE',
-        'bac1_tech_IA', 'bac1_tech_GL', 'bac1_tech_SI',
-        'bac2_tech_IA', 'bac2_tech_GL', 'bac2_tech_SI',
-        'bac3_tech_IA', 'bac3_tech_GL', 'bac3_tech_SI',
-        'bac4_tech_IA', 'bac4_tech_GL', 'bac4_tech_SI'
-    ]
+    allowed_tables = ['students', 'presences']
     
-    allowed_tables = student_tables + [f"presence_{t}" for t in student_tables] + ['presence']
-    
-    if table_name not in allowed_tables:
+    if table_name not in allowed_tables and table_name != 'presence': # 'presence' is old UI param
         return "Table non autorisée ou invalide."
         
     try:
@@ -1734,12 +2029,11 @@ def delete_student():
         # Fallback local
         conn = get_db_connection()
         cursor = conn.cursor()
-        tables_students = ['bac1_IAGE', 'bac2_IAGE', 'bac3_IAGE', 'bac1_tech_IA', 'bac1_tech_GL', 'bac1_tech_SI', 'bac2_tech_IA', 'bac2_tech_GL', 'bac2_tech_SI', 'bac3_tech_IA', 'bac3_tech_GL', 'bac3_tech_SI', 'bac4_tech_IA', 'bac4_tech_GL', 'bac4_tech_SI']
-        tables_presences = [f"presence_{t}" for t in tables_students] + ['presence']
-        for t in tables_students + tables_presences:
-            try:
-                execute_sql(cursor, f"DELETE FROM {t} WHERE matricule = ?", (matricule,))
-            except: pass
+        try:
+            execute_sql(cursor, "DELETE FROM students WHERE matricule = %s", (matricule,))
+            execute_sql(cursor, "DELETE FROM presences WHERE matricule = %s", (matricule,))
+        except Exception as e:
+            print(f"Erreur suppression locale: {e}")
         conn.commit()
         cursor.close()
         conn.close()
@@ -1767,9 +2061,7 @@ def reset_all():
         conn = get_db_connection()
         cursor = conn.cursor()
         
-        tables_students = ['bac1_IAGE', 'bac2_IAGE', 'bac3_IAGE', 'bac1_tech_IA', 'bac1_tech_GL', 'bac1_tech_SI', 'bac2_tech_IA', 'bac2_tech_GL', 'bac2_tech_SI', 'bac3_tech_IA', 'bac3_tech_GL', 'bac3_tech_SI', 'bac4_tech_IA', 'bac4_tech_GL', 'bac4_tech_SI']
-        tables_presences = [f"presence_{t}" for t in tables_students] + ['presence']
-        all_tables = tables_students + tables_presences + ['attendance_attempts', 'attendance_checks', 'random_check_responses']
+        all_tables = ['students', 'presences', 'attendance_attempts', 'attendance_checks', 'random_check_responses']
         
         for t in all_tables:
             try:

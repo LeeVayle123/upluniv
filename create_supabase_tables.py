@@ -86,7 +86,22 @@ try:
         );
     """)
 
-    # 5. Table random_checks
+    # 5. Table attendance_checks
+    print("Création de la table 'attendance_checks'...")
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS attendance_checks (
+            id SERIAL PRIMARY KEY,
+            attempt_id INTEGER,
+            check_type TEXT DEFAULT 'PIN',
+            pin TEXT,
+            status TEXT DEFAULT 'PENDING',
+            sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            responded_at TIMESTAMP,
+            FOREIGN KEY (attempt_id) REFERENCES attendance_attempts(id)
+        );
+    """)
+
+    # 6. Table random_checks
     print("Création de la table 'random_checks'...")
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS random_checks (

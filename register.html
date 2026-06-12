@@ -79,20 +79,21 @@
         }
 
         .conteneur-principal {
-            width: 90%;
-            max-width: 720px;
+            width: 95%;
+            max-width: 1050px;
+            min-height: 560px;
             display: flex;
             border-radius: var(--radius-lg);
             overflow: hidden;
             background: white;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 20px 40px -8px rgba(0, 0, 0, 0.18);
             border: 1px solid #e2e8f0;
         }
 
         .panneau-lateral {
-            flex: 0.6;
+            flex: 0 0 260px;
             background: linear-gradient(160deg, var(--primary) 0%, #000040 100%);
-            padding: 25px 8px 10px 8px;
+            padding: 35px 18px 20px 18px;
             color: white;
             display: flex;
             flex-direction: column;
@@ -136,9 +137,10 @@
         }
 
         .formulaire-interne {
-            flex: 1.4;
-            padding: 20px 24px;
+            flex: 1;
+            padding: 28px 36px;
             background: white;
+            overflow-y: auto;
         }
 
         .formulaire-principal {
@@ -158,8 +160,8 @@
 
         .grille-formulaire {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
         }
 
         .groupe-formulaire {
@@ -167,7 +169,7 @@
         }
 
         .groupe-formulaire.complet {
-            grid-column: span 2;
+            grid-column: span 3;
         }
 
         .etiquette-formulaire {
@@ -197,8 +199,139 @@
             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
         }
 
+        /* ===== CUSTOM DROPDOWN - STYLE ROULEAU (identique aux auditoires) ===== */
+        .custom-select-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .custom-select-wrapper select {
+            display: none;
+        }
+
+        .custom-select-trigger {
+            width: 100%;
+            padding: 10px 16px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            font-size: 0.88rem;
+            font-family: inherit;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            color: var(--text-muted);
+            font-weight: 500;
+            user-select: none;
+        }
+
+        .custom-select-trigger.has-value {
+            color: var(--text-main);
+            font-weight: 700;
+        }
+
+        .custom-select-trigger:hover {
+            border-color: navy;
+            box-shadow: 0 0 0 4px rgba(0, 0, 128, 0.06);
+        }
+
+        .custom-select-wrapper.open .custom-select-trigger {
+            border-color: navy;
+            box-shadow: 0 0 0 4px rgba(0, 0, 128, 0.08);
+        }
+
+        .custom-select-arrow {
+            font-size: 0.78rem;
+            color: navy;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-left: 8px;
+            flex-shrink: 0;
+        }
+
+        .custom-select-wrapper.open .custom-select-arrow {
+            transform: rotate(180deg);
+        }
+
+        /* LE ROULEAU : se déroule doucement depuis le haut */
+        .custom-select-dropdown {
+            position: absolute;
+            top: calc(100% + 6px);
+            left: 0;
+            right: 0;
+            background: rgba(30, 58, 138, 0.06);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-radius: 20px;
+            box-shadow: 0 15px 30px -10px rgba(0, 0, 128, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            z-index: 1000;
+            overflow-y: auto;
+            transform-origin: top;
+            transform: scaleY(0);
+            opacity: 0;
+            visibility: hidden;
+            transition: transform 1.2s cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1),
+                visibility 1.2s;
+            max-height: 250px;
+        }
+
+        .custom-select-wrapper.open .custom-select-dropdown {
+            transform: scaleY(1);
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .custom-select-option {
+            padding: 11px 18px;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 0.88rem;
+            border-bottom: 1px solid #f8fafc;
+            color: var(--text-main);
+        }
+
+        .custom-select-option:last-child {
+            border-bottom: none;
+        }
+
+        .custom-select-option:hover {
+            background: #f1f5f9;
+            color: navy;
+        }
+
+        .custom-select-option.selected {
+            background: #e8eeff;
+            color: navy;
+            font-weight: 700;
+        }
+
+        .custom-select-option.placeholder-opt {
+            color: #94a3b8;
+            font-style: italic;
+        }
+
+        .custom-select-dropdown::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .custom-select-dropdown::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .custom-select-dropdown::-webkit-scrollbar-thumb {
+            background: #bfcfff;
+            border-radius: 4px;
+        }
+
+        .custom-select-dropdown::-webkit-scrollbar-thumb:hover {
+            background: navy;
+        }
+
         .bouton-validation {
-            grid-column: span 2;
+            grid-column: span 3;
             background: var(--primary);
             color: white;
             border: none;
@@ -288,6 +421,30 @@
             accent-color: var(--primary);
         }
 
+        .message-erreur {
+            grid-column: span 3;
+            padding: 14px 16px;
+            margin-bottom: 14px;
+            border-radius: 14px;
+            background: #fee2e2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .message-success {
+            grid-column: span 3;
+            padding: 14px 16px;
+            margin-bottom: 14px;
+            border-radius: 14px;
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+            font-weight: 700;
+            text-align: center;
+        }
+
         .radio-label {
             font-size: 0.85rem;
             font-weight: 500;
@@ -308,6 +465,17 @@
 
             .formulaire-interne {
                 padding: 20px;
+            }
+        }
+
+        @media (max-width: 750px) {
+            .grille-formulaire {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .groupe-formulaire.complet,
+            .bouton-validation {
+                grid-column: span 2;
             }
         }
 
@@ -346,8 +514,7 @@
                 <img src="{{ url_for('static', filename='logo_upl.png') }}" class="logo-universitaire" alt="Logo UPL">
             </div>
             <div class="slogan">
-                <p>VOUS CONNAÎTREZ LA VÉRITÉ ET LA VÉRITÉ VOUS AFFRANCHIRA</p>
-                <p>YOU SHALL KNOW THE TRUTH, AND THE TRUTH SHALL SET YOU FREE</p>
+                <p>You shall know the truth, and the truth shall set you free.</p>
             </div>
         </aside>
 
@@ -358,73 +525,87 @@
                 <p class="sous-titre-formulaire">Fill in the form to create your account.</p>
             </div>
 
+            {% if error %}
+            <div class="message-erreur">{{ error }}</div>
+            {% endif %}
+            {% if success %}
+            <div class="message-success">{{ success }}</div>
+            {% endif %}
+
             <form action="/register" method="post" class="grille-formulaire">
                 <div class="groupe-formulaire">
                     <label class="etiquette-formulaire" for="matricule">Matricule</label>
                     <input type="text" id="matricule" name="matricule" class="champ-formulaire" required
-                        placeholder="Ex: 123/24">
+                        placeholder="Ex: 123/24" value="{{ matricule|default('') }}">
                 </div>
 
                 <div class="groupe-formulaire">
                     <label class="etiquette-formulaire" for="sexe">Sexe</label>
-                    <select id="sexe" name="sexe" class="champ-formulaire" required>
-                        <option value="">Sélectionner</option>
-                        <option value="M">M</option>
-                        <option value="F">F</option>
-                    </select>
+                    <div class="custom-select-wrapper">
+                        <select id="sexe" name="sexe" required>
+                            <option value="">---Sélectionner---</option>
+                            <option value="M" {% if sexe == 'M' %}selected{% endif %}>M</option>
+                            <option value="F" {% if sexe == 'F' %}selected{% endif %}>F</option>
+                        </select>
+                    </div>
                 </div>
 
                 <div class="groupe-formulaire">
                     <label class="etiquette-formulaire" for="nom">Name</label>
-                    <input type="text" id="nom" name="nom" class="champ-formulaire" required>
+                    <input type="text" id="nom" name="nom" class="champ-formulaire" required value="{{ nom|default('') }}">
                 </div>
 
                 <div class="groupe-formulaire">
                     <label class="etiquette-formulaire" for="postnom">Postname</label>
-                    <input type="text" id="postnom" name="postnom" class="champ-formulaire" required>
+                    <input type="text" id="postnom" name="postnom" class="champ-formulaire" required value="{{ postnom|default('') }}">
                 </div>
 
                 <div class="groupe-formulaire">
                     <label class="etiquette-formulaire" for="prenom">Firstname</label>
-                    <input type="text" id="prenom" name="prenom" class="champ-formulaire" required>
+                    <input type="text" id="prenom" name="prenom" class="champ-formulaire" required value="{{ prenom|default('') }}">
                 </div>
 
                 <div class="groupe-formulaire complet">
-                    <label class="etiquette-formulaire">Choose your Path</label>
-                    <div class="radio-group" style="display: flex; gap: 15px; margin-top: 5px;">
-                        <label class="radio-option">
-                            <input type="radio" name="parcours" value="IAGE" onchange="updateFields()" required>
-                            <span class="radio-label">IAGE</span>
-                        </label>
-                        <label class="radio-option">
-                            <input type="radio" name="parcours" value="TECHNOLOGIE" onchange="updateFields()" required>
-                            <span class="radio-label">TECHNOLOGY</span>
-                        </label>
+                    <label class="etiquette-formulaire" for="faculte">Faculté</label>
+                    <div class="custom-select-wrapper">
+                        <select id="faculte" name="faculte" required>
+                            <option value="">---Sélectionner---</option>
+                            <option value="Faculté de sciences informatiques" {% if faculte == 'Faculté de sciences informatiques' %}selected{% endif %}>Faculté de sciences informatiques</option>
+                            <option value="Faculté de polytechnique" {% if faculte == 'Faculté de polytechnique' %}selected{% endif %}>Faculté de polytechnique</option>
+                            <option value="Faculté de theologie" {% if faculte == 'Faculté de theologie' %}selected{% endif %}>Faculté de theologie</option>
+                            <option value="Faculté des sciences economiques" {% if faculte == 'Faculté des sciences economiques' %}selected{% endif %}>Faculté des sciences economiques</option>
+                            <option value="Faculté des lettres et sciences humaines" {% if faculte == 'Faculté des lettres et sciences humaines' %}selected{% endif %}>Faculté des lettres et sciences humaines</option>
+                            <option value="Ecole d'architecture" {% if faculte == "Ecole d'architecture" %}selected{% endif %}>Ecole d'architecture</option>
+                            <option value="Faculté de droit" {% if faculte == 'Faculté de droit' %}selected{% endif %}>Faculté de droit</option>
+                            <option value="Faculté des sciences de l'information et de la communication" {% if faculte == "Faculté des sciences de l'information et de la communication" %}selected{% endif %}>Faculté des sciences de l'information et de la communication</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="parcoursDiv" style="display:none;" class="groupe-formulaire complet">
+                    <label class="etiquette-formulaire" for="parcours">Choose your Path / Filière</label>
+                    <div class="custom-select-wrapper">
+                        <select id="parcours" name="parcours"></select>
+                    </div>
+                </div>
+
+                <div id="filiereDiv" style="display:none;" class="groupe-formulaire">
+                    <label class="etiquette-formulaire" for="filiere">Option / Spécialité</label>
+                    <div class="custom-select-wrapper">
+                        <select id="filiere" name="filiere">
+                            <option value="IA">IA</option>
+                            <option value="GL">GL</option>
+                            <option value="SI">SI</option>
+                        </select>
                     </div>
                 </div>
 
                 <div id="promotionDiv" style="display:none;" class="groupe-formulaire">
                     <label class="etiquette-formulaire" for="promotion">Promotion</label>
-                    <select id="promotion" name="promotion" class="champ-formulaire" required></select>
+                    <div class="custom-select-wrapper">
+                        <select id="promotion" name="promotion" required></select>
+                    </div>
                 </div>
-
-                <div id="filiereDiv" style="display:none;" class="groupe-formulaire">
-                    <label class="etiquette-formulaire" for="filiere">Filière</label>
-                    <select id="filiere" name="filiere" class="champ-formulaire" required>
-                        <option value="IA">IA</option>
-                        <option value="GL">GL</option>
-                        <option value="SI">SI</option>
-                    </select>
-                </div>
-
-                <div class="groupe-formulaire">
-                    <label class="etiquette-formulaire" for="faculte">Faculté</label>
-                    <select id="faculte" name="faculte" class="champ-formulaire" required>
-                        <option value="Faculté de sciences informatiques">Informatique</option>
-                        <option value="Polytechnique">Polytechnique</option>
-                    </select>
-                </div>
-
 
                 <button type="submit" class="bouton-validation">S'inscrire</button>
             </form>
@@ -443,35 +624,285 @@
     </div>
 
     <script>
-        function updateFields() {
-            var parcoursElement = document.querySelector('input[name="parcours"]:checked');
-            var parcours = parcoursElement ? parcoursElement.value : '';
-            var promotionDiv = document.getElementById('promotionDiv');
-            var filiereDiv = document.getElementById('filiereDiv');
-            var promotionSelect = document.getElementById('promotion');
+        const facultyData = {
+            "Faculté de sciences informatiques": {
+                hasPaths: true,
+                paths: {
+                    "IAGE": { promotions: ["Bac1", "Bac2", "Bac3"], hasFiliere: false },
+                    "TECHNOLOGIE": { promotions: ["Bac1", "Bac2", "Bac3", "Bac4"], hasFiliere: true, filieres: ["IA", "GL", "SI"] }
+                }
+            },
+            "Faculté de polytechnique": {
+                hasPaths: true,
+                paths: {
+                    "Électromécanique": { promotions: ["Bac1", "Bac2", "Bac3", "Bac4"], hasFiliere: false },
+                    "Géomine": { promotions: ["Bac1", "Bac2", "Bac3", "Bac4"], hasFiliere: false },
+                    "GMP": { promotions: ["Bac1", "Bac2", "Bac3", "Bac4"], hasFiliere: false },
+                    "Architecture": { promotions: ["Bac1", "Bac2", "Bac3", "Bac4"], hasFiliere: false }
+                }
+            },
+            "Faculté des sciences economiques": {
+                hasPaths: true,
+                paths: {
+                    "Finance et Banque": { promotions: ["Bac1", "Bac2", "Bac3"], hasFiliere: false },
+                    "Marketing": { promotions: ["Bac1", "Bac2", "Bac3"], hasFiliere: false },
+                    "Management": { promotions: ["Bac1", "Bac2", "Bac3"], hasFiliere: false },
+                    "Ressources Humaines": { promotions: ["Bac1", "Bac2", "Bac3"], hasFiliere: false }
+                }
+            },
+            "Faculté des sciences de l'information et de la communication": {
+                hasPaths: true,
+                paths: {
+                    "CO": { promotions: ["Bac1", "Bac2", "Bac3"], hasFiliere: false },
+                    "JM": { promotions: ["Bac1", "Bac2", "Bac3"], hasFiliere: false },
+                    "MCD": { promotions: ["Bac1", "Bac2", "Bac3"], hasFiliere: false }
+                }
+            },
+            "Faculté de droit": {
+                hasPaths: false,
+                defaultParcours: "Droit",
+                promotions: ["Bac1", "Bac2", "Bac3"]
+            },
+            "Ecole d'architecture": {
+                hasPaths: false,
+                defaultParcours: "Architecture",
+                promotions: ["Bac1", "Bac2", "Bac3", "Bac4"]
+            },
+            "Faculté de theologie": {
+                hasPaths: false,
+                defaultParcours: "Théologie",
+                promotions: ["Bac1", "Bac2", "Bac3"]
+            },
+            "Faculté des lettres et sciences humaines": {
+                hasPaths: false,
+                defaultParcours: "Lettres",
+                promotions: ["Bac1", "Bac2", "Bac3"]
+            }
+        };
 
-            if (parcours === 'IAGE') {
-                promotionDiv.style.display = 'block';
-                filiereDiv.style.display = 'none';
-                promotionSelect.innerHTML = `
-                    <option value="Bac1">Bac 1</option>
-                    <option value="Bac2">Bac 2</option>
-                    <option value="Bac3">Bac 3</option>
-                `;
-            } else if (parcours === 'TECHNOLOGIE') {
-                promotionDiv.style.display = 'block';
-                filiereDiv.style.display = 'block';
-                promotionSelect.innerHTML = `
-                    <option value="Bac1">Bac 1</option>
-                    <option value="Bac2">Bac 2</option>
-                    <option value="Bac3">Bac 3</option>
-                    <option value="Bac4">Bac 4</option>
-                `;
-            } else {
+        // ===== CUSTOM DROPDOWN ENGINE =====
+        function buildCustomDropdown(wrapper) {
+            const select = wrapper.querySelector('select');
+            if (!select || wrapper.querySelector('.custom-select-trigger')) return;
+
+            const trigger = document.createElement('div');
+            trigger.className = 'custom-select-trigger';
+
+            const label = document.createElement('span');
+            label.className = 'custom-select-label';
+            const firstOpt = select.options[select.selectedIndex];
+            label.textContent = firstOpt ? firstOpt.text : 'Sélectionner';
+
+            const arrow = document.createElement('span');
+            arrow.className = 'custom-select-arrow';
+            arrow.innerHTML = '<i class="fa-solid fa-chevron-down"></i>';
+
+            trigger.appendChild(label);
+            trigger.appendChild(arrow);
+
+            const dropdown = document.createElement('div');
+            dropdown.className = 'custom-select-dropdown';
+
+            function buildOptions() {
+                dropdown.innerHTML = '';
+                Array.from(select.options).forEach(opt => {
+                    const item = document.createElement('div');
+                    item.className = 'custom-select-option';
+                    if (!opt.value) item.classList.add('placeholder-opt');
+                    if (opt.selected) item.classList.add('selected');
+                    item.textContent = opt.text;
+                    item.dataset.value = opt.value;
+                    item.addEventListener('click', () => {
+                        select.value = opt.value;
+                        label.textContent = opt.text;
+                        if (opt.value) {
+                            trigger.classList.add('has-value');
+                        } else {
+                            trigger.classList.remove('has-value');
+                        }
+                        dropdown.querySelectorAll('.custom-select-option').forEach(o => o.classList.remove('selected'));
+                        item.classList.add('selected');
+                        closeDropdown();
+                        // Déclencher updateFields si c'est une select dynamique
+                        const evt = new Event('change', { bubbles: true });
+                        select.dispatchEvent(evt);
+                    });
+                    dropdown.appendChild(item);
+                });
+            }
+
+            buildOptions();
+
+            function openDropdown() {
+                // Fermer tous les autres dropdowns
+                document.querySelectorAll('.custom-select-wrapper.open').forEach(w => {
+                    if (w !== wrapper) w.classList.remove('open');
+                });
+                wrapper.classList.toggle('open');
+            }
+
+            function closeDropdown() {
+                wrapper.classList.remove('open');
+            }
+
+            trigger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                openDropdown();
+            });
+
+            wrapper.appendChild(trigger);
+            wrapper.appendChild(dropdown);
+
+            // Méthode publique pour reconstruire les options après changement du select
+            wrapper._refreshDropdown = function () {
+                buildOptions();
+                const selOpt = select.options[select.selectedIndex];
+                label.textContent = selOpt ? selOpt.text : 'Sélectionner';
+            };
+        }
+
+        function refreshDropdown(selectEl) {
+            const wrapper = selectEl.closest('.custom-select-wrapper');
+            if (wrapper && wrapper._refreshDropdown) wrapper._refreshDropdown();
+        }
+
+        // Fermer tous les dropdowns au clic à l'extérieur
+        document.addEventListener('click', () => {
+            document.querySelectorAll('.custom-select-wrapper.open').forEach(w => {
+                w.classList.remove('open');
+            });
+        });
+
+        // ===== LOGIQUE DYNAMIQUE FACULTÉ =====
+        function updateFields() {
+            const faculte = document.getElementById('faculte').value;
+            const parcoursDiv = document.getElementById('parcoursDiv');
+            const parcoursSelect = document.getElementById('parcours');
+            const promotionDiv = document.getElementById('promotionDiv');
+            const promotionSelect = document.getElementById('promotion');
+            const filiereDiv = document.getElementById('filiereDiv');
+            const filiereSelect = document.getElementById('filiere');
+
+            parcoursSelect.removeAttribute('required');
+            promotionSelect.removeAttribute('required');
+            filiereSelect.removeAttribute('required');
+
+            if (!faculte || !facultyData[faculte]) {
+                parcoursDiv.style.display = 'none';
                 promotionDiv.style.display = 'none';
                 filiereDiv.style.display = 'none';
+                return;
+            }
+
+            const data = facultyData[faculte];
+
+            if (data.hasPaths) {
+                parcoursDiv.style.display = 'block';
+                parcoursSelect.setAttribute('required', 'required');
+
+                const currentParcours = parcoursSelect.value;
+                if (!data.paths[currentParcours]) {
+                    let optionsHtml = '<option value="">Sélectionner un Parcours</option>';
+                    for (const pathKey in data.paths) {
+                        optionsHtml += `<option value="${pathKey}">${pathKey}</option>`;
+                    }
+                    parcoursSelect.innerHTML = optionsHtml;
+                    parcoursSelect.value = "";
+                }
+                refreshDropdown(parcoursSelect);
+
+                const selectedPath = parcoursSelect.value;
+                if (selectedPath && data.paths[selectedPath]) {
+                    const pathData = data.paths[selectedPath];
+
+                    promotionDiv.style.display = 'block';
+                    promotionSelect.setAttribute('required', 'required');
+                    let promoHtml = '<option value="">Sélectionner</option>';
+                    pathData.promotions.forEach(promo => {
+                        promoHtml += `<option value="${promo}">${promo}</option>`;
+                    });
+                    promotionSelect.innerHTML = promoHtml;
+                    refreshDropdown(promotionSelect);
+
+                    if (pathData.hasFiliere) {
+                        filiereDiv.style.display = 'block';
+                        filiereSelect.setAttribute('required', 'required');
+                        let filHtml = '<option value="">Sélectionner</option>';
+                        pathData.filieres.forEach(fil => {
+                            filHtml += `<option value="${fil}">${fil}</option>`;
+                        });
+                        filiereSelect.innerHTML = filHtml;
+                        refreshDropdown(filiereSelect);
+                    } else {
+                        filiereDiv.style.display = 'none';
+                        filiereSelect.value = '';
+                    }
+                } else {
+                    promotionDiv.style.display = 'none';
+                    filiereDiv.style.display = 'none';
+                }
+            } else {
+                parcoursDiv.style.display = 'none';
+                parcoursSelect.innerHTML = `<option value="${data.defaultParcours}">${data.defaultParcours}</option>`;
+                parcoursSelect.value = data.defaultParcours;
+
+                promotionDiv.style.display = 'block';
+                promotionSelect.setAttribute('required', 'required');
+                let promoHtml = '<option value="">Sélectionner</option>';
+                data.promotions.forEach(promo => {
+                    promoHtml += `<option value="${promo}">${promo}</option>`;
+                });
+                promotionSelect.innerHTML = promoHtml;
+                refreshDropdown(promotionSelect);
+
+                filiereDiv.style.display = 'none';
+                filiereSelect.value = '';
             }
         }
+
+        // Écouter les changements sur les selects dynamiques
+        document.getElementById('faculte').addEventListener('change', updateFields);
+        document.getElementById('parcours').addEventListener('change', updateFields);
+
+        // ===== INITIALISATION =====
+        document.addEventListener('DOMContentLoaded', () => {
+            const oldValues = {
+                faculte: "{{ faculte|default('') }}",
+                parcours: "{{ parcours|default('') }}",
+                promotion: "{{ promotion|default('') }}",
+                filiere: "{{ filiere|default('') }}",
+                sexe: "{{ sexe|default('') }}"
+            };
+
+            if (oldValues.faculte) {
+                document.getElementById('faculte').value = oldValues.faculte;
+            }
+            if (oldValues.sexe) {
+                document.getElementById('sexe').value = oldValues.sexe;
+            }
+
+            updateFields();
+
+            if (oldValues.parcours) {
+                const parcoursSelect = document.getElementById('parcours');
+                parcoursSelect.value = oldValues.parcours;
+                refreshDropdown(parcoursSelect);
+            }
+            if (oldValues.promotion) {
+                const promotionSelect = document.getElementById('promotion');
+                promotionSelect.value = oldValues.promotion;
+                refreshDropdown(promotionSelect);
+            }
+            if (oldValues.filiere) {
+                const filiereSelect = document.getElementById('filiere');
+                filiereSelect.value = oldValues.filiere;
+                refreshDropdown(filiereSelect);
+            }
+
+            document.querySelectorAll('.custom-select-wrapper').forEach(wrapper => {
+                buildCustomDropdown(wrapper);
+            });
+        });
     </script>
 </body>
 
