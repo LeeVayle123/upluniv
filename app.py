@@ -1216,7 +1216,7 @@ def register():
         if already_exists:
             return render_template(
                 'register.html',
-                error='Ce matricule est déjà utilisé.,
+                error='Ce matricule est déjà utilisé.',
                 matricule=matricule,
                 nom=nom,
                 postnom=postnom,
