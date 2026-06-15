@@ -154,21 +154,37 @@
             border-color: white;
         }
 
+        /* === MOBILE : Plein écran garanti === */
         @media (max-width: 768px) {
-            .Conteneur {
-                flex-direction: column;
-                width: 100%;
-                max-width: 100%;
-                border-radius: 0;
-                box-shadow: none;
+            body {
+                padding: 0 !important;
+                margin: 0 !important;
+                align-items: stretch !important;
+                background: var(--surface) !important;
             }
+
+            .Conteneur {
+                flex-direction: column !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                height: auto !important;
+                min-height: 100vh !important;
+                margin: 0 !important;
+                border-radius: 0 !important;
+                box-shadow: none !important;
+                border: none !important;
+            }
+
             .panneau-lateral {
                 flex: 0 0 auto;
                 max-width: 100%;
-                padding: 15px 20px;
+                padding: 18px 20px;
+                border-radius: 0 !important;
             }
+
             .panneau-formulaire {
                 padding: 20px 20px;
+                flex: 1;
             }
         }
 
@@ -354,26 +370,8 @@
         }
 
         @media (max-width: 600px) {
-            body {
-                padding: 0;
-                margin: 0;
-                align-items: stretch;
-            }
-
-            .Conteneur {
-                width: 100%;
-                max-width: 100%;
-                margin: 0;
-                border-radius: 0;
-                box-shadow: none;
-                height: 100vh;
-                min-height: 100vh;
-            }
-
             .panneau-lateral {
-                padding: 12px 12px;
-                flex: 0 0 auto;
-                max-width: 100%;
+                padding: 12px 15px;
             }
 
             .logo-universitaire {
@@ -396,88 +394,88 @@
             }
 
             .panneau-formulaire {
-                padding: 12px 12px;
+                padding: 15px 15px;
             }
 
             .titre-formulaire {
-                font-size: 0.8rem;
+                font-size: 0.85rem;
                 margin-bottom: 8px;
             }
 
             .champ-formulaire {
-                padding: 7px 10px;
-                font-size: 0.75rem;
-                border-radius: 10px;
+                padding: 10px 14px;
+                font-size: 0.85rem;
+                border-radius: 14px;
             }
 
             .custom-select-trigger {
-                padding: 7px 10px;
-                font-size: 0.75rem;
-                border-radius: 10px;
+                padding: 10px 14px;
+                font-size: 0.85rem;
+                border-radius: 14px;
             }
 
             .custom-select-option {
-                padding: 8px 12px;
-                font-size: 0.75rem;
+                padding: 10px 14px;
+                font-size: 0.8rem;
             }
 
             .bouton-validation {
-                padding: 9px;
-                font-size: 0.78rem;
-                border-radius: 10px;
-                margin-top: 10px;
+                padding: 12px;
+                font-size: 0.9rem;
+                border-radius: 14px;
+                margin-top: 12px;
             }
 
             .groupe-formulaire {
-                margin-bottom: 8px;
+                margin-bottom: 10px;
             }
 
             .etiquette-formulaire {
-                font-size: 0.68rem;
-                margin-bottom: 3px;
+                font-size: 0.75rem;
+                margin-bottom: 4px;
             }
 
             #gps-status {
-                font-size: 0.65rem;
+                font-size: 0.7rem;
             }
 
             #student-info-badge {
-                padding: 8px 10px !important;
-                border-radius: 8px !important;
-                margin-bottom: 8px !important;
+                padding: 10px 12px !important;
+                border-radius: 10px !important;
+                margin-bottom: 10px !important;
             }
 
             #student-info-badge p {
-                font-size: 0.72rem !important;
+                font-size: 0.78rem !important;
             }
 
             #success-ticket {
-                padding: 10px !important;
-                border-radius: 8px !important;
-                margin-bottom: 8px !important;
+                padding: 12px !important;
+                border-radius: 10px !important;
+                margin-bottom: 10px !important;
             }
 
             #success-ticket h3 {
-                font-size: 0.8rem !important;
+                font-size: 0.85rem !important;
             }
 
             #success-ticket p,
             #success-ticket div {
-                font-size: 0.62rem !important;
+                font-size: 0.68rem !important;
             }
 
             #random-check-zone {
-                padding: 10px !important;
-                border-radius: 8px !important;
-                margin-bottom: 8px !important;
+                padding: 12px !important;
+                border-radius: 10px !important;
+                margin-bottom: 10px !important;
             }
 
             #random-check-zone h3 {
-                font-size: 0.8rem !important;
+                font-size: 0.85rem !important;
             }
 
             #random-check-zone p {
-                font-size: 0.65rem !important;
+                font-size: 0.7rem !important;
             }
         }
 
