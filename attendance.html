@@ -1585,26 +1585,173 @@
         </div>
 
         <!-- ===================== ONGLET NOTES PRÉSENCE ===================== -->
+        <style>
+            #tab-notes {
+                background: #f1f5f9;
+                flex-direction: column !important;
+                overflow-y: auto !important;
+                min-height: 0 !important;
+                padding-bottom: 80px !important;
+            }
+            .notes-header {
+                background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+                padding: 20px 16px 16px;
+                margin: -16px -16px 16px;
+                border-radius: 0 0 24px 24px;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+            .notes-header-icon {
+                width: 40px; height: 40px;
+                background: rgba(255,255,255,0.15);
+                border-radius: 12px;
+                display: flex; align-items: center; justify-content: center;
+                font-size: 1.2rem;
+                color: white;
+                flex-shrink: 0;
+            }
+            .notes-header h2 {
+                font-size: 1.05rem;
+                font-weight: 800;
+                color: white;
+                margin: 0;
+            }
+            .notes-header p {
+                font-size: 0.7rem;
+                color: rgba(255,255,255,0.75);
+                margin: 2px 0 0;
+                font-weight: 500;
+            }
+            .coming-soon-card {
+                background: #ffffff;
+                border-radius: 18px;
+                padding: 32px 20px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+                text-align: center;
+            }
+            .coming-soon-icon {
+                width: 64px; height: 64px;
+                border-radius: 20px;
+                display: flex; align-items: center; justify-content: center;
+                font-size: 1.8rem;
+                margin: 0 auto 16px;
+            }
+            .coming-soon-title {
+                font-size: 0.95rem;
+                font-weight: 800;
+                margin-bottom: 6px;
+                color: #1e293b;
+            }
+            .coming-soon-sub {
+                font-size: 0.75rem;
+                color: #64748b;
+                line-height: 1.6;
+            }
+            .coming-soon-badge {
+                display: inline-block;
+                margin-top: 16px;
+                padding: 5px 14px;
+                border-radius: 20px;
+                font-size: 0.68rem;
+                font-weight: 700;
+                letter-spacing: 0.5px;
+                text-transform: uppercase;
+            }
+        </style>
         <div id="tab-notes" class="tab-panel" style="display:none; padding: 16px; flex: 1; animation: fadeIn 0.3s ease;">
-            <h2 style="font-size: 1rem; font-weight: 800; color: var(--primary); margin-bottom: 14px; display: flex; align-items: center; gap: 8px;">
-                <i class="fa-solid fa-clipboard-list"></i> Notes de Présence
-            </h2>
-            <div style="background: #fef2f2; border: 2px solid #ef4444; border-radius: 14px; padding: 20px; text-align: center; margin-top: 20px;">
-                <i class="fa-solid fa-circle-xmark" style="font-size: 2rem; color: #ef4444; margin-bottom: 10px; display: block;"></i>
-                <p style="font-weight: 700; color: #dc2626; font-size: 0.9rem; margin-bottom: 4px;">Fonctionnalité indisponible</p>
-                <p style="font-size: 0.75rem; color: #ef4444; line-height: 1.5;">Cette section est en cours de développement.<br>Elle sera disponible prochainement.</p>
+
+            <!-- En-tête coloré -->
+            <div class="notes-header">
+                <div class="notes-header-icon">
+                    <i class="fa-solid fa-clipboard-list"></i>
+                </div>
+                <div>
+                    <h2>Notes de Présence</h2>
+                    <p>Résultats et évaluation</p>
+                </div>
+            </div>
+
+            <!-- Carte bientôt disponible -->
+            <div class="coming-soon-card">
+                <div class="coming-soon-icon" style="background: #f3e8ff; color: #7c3aed;">
+                    <i class="fa-solid fa-flask-vial"></i>
+                </div>
+                <p class="coming-soon-title">Fonctionnalité en développement</p>
+                <p class="coming-soon-sub">
+                    Les notes de présence seront disponibles<br>prochainement dans cette section.
+                </p>
+                <span class="coming-soon-badge" style="background: #f3e8ff; color: #7c3aed;">
+                    <i class="fa-solid fa-clock"></i>&nbsp; Bientôt disponible
+                </span>
             </div>
         </div>
 
         <!-- ===================== ONGLET HORAIRES ===================== -->
+        <style>
+            #tab-horaires {
+                background: #f1f5f9;
+                flex-direction: column !important;
+                overflow-y: auto !important;
+                min-height: 0 !important;
+                padding-bottom: 80px !important;
+            }
+            .horaires-header {
+                background: linear-gradient(135deg, #0f766e 0%, #14b8a6 100%);
+                padding: 20px 16px 16px;
+                margin: -16px -16px 16px;
+                border-radius: 0 0 24px 24px;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+            .horaires-header-icon {
+                width: 40px; height: 40px;
+                background: rgba(255,255,255,0.15);
+                border-radius: 12px;
+                display: flex; align-items: center; justify-content: center;
+                font-size: 1.2rem;
+                color: white;
+                flex-shrink: 0;
+            }
+            .horaires-header h2 {
+                font-size: 1.05rem;
+                font-weight: 800;
+                color: white;
+                margin: 0;
+            }
+            .horaires-header p {
+                font-size: 0.7rem;
+                color: rgba(255,255,255,0.75);
+                margin: 2px 0 0;
+                font-weight: 500;
+            }
+        </style>
         <div id="tab-horaires" class="tab-panel" style="display:none; padding: 16px; flex: 1; animation: fadeIn 0.3s ease;">
-            <h2 style="font-size: 1rem; font-weight: 800; color: var(--primary); margin-bottom: 14px; display: flex; align-items: center; gap: 8px;">
-                <i class="fa-solid fa-calendar-days"></i> Horaires
-            </h2>
-            <div style="background: #fef2f2; border: 2px solid #ef4444; border-radius: 14px; padding: 20px; text-align: center; margin-top: 20px;">
-                <i class="fa-solid fa-circle-xmark" style="font-size: 2rem; color: #ef4444; margin-bottom: 10px; display: block;"></i>
-                <p style="font-weight: 700; color: #dc2626; font-size: 0.9rem; margin-bottom: 4px;">Fonctionnalité indisponible</p>
-                <p style="font-size: 0.75rem; color: #ef4444; line-height: 1.5;">Les horaires ne sont pas encore configurés.<br>Contactez l'administration UPL.</p>
+
+            <!-- En-tête coloré -->
+            <div class="horaires-header">
+                <div class="horaires-header-icon">
+                    <i class="fa-solid fa-calendar-days"></i>
+                </div>
+                <div>
+                    <h2>Horaires</h2>
+                    <p>Emploi du temps hebdomadaire</p>
+                </div>
+            </div>
+
+            <!-- Carte bientôt disponible -->
+            <div class="coming-soon-card">
+                <div class="coming-soon-icon" style="background: #ccfbf1; color: #0f766e;">
+                    <i class="fa-solid fa-calendar-xmark"></i>
+                </div>
+                <p class="coming-soon-title">Horaires non encore configurés</p>
+                <p class="coming-soon-sub">
+                    L'emploi du temps sera disponible<br>dès que l'administration UPL<br>aura finalisé la configuration.
+                </p>
+                <span class="coming-soon-badge" style="background: #ccfbf1; color: #0f766e;">
+                    <i class="fa-solid fa-gear fa-spin"></i>&nbsp; En préparation
+                </span>
             </div>
         </div>
 
