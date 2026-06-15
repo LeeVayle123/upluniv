@@ -1574,27 +1574,161 @@
         </style>
 
         <!-- ===================== ONGLET HISTORIQUE ===================== -->
+        <style>
+            /* ===== HISTORIQUE MOBILE ===== */
+            #tab-historique {
+                background: #f1f5f9;
+            }
+            .histo-header {
+                background: linear-gradient(135deg, #000080 0%, #1e40af 100%);
+                padding: 20px 16px 16px;
+                margin: -16px -16px 16px;
+                border-radius: 0 0 24px 24px;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+            .histo-header-icon {
+                width: 40px; height: 40px;
+                background: rgba(255,255,255,0.15);
+                border-radius: 12px;
+                display: flex; align-items: center; justify-content: center;
+                font-size: 1.2rem;
+                color: white;
+                flex-shrink: 0;
+            }
+            .histo-header h2 {
+                font-size: 1.05rem;
+                font-weight: 800;
+                color: white;
+                margin: 0;
+            }
+            .histo-header p {
+                font-size: 0.7rem;
+                color: rgba(255,255,255,0.75);
+                margin: 2px 0 0;
+                font-weight: 500;
+            }
+            /* Carte d'entrée/sortie */
+            .histo-card {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                padding: 13px 14px;
+                background: #ffffff;
+                border-radius: 16px;
+                margin-bottom: 10px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+                border-left: 4px solid transparent;
+                transition: transform 0.15s;
+            }
+            .histo-card:active { transform: scale(0.98); }
+            .histo-card.entree { border-left-color: #22c55e; }
+            .histo-card.sortie { border-left-color: #ef4444; }
+            .histo-card-icon {
+                width: 42px; height: 42px;
+                border-radius: 12px;
+                display: flex; align-items: center; justify-content: center;
+                font-size: 1rem;
+                flex-shrink: 0;
+            }
+            .histo-card.entree .histo-card-icon {
+                background: #dcfce7;
+                color: #16a34a;
+            }
+            .histo-card.sortie .histo-card-icon {
+                background: #fee2e2;
+                color: #ef4444;
+            }
+            .histo-card-content { flex: 1; min-width: 0; }
+            .histo-card-title {
+                font-size: 0.82rem;
+                font-weight: 700;
+                color: #1e293b;
+                margin-bottom: 3px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            .histo-card-sub {
+                font-size: 0.72rem;
+                color: #64748b;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+            }
+            .histo-card-sub i { font-size: 0.65rem; }
+            .histo-badge {
+                font-size: 0.62rem;
+                font-weight: 700;
+                padding: 3px 10px;
+                border-radius: 20px;
+                flex-shrink: 0;
+            }
+            .histo-badge.entree { color: #16a34a; background: #dcfce7; }
+            .histo-badge.sortie { color: #ef4444; background: #fee2e2; }
+            /* Graphe section */
+            .histo-chart-box {
+                background: #ffffff;
+                border-radius: 18px;
+                padding: 16px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            }
+            .histo-chart-title {
+                font-size: 0.82rem;
+                font-weight: 700;
+                color: #334155;
+                margin-bottom: 14px;
+                display: flex;
+                align-items: center;
+                gap: 7px;
+            }
+            .histo-chart-title i { color: #000080; }
+            #historique-chart {
+                display: flex;
+                align-items: flex-end;
+                gap: 6px;
+                height: 100px;
+                justify-content: space-around;
+                padding: 0 4px;
+            }
+            #historique-chart-labels {
+                display: flex;
+                gap: 6px;
+                justify-content: space-around;
+                margin-top: 6px;
+            }
+        </style>
         <div id="tab-historique" class="tab-panel" style="display:none; padding: 16px; flex: 1; overflow-y: auto; animation: fadeIn 0.3s ease;">
-            <h2 style="font-size: 1rem; font-weight: 800; color: var(--primary); margin-bottom: 14px; display: flex; align-items: center; gap: 8px;">
-                <i class="fa-solid fa-clock-rotate-left"></i> Historique de la semaine
-            </h2>
 
-            <!-- Liste des présences -->
-            <div id="historique-liste" style="margin-bottom: 20px;">
-                <div style="text-align:center; color: #94a3b8; font-size: 0.82rem; padding: 20px 0;">
-                    <i class="fa-solid fa-spinner fa-spin"></i> Chargement...
+            <!-- En-tête coloré -->
+            <div class="histo-header">
+                <div class="histo-header-icon">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                </div>
+                <div>
+                    <h2>Historique de présence</h2>
+                    <p>Semaine en cours</p>
                 </div>
             </div>
 
-            <!-- Diagramme en barres -->
-            <div style="background: #f8fafc; border-radius: 16px; padding: 14px;">
-                <h3 style="font-size: 0.82rem; font-weight: 700; color: #334155; margin-bottom: 12px; display:flex; align-items:center; gap:6px;">
-                    <i class="fa-solid fa-chart-bar" style="color: var(--primary);"></i> Présences par jour
-                </h3>
-                <div id="historique-chart" style="display: flex; align-items: flex-end; gap: 8px; height: 90px; justify-content: space-around; padding: 0 4px;">
+            <!-- Liste des présences -->
+            <div id="historique-liste" style="margin-bottom: 16px;">
+                <div style="text-align:center; color: #94a3b8; font-size: 0.82rem; padding: 30px 0;">
+                    <i class="fa-solid fa-spinner fa-spin" style="font-size:1.5rem; display:block; margin-bottom:8px;"></i>
+                    Chargement...
+                </div>
+            </div>
+
+            <!-- Graphe en barres -->
+            <div class="histo-chart-box">
+                <div class="histo-chart-title">
+                    <i class="fa-solid fa-chart-bar"></i> Présences par jour
+                </div>
+                <div id="historique-chart">
                     <!-- rempli par JS -->
                 </div>
-                <div id="historique-chart-labels" style="display: flex; gap: 8px; justify-content: space-around; margin-top: 5px;">
+                <div id="historique-chart-labels">
                     <!-- rempli par JS -->
                 </div>
             </div>
@@ -1627,33 +1761,92 @@
         </main>
 
         <!-- ===================== BARRE DE NAVIGATION ===================== -->
-        <nav id="bottom-nav" style="
-            position: fixed;
-            bottom: 0; left: 0; right: 0;
-            background: #ffffff;
-            border-top: 1px solid #e2e8f0;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            padding: 8px 0 10px;
-            z-index: 9999;
-            box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
-        ">
-            <button class="nav-btn active" id="nav-pointage" onclick="switchTab('pointage')" style="background:rgba(0,0,128,0.06); border:none; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:2px; padding: 4px 12px; border-radius: 12px; transition: background 0.2s;">
-                <span style="font-size: 1.4rem; line-height:1;">🏠</span>
-                <span style="font-size: 0.6rem; font-weight: 700; color: #000080; font-family: 'Outfit', sans-serif; letter-spacing: 0.5px;">POINTAGE</span>
+        <style>
+            /* ===== BOTTOM NAV MODERNE ===== */
+            #bottom-nav {
+                position: fixed;
+                bottom: 0; left: 0; right: 0;
+                background: #ffffff;
+                border-top: 1px solid #e2e8f0;
+                display: flex;
+                justify-content: space-around;
+                align-items: center;
+                padding: 6px 8px calc(6px + env(safe-area-inset-bottom));
+                z-index: 9999;
+                box-shadow: 0 -4px 24px rgba(0,0,128,0.10);
+            }
+            .nav-btn {
+                background: none;
+                border: none;
+                cursor: pointer;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 3px;
+                padding: 6px 14px;
+                border-radius: 14px;
+                transition: background 0.2s, transform 0.15s;
+                flex: 1;
+                min-width: 0;
+                position: relative;
+            }
+            .nav-btn:active {
+                transform: scale(0.93);
+            }
+            .nav-btn .nav-icon {
+                font-size: 1.25rem;
+                line-height: 1;
+                color: #94a3b8;
+                transition: color 0.2s, transform 0.2s;
+            }
+            .nav-btn .nav-label {
+                font-size: 0.58rem;
+                font-weight: 700;
+                color: #94a3b8;
+                font-family: 'Outfit', sans-serif;
+                letter-spacing: 0.4px;
+                text-transform: uppercase;
+                transition: color 0.2s;
+                white-space: nowrap;
+            }
+            .nav-btn.active {
+                background: rgba(0,0,128,0.07);
+            }
+            .nav-btn.active .nav-icon {
+                color: #000080;
+                transform: translateY(-1px);
+            }
+            .nav-btn.active .nav-label {
+                color: #000080;
+            }
+            .nav-btn.active::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 28px;
+                height: 3px;
+                background: #000080;
+                border-radius: 0 0 4px 4px;
+            }
+        </style>
+        <nav id="bottom-nav">
+            <button class="nav-btn active" id="nav-pointage" onclick="switchTab('pointage')">
+                <i class="fa-solid fa-house nav-icon"></i>
+                <span class="nav-label">Pointage</span>
             </button>
-            <button class="nav-btn" id="nav-historique" onclick="switchTab('historique')" style="background:none; border:none; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:2px; padding: 4px 12px; border-radius: 12px; transition: background 0.2s;">
-                <span style="font-size: 1.4rem; line-height:1;">🕐</span>
-                <span style="font-size: 0.6rem; font-weight: 700; color: #94a3b8; font-family: 'Outfit', sans-serif; letter-spacing: 0.5px;">HISTORIQUE</span>
+            <button class="nav-btn" id="nav-historique" onclick="switchTab('historique')">
+                <i class="fa-solid fa-clock-rotate-left nav-icon"></i>
+                <span class="nav-label">Historique</span>
             </button>
-            <button class="nav-btn" id="nav-notes" onclick="switchTab('notes')" style="background:none; border:none; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:2px; padding: 4px 12px; border-radius: 12px; transition: background 0.2s;">
-                <span style="font-size: 1.4rem; line-height:1;">📋</span>
-                <span style="font-size: 0.6rem; font-weight: 700; color: #94a3b8; font-family: 'Outfit', sans-serif; letter-spacing: 0.5px;">NOTES</span>
+            <button class="nav-btn" id="nav-notes" onclick="switchTab('notes')">
+                <i class="fa-solid fa-clipboard-list nav-icon"></i>
+                <span class="nav-label">Notes</span>
             </button>
-            <button class="nav-btn" id="nav-horaires" onclick="switchTab('horaires')" style="background:none; border:none; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:2px; padding: 4px 12px; border-radius: 12px; transition: background 0.2s;">
-                <span style="font-size: 1.4rem; line-height:1;">📅</span>
-                <span style="font-size: 0.6rem; font-weight: 700; color: #94a3b8; font-family: 'Outfit', sans-serif; letter-spacing: 0.5px;">HORAIRES</span>
+            <button class="nav-btn" id="nav-horaires" onclick="switchTab('horaires')">
+                <i class="fa-solid fa-calendar-days nav-icon"></i>
+                <span class="nav-label">Horaires</span>
             </button>
         </nav>
 
@@ -1706,10 +1899,7 @@
             // Réinitialiser tous les boutons nav
             ['pointage','historique','notes','horaires'].forEach(t => {
                 const btn = document.getElementById('nav-' + t);
-                const emoji = btn.querySelector('span:first-child');
-                const label = btn.querySelectorAll('span')[1];
-                if (label) label.style.color = '#94a3b8';
-                btn.style.background = 'none';
+                btn.classList.remove('active');
             });
 
             // Afficher le panel actif
@@ -1723,9 +1913,7 @@
 
             // Activer le bouton nav
             const activeBtn = document.getElementById('nav-' + name);
-            const activeLabel = activeBtn.querySelectorAll('span')[1];
-            if (activeLabel) activeLabel.style.color = '#000080';
-            activeBtn.style.background = 'rgba(0,0,128,0.06)';
+            activeBtn.classList.add('active');
 
             // Charger l'historique si besoin
             if (name === 'historique') {
@@ -1838,18 +2026,25 @@
                         const dateStr = `${jourNom} ${d.getDate()} ${moisNom}`;
                         const heureStr = d.toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'});
                         const isEntree = p.type_presence === 'Entrée';
-                        const couleur = isEntree ? '#22c55e' : '#ef4444';
+                        const typeClass = isEntree ? 'entree' : 'sortie';
                         const icone = isEntree ? 'fa-right-to-bracket' : 'fa-right-from-bracket';
+                        const salle = p.auditorium_code || p.filiere || '—';
                         html += `
-                            <div style="display:flex; align-items:center; gap:10px; padding: 10px 12px; background: #f8fafc; border-radius: 12px; margin-bottom: 8px; border-left: 4px solid ${couleur};">
-                                <div style="background: ${couleur}18; border-radius: 50%; width: 36px; height: 36px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
-                                    <i class="fa-solid ${icone}" style="color: ${couleur}; font-size: 0.9rem;"></i>
+                            <div class="histo-card ${typeClass}">
+                                <div class="histo-card-icon">
+                                    <i class="fa-solid ${icone}"></i>
                                 </div>
-                                <div style="flex:1; min-width:0;">
-                                    <div style="font-size: 0.78rem; font-weight: 700; color: #1e293b;">${dateStr} — ${p.auditorium_code || p.filiere || '—'}</div>
-                                    <div style="font-size: 0.7rem; color: #64748b; margin-top: 2px;">${p.type_presence} · ${heureStr}</div>
+                                <div class="histo-card-content">
+                                    <div class="histo-card-title">
+                                        <i class="fa-solid fa-door-open" style="font-size:0.65rem; margin-right:4px;"></i>${salle} &nbsp;·&nbsp; ${dateStr}
+                                    </div>
+                                    <div class="histo-card-sub">
+                                        <i class="fa-regular fa-clock"></i> ${heureStr}
+                                        &nbsp;·&nbsp;
+                                        <i class="fa-solid fa-${isEntree ? 'arrow-right-to-bracket' : 'arrow-right-from-bracket'}"></i> ${p.type_presence}
+                                    </div>
                                 </div>
-                                <span style="font-size: 0.62rem; font-weight: 700; color: ${couleur}; background: ${couleur}15; padding: 2px 8px; border-radius: 20px;">${p.type_presence}</span>
+                                <span class="histo-badge ${typeClass}">${p.type_presence}</span>
                             </div>`;
                     });
                     liste.innerHTML = html;
@@ -1871,18 +2066,23 @@
 
                     const maxVal = Math.max(...Object.values(countByDay), 1);
                     const couleurs = ['#000080','#1e40af','#2563eb','#3b82f6','#60a5fa','#93c5fd','#bfdbfe'];
+                    const today = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'][new Date().getDay()];
                     chart.innerHTML = joursComplets.map((j, i) => {
                         const val = countByDay[j] || 0;
-                        const pct = Math.round((val / maxVal) * 80) + 4;
-                        return `<div style="display:flex; flex-direction:column; align-items:center; flex:1; gap:4px;">
-                            <span style="font-size:0.6rem; font-weight:700; color: ${couleurs[i]};">${val > 0 ? val : ''}</span>
-                            <div style="width: 100%; height: ${pct}px; background: ${val > 0 ? couleurs[i] : '#e2e8f0'}; border-radius: 6px 6px 0 0; transition: height 0.5s ease;"></div>
+                        const pct = Math.round((val / maxVal) * 85) + 6;
+                        const isToday = j === today;
+                        const barColor = val > 0 ? couleurs[i] : '#e2e8f0';
+                        const highlight = isToday ? 'box-shadow: 0 0 0 2px ' + couleurs[i] + '40;' : '';
+                        return `<div style="display:flex; flex-direction:column; align-items:center; flex:1; gap:3px;">
+                            <span style="font-size:0.65rem; font-weight:800; color: ${val > 0 ? couleurs[i] : 'transparent'};">${val > 0 ? val : '·'}</span>
+                            <div style="width:100%; height:${pct}px; background:${barColor}; border-radius:6px 6px 0 0; transition:height 0.6s cubic-bezier(0.34,1.56,0.64,1); ${highlight}"></div>
                         </div>`;
                     }).join('');
 
-                    chartLabels.innerHTML = joursComplets.map(j =>
-                        `<div style="flex:1; text-align:center; font-size:0.6rem; font-weight:700; color:#64748b;">${j}</div>`
-                    ).join('');
+                    chartLabels.innerHTML = joursComplets.map((j, i) => {
+                        const isToday = j === today;
+                        return `<div style="flex:1; text-align:center; font-size:0.62rem; font-weight:${isToday ? '800' : '600'}; color:${isToday ? '#000080' : '#94a3b8'}; ${isToday ? 'text-decoration:underline;' : ''}">${j}</div>`;
+                    }).join('');
                 })
                 .catch(() => {
                     liste.innerHTML = `<div style="text-align:center; padding: 20px; background: #fef2f2; border-radius: 12px; border: 1.5px solid #ef4444;">
