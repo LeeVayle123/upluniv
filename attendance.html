@@ -167,8 +167,9 @@
                 flex-direction: column !important;
                 width: 100% !important;
                 max-width: 100% !important;
-                height: auto !important;
+                height: 100vh !important;
                 min-height: 100vh !important;
+                overflow: hidden !important;
                 margin: 0 !important;
                 border-radius: 0 !important;
                 box-shadow: none !important;
@@ -185,6 +186,15 @@
             .panneau-formulaire {
                 padding: 20px 20px;
                 flex: 1;
+                min-height: 0;
+                overflow-y: auto;
+            }
+
+            /* Tous les onglets occupent le reste de l'espace et scrollent */
+            .tab-panel {
+                flex: 1 !important;
+                min-height: 0 !important;
+                overflow-y: auto !important;
             }
         }
 
@@ -1578,6 +1588,10 @@
             /* ===== HISTORIQUE MOBILE ===== */
             #tab-historique {
                 background: #f1f5f9;
+                flex-direction: column !important;
+                overflow-y: auto !important;
+                min-height: 0 !important;
+                padding-bottom: 80px !important;
             }
             .histo-header {
                 background: linear-gradient(135deg, #000080 0%, #1e40af 100%);
@@ -1699,7 +1713,7 @@
                 margin-top: 6px;
             }
         </style>
-        <div id="tab-historique" class="tab-panel" style="display:none; padding: 16px; flex: 1; overflow-y: auto; animation: fadeIn 0.3s ease;">
+        <div id="tab-historique" class="tab-panel" style="display:none; padding: 16px; flex: 1; min-height: 0; animation: fadeIn 0.3s ease;">
 
             <!-- En-tête coloré -->
             <div class="histo-header">
@@ -1909,7 +1923,17 @@
                 notes:      document.getElementById('tab-notes'),
                 horaires:   document.getElementById('tab-horaires')
             };
-            if (panelMap[name]) panelMap[name].style.display = 'flex';
+            if (panelMap[name]) {
+                if (name === 'historique') {
+                    panelMap[name].style.display = 'flex';
+                    panelMap[name].style.flexDirection = 'column';
+                    panelMap[name].style.overflowY = 'auto';
+                } else {
+                    panelMap[name].style.display = 'flex';
+                    panelMap[name].style.flexDirection = '';
+                    panelMap[name].style.overflowY = '';
+                }
+            }
 
             // Activer le bouton nav
             const activeBtn = document.getElementById('nav-' + name);
