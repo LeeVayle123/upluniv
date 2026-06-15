@@ -1141,7 +1141,7 @@ def register():
         if already_exists:
             return render_template(
                 'register.html',
-                error='ID already used',
+                error='Ce matricule est déjà utilisé. Impossible d\'avoir deux matricules identiques dans la base de données.',
                 matricule=matricule,
                 nom=nom,
                 postnom=postnom,
@@ -1161,18 +1161,52 @@ def register():
                 saved_to_cloud = True
                 print(f"INFO: Étudiant {matricule} enregistré sur Supabase Cloud.")
             except Exception as e_supa:
+                err_msg = str(e_supa).lower()
+                # Détecter les erreurs de contrainte UNIQUE (duplicate key)
+                if 'duplicate' in err_msg or 'unique' in err_msg or '23505' in err_msg or 'already exists' in err_msg:
+                    return render_template(
+                        'register.html',
+                        error='Ce matricule est déjà utilisé. Impossible d\'avoir deux matricules identiques dans la base de données.',
+                        matricule=matricule,
+                        nom=nom,
+                        postnom=postnom,
+                        prenom=prenom,
+                        sexe=sexe,
+                        parcours=parcours,
+                        promotion=promotion,
+                        filiere=filiere,
+                        faculte=faculte
+                    )
                 print(f"AVERTISSEMENT: Supabase inaccessible ({e_supa}). Fallback vers la base locale.")
                 saved_to_cloud = False
 
         if not saved_to_cloud:
             # Fallback local (SQLite ou MySQL)
-            conn = get_db_connection()
-            cursor = conn.cursor()
-            query = "INSERT INTO students (matricule, nom, postnom, prenom, sexe, parcours, promotion, filiere, faculte) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
-            execute_sql(cursor, query, (matricule, nom, postnom, prenom, sexe, parcours, promotion, filiere, faculte))
-            conn.commit()
-            conn.close()
-            print(f"INFO: Étudiant {matricule} enregistré en local dans la table students.")
+            try:
+                conn = get_db_connection()
+                cursor = conn.cursor()
+                query = "INSERT INTO students (matricule, nom, postnom, prenom, sexe, parcours, promotion, filiere, faculte) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
+                execute_sql(cursor, query, (matricule, nom, postnom, prenom, sexe, parcours, promotion, filiere, faculte))
+                conn.commit()
+                conn.close()
+                print(f"INFO: Étudiant {matricule} enregistré en local dans la table students.")
+            except Exception as e_local:
+                err_local = str(e_local).lower()
+                if 'unique' in err_local or 'duplicate' in err_local:
+                    return render_template(
+                        'register.html',
+                        error='Ce matricule est déjà utilisé. Impossible d\'avoir deux matricules identiques dans la base de données.',
+                        matricule=matricule,
+                        nom=nom,
+                        postnom=postnom,
+                        prenom=prenom,
+                        sexe=sexe,
+                        parcours=parcours,
+                        promotion=promotion,
+                        filiere=filiere,
+                        faculte=faculte
+                    )
+                raise  # Re-lever l'erreur si ce n'est pas un doublon
 
         # Rester sur la page d'inscription et afficher le message de confirmation
         return render_template(
