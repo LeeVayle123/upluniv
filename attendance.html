@@ -581,6 +581,32 @@
             </div>
             <h1 class="titre-marque">UPL</h1>
             <p class="description-marque">POINTEZ LA PRESENCE</p>
+            <!-- Champ matricule dans le header -->
+            <div style="margin-top: 14px; width: 100%; max-width: 280px;">
+                <input type="text" id="matricule-header"
+                    placeholder="🎓 Votre matricule..."
+                    autocomplete="off"
+                    style="
+                        width: 100%;
+                        padding: 10px 16px;
+                        border-radius: 50px;
+                        border: 2px solid rgba(255,255,255,0.4);
+                        background: rgba(255,255,255,0.15);
+                        color: white;
+                        font-size: 0.88rem;
+                        font-family: 'Outfit', sans-serif;
+                        font-weight: 600;
+                        outline: none;
+                        text-align: center;
+                        backdrop-filter: blur(8px);
+                        transition: all 0.3s ease;
+                    "
+                    oninput="syncMatricule(this.value)"
+                    onfocus="this.style.background='rgba(255,255,255,0.25)'; this.style.borderColor='white';"
+                    onblur="this.style.background='rgba(255,255,255,0.15)'; this.style.borderColor='rgba(255,255,255,0.4)';"
+                >
+                <p id="header-student-name" style="margin-top: 6px; font-size: 0.72rem; color: rgba(255,255,255,0.85); font-weight: 600; min-height: 16px; text-align: center;"></p>
+            </div>
         </aside>
 
         <main class="panneau-formulaire">
@@ -1613,20 +1639,20 @@
             z-index: 9999;
             box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
         ">
-            <button class="nav-btn active" id="nav-pointage" onclick="switchTab('pointage')" style="background:none; border:none; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:3px; padding: 4px 12px; border-radius: 12px; transition: background 0.2s;">
-                <i class="fa-solid fa-house" style="font-size: 1.2rem; color: var(--primary);"></i>
-                <span style="font-size: 0.6rem; font-weight: 700; color: var(--primary); font-family: 'Outfit', sans-serif; letter-spacing: 0.5px;">POINTAGE</span>
+            <button class="nav-btn active" id="nav-pointage" onclick="switchTab('pointage')" style="background:rgba(0,0,128,0.06); border:none; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:2px; padding: 4px 12px; border-radius: 12px; transition: background 0.2s;">
+                <span style="font-size: 1.4rem; line-height:1;">🏠</span>
+                <span style="font-size: 0.6rem; font-weight: 700; color: #000080; font-family: 'Outfit', sans-serif; letter-spacing: 0.5px;">POINTAGE</span>
             </button>
-            <button class="nav-btn" id="nav-historique" onclick="switchTab('historique')" style="background:none; border:none; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:3px; padding: 4px 12px; border-radius: 12px; transition: background 0.2s;">
-                <i class="fa-solid fa-clock-rotate-left" style="font-size: 1.2rem; color: #94a3b8;"></i>
+            <button class="nav-btn" id="nav-historique" onclick="switchTab('historique')" style="background:none; border:none; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:2px; padding: 4px 12px; border-radius: 12px; transition: background 0.2s;">
+                <span style="font-size: 1.4rem; line-height:1;">🕐</span>
                 <span style="font-size: 0.6rem; font-weight: 700; color: #94a3b8; font-family: 'Outfit', sans-serif; letter-spacing: 0.5px;">HISTORIQUE</span>
             </button>
-            <button class="nav-btn" id="nav-notes" onclick="switchTab('notes')" style="background:none; border:none; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:3px; padding: 4px 12px; border-radius: 12px; transition: background 0.2s;">
-                <i class="fa-solid fa-clipboard-list" style="font-size: 1.2rem; color: #94a3b8;"></i>
+            <button class="nav-btn" id="nav-notes" onclick="switchTab('notes')" style="background:none; border:none; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:2px; padding: 4px 12px; border-radius: 12px; transition: background 0.2s;">
+                <span style="font-size: 1.4rem; line-height:1;">📋</span>
                 <span style="font-size: 0.6rem; font-weight: 700; color: #94a3b8; font-family: 'Outfit', sans-serif; letter-spacing: 0.5px;">NOTES</span>
             </button>
-            <button class="nav-btn" id="nav-horaires" onclick="switchTab('horaires')" style="background:none; border:none; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:3px; padding: 4px 12px; border-radius: 12px; transition: background 0.2s;">
-                <i class="fa-solid fa-calendar-days" style="font-size: 1.2rem; color: #94a3b8;"></i>
+            <button class="nav-btn" id="nav-horaires" onclick="switchTab('horaires')" style="background:none; border:none; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:2px; padding: 4px 12px; border-radius: 12px; transition: background 0.2s;">
+                <span style="font-size: 1.4rem; line-height:1;">📅</span>
                 <span style="font-size: 0.6rem; font-weight: 700; color: #94a3b8; font-family: 'Outfit', sans-serif; letter-spacing: 0.5px;">HORAIRES</span>
             </button>
         </nav>
@@ -1680,10 +1706,9 @@
             // Réinitialiser tous les boutons nav
             ['pointage','historique','notes','horaires'].forEach(t => {
                 const btn = document.getElementById('nav-' + t);
-                const icon = btn.querySelector('i');
-                const label = btn.querySelector('span');
-                icon.style.color = '#94a3b8';
-                label.style.color = '#94a3b8';
+                const emoji = btn.querySelector('span:first-child');
+                const label = btn.querySelectorAll('span')[1];
+                if (label) label.style.color = '#94a3b8';
                 btn.style.background = 'none';
             });
 
@@ -1698,10 +1723,8 @@
 
             // Activer le bouton nav
             const activeBtn = document.getElementById('nav-' + name);
-            const activeIcon = activeBtn.querySelector('i');
-            const activeLabel = activeBtn.querySelector('span');
-            activeIcon.style.color = 'var(--primary, #000080)';
-            activeLabel.style.color = 'var(--primary, #000080)';
+            const activeLabel = activeBtn.querySelectorAll('span')[1];
+            if (activeLabel) activeLabel.style.color = '#000080';
             activeBtn.style.background = 'rgba(0,0,128,0.06)';
 
             // Charger l'historique si besoin
@@ -1710,9 +1733,44 @@
             }
         }
 
+        /* ========== SYNC MATRICULE HEADER <-> FORM ========== */
+        function syncMatricule(val) {
+            const formMat = document.getElementById('matricule');
+            if (formMat) formMat.value = val;
+            // Afficher le nom si déjà chargé
+            const badge = document.getElementById('info-name');
+            const nameEl = document.getElementById('header-student-name');
+            if (badge && nameEl) nameEl.textContent = badge.textContent || '';
+            // Déclencher l'événement input du formulaire pour le GPS/lookup
+            if (formMat) formMat.dispatchEvent(new Event('input', {bubbles: true}));
+        }
+
+        // Synchroniser aussi dans l'autre sens (si on tape dans le form)
+        document.addEventListener('DOMContentLoaded', function() {
+            const formMat = document.getElementById('matricule');
+            const headerMat = document.getElementById('matricule-header');
+            const nameEl = document.getElementById('header-student-name');
+            if (formMat && headerMat) {
+                formMat.addEventListener('input', function() {
+                    headerMat.value = formMat.value;
+                });
+            }
+            // Mettre à jour le nom dans le header quand le badge change
+            const infoName = document.getElementById('info-name');
+            if (infoName && nameEl) {
+                const observer = new MutationObserver(() => {
+                    nameEl.textContent = infoName.textContent || '';
+                });
+                observer.observe(infoName, {childList: true, characterData: true, subtree: true});
+            }
+        });
+
         /* ========== HISTORIQUE : CHARGEMENT ET GRAPHE ========== */
         function chargerHistorique() {
-            const matricule = document.getElementById('matricule') ? document.getElementById('matricule').value.trim() : '';
+            // Lire depuis le champ header ou le champ form
+            const headerMat = document.getElementById('matricule-header');
+            const formMat = document.getElementById('matricule');
+            const matricule = (headerMat && headerMat.value.trim()) || (formMat && formMat.value.trim()) || '';
             const liste = document.getElementById('historique-liste');
             const chart = document.getElementById('historique-chart');
             const chartLabels = document.getElementById('historique-chart-labels');

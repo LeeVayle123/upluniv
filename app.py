@@ -1034,6 +1034,81 @@ def get_student_info(matricule):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route('/api/historique/<path:matricule>')
+def get_historique(matricule):
+    """
+    Retourne les présences d'un étudiant pour une semaine donnée.
+    Paramètres GET : from=YYYY-MM-DD, to=YYYY-MM-DD
+    """
+    matricule = matricule.strip()
+    date_from = request.args.get('from')
+    date_to   = request.args.get('to')
+
+    try:
+        if supabase:
+            query = supabase.table("presences").select(
+                "matricule, type_presence, date_inscription, filiere, faculte"
+            ).eq("matricule", matricule).order("date_inscription", desc=True)
+
+            if date_from:
+                query = query.gte("date_inscription", date_from)
+            if date_to:
+                query = query.lte("date_inscription", date_to + "T23:59:59")
+
+            res = query.execute()
+            presences = res.data if res.data else []
+
+            # Récupérer l'auditoire depuis attendance_attempts
+            att_query = supabase.table("attendance_attempts").select(
+                "auditorium_code, timestamp"
+            ).eq("student_external_id", matricule).eq("result", "Accepté").order("timestamp", desc=True)
+
+            if date_from:
+                att_query = att_query.gte("timestamp", date_from)
+            if date_to:
+                att_query = att_query.lte("timestamp", date_to + "T23:59:59")
+
+            att_res = att_query.execute()
+            att_map = {}
+            for a in (att_res.data or []):
+                ts = (a.get('timestamp') or '')[:16]
+                att_map[ts] = a.get('auditorium_code', '')
+
+            for p in presences:
+                ts = (p.get('date_inscription') or '')[:16]
+                p['auditorium_code'] = att_map.get(ts, '')
+
+            return jsonify({"presences": presences})
+        else:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            q = "SELECT matricule, type_presence, date_inscription, filiere, faculte FROM presences WHERE matricule = %s"
+            params = [matricule]
+            if date_from:
+                q += " AND date(date_inscription) >= %s"
+                params.append(date_from)
+            if date_to:
+                q += " AND date(date_inscription) <= %s"
+                params.append(date_to)
+            q += " ORDER BY date_inscription DESC"
+            execute_sql(cursor, q, tuple(params))
+            rows = cursor.fetchall()
+            presences = []
+            for row in rows:
+                if isinstance(row, dict):
+                    presences.append(dict(row))
+                else:
+                    presences.append({
+                        "matricule": row[0], "type_presence": row[1],
+                        "date_inscription": str(row[2]), "filiere": row[3],
+                        "faculte": row[4], "auditorium_code": ""
+                    })
+            conn.close()
+            return jsonify({"presences": presences})
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 @app.route('/generate_qr')
 def generate_qr():
     """
@@ -1141,7 +1216,7 @@ def register():
         if already_exists:
             return render_template(
                 'register.html',
-                error='Ce matricule est déjà utilisé. Impossible d\'avoir deux matricules identiques dans la base de données.',
+                error='Ce matricule est déjà utilisé.,
                 matricule=matricule,
                 nom=nom,
                 postnom=postnom,
