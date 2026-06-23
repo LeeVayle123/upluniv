@@ -530,6 +530,7 @@
                     <label class="etiquette-formulaire" for="matricule">Matricule</label>
                     <!-- champs matricule gps -->
                     <input type="text" id="matricule" name="matricule" class="champ-formulaire" required
+                        minlength="10" maxlength="10" pattern=".{10}" title="Le matricule doit contenir exactement 10 caractères."
                         placeholder="Ex: 2024021018" autocomplete="off">
                 </div>
 
@@ -868,7 +869,7 @@
                 // On check la limite atteinte
                 if (submitBtn.innerHTML === "Limite atteinte") return;
 
-                if (matricule.length >= 3 && isReady) {
+                if (matricule.length === 10 && isReady) {
                     submitBtn.disabled = false;
                     submitBtn.innerHTML = '<i class="fa-solid fa-circle-check"></i> Valider votre présence';
                     submitBtn.style.background = "var(--accent)";
@@ -887,7 +888,7 @@
                 // Toujours synchroniser l'indicateur
                 if (typeof TrackingEngine !== 'undefined') TrackingEngine.updateIndicator();
 
-                if (matricule.length < 3) {
+                if (matricule.length !== 10) {
                     badge.style.display = 'none';
                     return;
                 }

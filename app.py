@@ -630,6 +630,8 @@ def check_attendance():
     """
     # 1. Récupération des données du formulaire
     matricule = request.form.get('matricule', '').strip()
+    if len(matricule) != 10:
+        return jsonify({"status": "error", "message": "Le matricule doit faire exactement 10 caractères."}), 400
     type_presence = request.form.get('type_presence', 'Entrée')
     device_signature = request.form.get('device_signature', 'Unknown-Device')
     auditorium_code = request.form.get('auditorium_code')
@@ -991,6 +993,8 @@ def get_student_info(matricule):
     --- MODIFICATION SUPABASE : Recherche Cloud unifiée ---
     """
     matricule = matricule.strip()
+    if len(matricule) != 10:
+        return jsonify({"error": "Le matricule doit faire exactement 10 caractères."}), 400
     try:
         if supabase:
             # Recherche de l'étudiant
@@ -1167,7 +1171,7 @@ def register():
     # --- MODIFICATION SUPABASE : Migration vers la base de données Cloud ---
     try:
         # Récupération des données du formulaire
-        matricule = request.form['matricule']
+        matricule = request.form['matricule'].strip()
         nom = request.form['nom']
         postnom = request.form['postnom']
         prenom = request.form['prenom']
@@ -1176,6 +1180,21 @@ def register():
         promotion = request.form.get('promotion', '')
         filiere = request.form.get('filiere', '')
         faculte = request.form['faculte']
+
+        if len(matricule) != 10:
+            return render_template(
+                'register.html',
+                error='Le matricule doit contenir exactement 10 caractères.',
+                matricule=matricule,
+                nom=nom,
+                postnom=postnom,
+                prenom=prenom,
+                sexe=sexe,
+                parcours=parcours,
+                promotion=promotion,
+                filiere=filiere,
+                faculte=faculte
+            )
 
         # Préparation des données pour Supabase
         student_data = {

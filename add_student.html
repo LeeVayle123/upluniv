@@ -141,7 +141,8 @@
             <form action="/register_student" method="POST">
                 <div class="form-group">
                     <label class="form-label">Numéro Matricule</label>
-                    <input type="text" name="matricule" class="form-input" placeholder="Ex: 24-001" required>
+                    <input type="text" name="matricule" class="form-input" placeholder="Ex: 2024021018" required
+                        minlength="10" maxlength="10" pattern=".{10}" title="Le matricule doit contenir exactement 10 caractères.">
                 </div>
 
                 <div class="row">

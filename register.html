@@ -536,7 +536,8 @@
                 <div class="groupe-formulaire">
                     <label class="etiquette-formulaire" for="matricule">Matricule</label>
                     <input type="text" id="matricule" name="matricule" class="champ-formulaire" required
-                        placeholder="Ex: 123/24" value="{{ matricule|default('') }}">
+                        minlength="10" maxlength="10" pattern=".{10}" title="Le matricule doit contenir exactement 10 caractères."
+                        placeholder="Ex: 2024021018" value="{{ matricule|default('') }}">
                 </div>
 
                 <div class="groupe-formulaire">
@@ -802,7 +803,7 @@
 
                 const currentParcours = parcoursSelect.value;
                 if (!data.paths[currentParcours]) {
-                    let optionsHtml = '<option value="">Sélectionner un Parcours</option>';
+                    let optionsHtml = '<option value="">S---électionner un Parcours---</option>';
                     for (const pathKey in data.paths) {
                         optionsHtml += `<option value="${pathKey}">${pathKey}</option>`;
                     }
@@ -817,7 +818,7 @@
 
                     promotionDiv.style.display = 'block';
                     promotionSelect.setAttribute('required', 'required');
-                    let promoHtml = '<option value="">Sélectionner</option>';
+                    let promoHtml = '<option value="">---Sélectionner---</option>';
                     pathData.promotions.forEach(promo => {
                         promoHtml += `<option value="${promo}">${promo}</option>`;
                     });
@@ -827,7 +828,7 @@
                     if (pathData.hasFiliere) {
                         filiereDiv.style.display = 'block';
                         filiereSelect.setAttribute('required', 'required');
-                        let filHtml = '<option value="">Sélectionner</option>';
+                        let filHtml = '<option value="">---Sélectionner---</option>';
                         pathData.filieres.forEach(fil => {
                             filHtml += `<option value="${fil}">${fil}</option>`;
                         });
@@ -848,7 +849,7 @@
 
                 promotionDiv.style.display = 'block';
                 promotionSelect.setAttribute('required', 'required');
-                let promoHtml = '<option value="">Sélectionner</option>';
+                let promoHtml = '<option value="">---Sélectionner---</option>';
                 data.promotions.forEach(promo => {
                     promoHtml += `<option value="${promo}">${promo}</option>`;
                 });
