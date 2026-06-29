@@ -103,7 +103,7 @@ if PUBLIC_URL and not PUBLIC_URL.startswith(('http://', 'https://')):
 
 # --- CONFIGURATION DES HORAIRES DE SUIVI (PRODUCTION) ---
 # NOTE: Ces horaires sont utilisés pour le suivi standard.
-# Pour les ESSAIS actuels, un suivi progressif (15s, 60s...) est actif côté client.
+
 # Heures de vérification pour la session du MATIN (Entrée possible dès 07:00)
 MORNING_CHECK_TIMES = ["09:00", "10:00", "10:30", "10:40", "11:00", "11:30", "11:55"]
 
@@ -158,7 +158,7 @@ def admin_logout():
 
 # --- CONFIGURATION DE LA CONNEXION À LA BASE DE DONNÉES ---
 def get_db_connection():
-    # --- MODIFICATION SUPABASE : La connexion passe désormais par le client Supabase ---
+    # --- MODIFICATION SUPABASE : donc, ici, La connexion passe désormais par le client Supabase ---
     # Cette fonction est conservée pour la compatibilité, mais nous privilégierons 
     # l'utilisation de l'objet 'supabase' directement pour les nouvelles opérations cloud.
     
@@ -182,10 +182,7 @@ def init_sqlite_db():
     if os.environ.get('RENDER') or not host:
         conn = sqlite3.connect('database.db')
         cursor = conn.cursor()
-        
-        # --- 9. Tables étudiants supprimées ---
-        # --- 10. Tables présences supprimées ---
-
+  
         # Table centrale globale des présences
         execute_sql(cursor, '''
             CREATE TABLE IF NOT EXISTS presences (
@@ -324,9 +321,9 @@ def init_sqlite_db():
         conn.commit()
         conn.close()
             
-# =============================================================================
-# INITIALISATION MYSQL : Création automatique des tables et colonnes manquantes
-# =============================================================================
+
+# --------INITIALISATION MYSQL : Création automatique des tables et colonnes manquantes----------
+
 def init_mysql_db():
     """
     Crée automatiquement toutes les tables MySQL nécessaires si elles n'existent pas.
