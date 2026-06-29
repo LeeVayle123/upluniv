@@ -44,6 +44,39 @@ def execute_sql(cursor, query, params=None):
     return cursor.execute(actual_query, params)
 
 
+def format_presence_datetime(value):
+    """Formate une valeur de date/heure pour l'affichage en page de présences."""
+    formatted_date = "N/A"
+    formatted_time = "N/A"
+
+    if not value:
+        return {"formatted_date": formatted_date, "formatted_time": formatted_time}
+
+    dt = None
+
+    if isinstance(value, datetime):
+        dt = value
+    elif isinstance(value, str):
+        cleaned = value.split('.')[0] if '.' in value else value
+        cleaned = cleaned.replace('Z', '+00:00') if cleaned.endswith('Z') else cleaned
+
+        try:
+            dt = datetime.fromisoformat(cleaned)
+        except ValueError:
+            for fmt in ['%Y-%m-%d %H:%M:%S', '%Y-%m-%dT%H:%M:%S']:
+                try:
+                    dt = datetime.strptime(cleaned, fmt)
+                    break
+                except ValueError:
+                    continue
+
+    if dt is not None:
+        formatted_date = dt.strftime('%d/%m/%Y')
+        formatted_time = dt.strftime('%H:%M:%S')
+
+    return {"formatted_date": formatted_date, "formatted_time": formatted_time}
+
+
 def safe_supabase_delete(table_name):
     """Supprime les lignes d'une table Supabase si elle existe."""
     try:
@@ -1343,18 +1376,9 @@ def view_presences():
 
         # 3. FORMATAGE DES DATES pour un affichage propre à l'écran
         for presence in all_presences:
-            dt = presence['date_inscription']
-            if dt:
-                if isinstance(dt, str):
-                    try: dt = datetime.strptime(dt.split('.')[0], '%Y-%m-%d %H:%M:%S')
-                    except: pass
-                
-                if hasattr(dt, 'strftime'):
-                    presence['formatted_date'] = dt.strftime('%d/%m/%Y à %H:%M:%S')
-                else:
-                    presence['formatted_date'] = str(dt)
-            else:
-                presence['formatted_date'] = "Inconnue"
+            formatted = format_presence_datetime(presence.get('date_inscription'))
+            presence['formatted_date'] = formatted['formatted_date']
+            presence['formatted_time'] = formatted['formatted_time']
         
         # 4. TRI des présences par ordre chronologique décroissant (la plus récente en haut)
         # C'est ici qu'on gère l'ordre demandé par l'utilisateur.
@@ -1591,18 +1615,9 @@ def api_presences():
 
         # Formatage des données pour le frontend
         for row in all_presences:
-            dt_str = row.get('date_inscription')
-            if isinstance(dt_str, datetime):
-                dt_str = dt_str.isoformat()
-            elif hasattr(dt_str, 'strftime'):
-                dt_str = dt_str.strftime('%Y-%m-%dT%H:%M:%S')
-                
-            if dt_str and 'T' in dt_str:
-                row['formatted_date'] = dt_str.split('T')[0]
-                row['formatted_time'] = dt_str.split('T')[1].split('+')[0]
-            else:
-                row['formatted_date'] = "N/A"
-                row['formatted_time'] = "N/A"
+            formatted = format_presence_datetime(row.get('date_inscription'))
+            row['formatted_date'] = formatted['formatted_date']
+            row['formatted_time'] = formatted['formatted_time']
 
         return jsonify(all_presences)
     except Exception as e:
