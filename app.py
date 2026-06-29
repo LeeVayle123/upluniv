@@ -312,8 +312,12 @@ def init_sqlite_db():
                 ('IF-301', 'Info-301', -11.670, 27.486, 30, 3, 10, 1),
                 ('IF-101', 'Info-101', -11.671, 27.487, 30, 1, 10, 1),
                 ('IF-302', 'Info-302', -11.672, 27.488, 30, 3, 10, 1),
-                ('IF-102', 'Info-102', -11.6529086, 27.48359, 22, 1, 400, 1),
-                ('IF-304', 'Info-304', -11.674, 27.490, 30, 3, 10, 1)
+                ('IF-102', 'Info-102', -11.6529086, 27.48359, 15, 1, 10, 1),
+                ('IF-304', 'Info-304', -11.674, 27.490, 30, 3, 10, 1),
+                ('Labo-GL', 'Labo-GL', -11.675, 27.491, 30, 3, 10, 1),
+                ('Labo-SI', 'Labo-SI', -11.676, 27.492, 30, 3, 10, 1),
+                ('Labo-IOT', 'Labo-IOT', -11.677, 27.493, 30, 3, 10, 1),
+                ('salle-machines', 'salle-machines', -11.6683023, 27.4833253, 30, 3, 10, 1)
             ]
             for aud in auds:
                 execute_sql(cursor, "INSERT INTO auditoriums (code, nom, latitude, longitude, radius_m, floor, tolerance_m, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", aud)
@@ -411,7 +415,7 @@ def init_mysql_db():
                     ('IF-301', 'Info-301', -11.670, 27.486, 30, 3, 10, 1),
                     ('IF-101', 'Info-101', -11.671, 27.487, 30, 1, 10, 1),
                     ('IF-302', 'Info-302', -11.672, 27.488, 30, 3, 10, 1),
-                    ('IF-102', 'Info-102', -11.6529086, 27.48359, 22, 1, 400, 1),
+                    ('IF-102', 'Info-102', -11.6529086, 27.48359, 15, 1, 10, 1),
                     ('IF-304', 'Info-304', -11.674, 27.490, 30, 3, 10, 1)
                 ]
                 for aud in auds:
@@ -2213,6 +2217,44 @@ def admin_general_dashboard():
     Rends le nouveau tableau de bord de rapport général.
     """
     return render_template('general_dashboard.html')
+
+@app.route('/api/admin/update_auditorium', methods=['POST'])
+@login_required
+def update_auditorium():
+    """
+    Met à jour les dimensions d'un auditoire dans Supabase.
+    Payload JSON : { "code": "IF-102", "radius_m": 15, "tolerance_m": 10 }
+    """
+    try:
+        data = request.json
+        code = data.get('code')
+        radius_m = data.get('radius_m')
+        tolerance_m = data.get('tolerance_m')
+        if not code:
+            return jsonify({"status": "error", "message": "Code auditoire manquant"}), 400
+        update_data = {}
+        if radius_m is not None:
+            update_data['radius_m'] = radius_m
+        if tolerance_m is not None:
+            update_data['tolerance_m'] = tolerance_m
+        if not update_data:
+            return jsonify({"status": "error", "message": "Aucune donnée à mettre à jour"}), 400
+        if supabase:
+            supabase.table("auditoriums").update(update_data).eq("code", code).execute()
+        # Fallback local aussi
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            for key, val in update_data.items():
+                execute_sql(cursor, f"UPDATE auditoriums SET {key} = %s WHERE code = %s", (val, code))
+            conn.commit()
+            cursor.close()
+            conn.close()
+        except Exception:
+            pass
+        return jsonify({"status": "success", "message": f"Auditoire {code} mis à jour : {update_data}"})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
 
 @app.route('/api/admin/stats_summary')
 @login_required
