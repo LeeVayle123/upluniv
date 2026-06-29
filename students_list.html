@@ -10,6 +10,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Font Awesome pour les icônes -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS (Dashboard layout) -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
     <!-- SheetJS : bibliothèque d'export Excel -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
@@ -40,15 +42,13 @@
             font-family: 'Outfit', sans-serif;
             background: var(--bg);
             color: var(--text);
-            min-height: 100vh;
-            padding: 0;
-            margin: 0;
+            /* Layout flex and overflow are handled by dashboard.css */
         }
 
         .Conteneur {
-            max-width: 100%;
-            margin: 0;
-            padding: 0 10px;
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 10px;
         }
 
         /* ===== EN-TÊTE ===== */
@@ -57,12 +57,12 @@
             justify-content: space-between;
             align-items: center;
             background: var(--white);
-            padding: 15px 20px;
+            padding: 10px 15px;
             border-radius: 0;
             box-shadow: var(--shadow);
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             flex-wrap: wrap;
-            gap: 14px;
+            gap: 10px;
         }
 
         .entete-gauche {
@@ -72,21 +72,21 @@
         }
 
         .image-logo {
-            width: 50px;
-            height: 50px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             object-fit: contain;
             border: 3px solid #e0e8ff;
         }
 
         .titre-entete {
-            font-size: 1.2rem;
+            font-size: 0.95rem;
             font-weight: 800;
             color: var(--navy);
         }
 
         .sous-titre-entete {
-            font-size: 0.78rem;
+            font-size: 0.7rem;
             color: var(--muted);
             margin-top: 2px;
         }
@@ -149,15 +149,16 @@
         .enveloppe-onglets {
             display: flex;
             flex-direction: column;
-            gap: 14px;
-            margin-bottom: 20px;
+            gap: 10px;
+            margin-bottom: 15px;
+            padding: 0 15px;
         }
 
         .section-faculte {
             background: var(--white);
             border-radius: var(--radius-lg);
             box-shadow: var(--shadow);
-            padding: 14px 18px;
+            padding: 10px 14px;
         }
 
         .etiquette-faculte {
@@ -171,6 +172,7 @@
 
         .rangee-onglets {
             display: flex;
+            justify-content: center;
             gap: 6px;
             flex-wrap: wrap;
         }
@@ -262,42 +264,43 @@
         .grille-stats {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 14px;
-            margin-bottom: 20px;
+            gap: 10px;
+            margin-bottom: 15px;
+            padding: 0 15px;
         }
 
         .carte-stat {
             background: var(--white);
             border-radius: 0;
             box-shadow: var(--shadow);
-            padding: 18px 20px;
+            padding: 12px 15px;
             display: flex;
             align-items: center;
-            gap: 14px;
+            gap: 10px;
         }
 
         .icone-stat {
-            width: 44px;
-            height: 44px;
-            border-radius: 12px;
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.1rem;
+            font-size: 1rem;
             background: #eff6ff;
             color: var(--navy);
         }
 
         .etiquette-stat {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             color: var(--muted);
             font-weight: 600;
             text-transform: uppercase;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }
 
         .valeur-stat {
-            font-size: 1.6rem;
+            font-size: 1.1rem;
             font-weight: 800;
             color: var(--text);
         }
@@ -310,7 +313,9 @@
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
+            margin-left: 15px;
+            margin-right: 15px;
         }
 
         .barre-outils {
@@ -367,7 +372,7 @@
 
         thead th {
             background: #f8fafc;
-            padding: 12px 18px;
+            padding: 8px 12px;
             font-size: 0.71rem;
             font-weight: 700;
             text-transform: uppercase;
@@ -376,7 +381,7 @@
         }
 
         tbody td {
-            padding: 13px 18px;
+            padding: 8px 12px;
             border-bottom: 1px solid #f1f5f9;
             font-size: 0.88rem;
         }
@@ -525,7 +530,9 @@
 </head>
 
 <body>
-    <div class="Conteneur">
+    {% include 'sidebar.html' %}
+    <main class="main-content">
+        <div class="Conteneur">
         <header>
             <div class="entete-gauche">
                 <img src="{{ url_for('static', filename='logo_upl.png') }}" class="image-logo" alt="Logo UPL">
@@ -560,12 +567,12 @@
             <div class="section-faculte" style="padding-bottom: 8px;">
                 <div class="etiquette-faculte">Choisir un domaine / faculté</div>
                 <div class="rangee-onglets" id="facultes-radio">
-                    <button class="onglet-promo actif" id="btn-fac-global" onclick="selectFaculte('global')">VUE GLOBALE</button>
-                    <button class="onglet-promo" id="btn-fac-info" onclick="selectFaculte('info')">SCIENCES INFORMATIQUES</button>
-                    <button class="onglet-promo" id="btn-fac-poly" onclick="selectFaculte('poly')">POLYTECHNIQUE</button>
-                    <button class="onglet-promo" id="btn-fac-eco" onclick="selectFaculte('eco')">SCIENCES ÉCONOMIQUES</button>
-                    <button class="onglet-promo" id="btn-fac-sic" onclick="selectFaculte('sic')">SCIENCES DE L'INFO (SIC)</button>
-                    <button class="onglet-promo" id="btn-fac-autres" onclick="selectFaculte('autres')">AUTRES FACULTÉS</button>
+                    <button class="onglet-promo actif" id="btn-fac-global" onclick="selectFaculte('global')"><i class="fa-solid fa-globe" style="color: #3b82f6 !important;"></i> VUE GLOBALE</button>
+                    <button class="onglet-promo" id="btn-fac-info" onclick="selectFaculte('info')"><i class="fa-solid fa-laptop-code" style="color: #8b5cf6 !important;"></i> SCIENCES INFORMATIQUES</button>
+                    <button class="onglet-promo" id="btn-fac-poly" onclick="selectFaculte('poly')"><i class="fa-solid fa-gears" style="color: #f59e0b !important;"></i> POLYTECHNIQUE</button>
+                    <button class="onglet-promo" id="btn-fac-eco" onclick="selectFaculte('eco')"><i class="fa-solid fa-chart-pie" style="color: #10b981 !important;"></i> SCIENCES ÉCONOMIQUES</button>
+                    <button class="onglet-promo" id="btn-fac-sic" onclick="selectFaculte('sic')"><i class="fa-solid fa-newspaper" style="color: #ef4444 !important;"></i> SCIENCES DE L'INFO (SIC)</button>
+                    <button class="onglet-promo" id="btn-fac-autres" onclick="selectFaculte('autres')"><i class="fa-solid fa-ellipsis" style="color: #64748b !important;"></i> AUTRES FACULTÉS</button>
                 </div>
             </div>
 
@@ -1097,6 +1104,7 @@
             </div>
         </div>
     </div>
+    </main>
 </body>
 
 </html>
