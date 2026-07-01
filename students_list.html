@@ -46,7 +46,8 @@
         }
 
         .Conteneur {
-            max-width: 1750px;
+            width: min(100%, 1920px);
+            max-width: 100%;
             margin: 0 auto;
             padding: 18px 24px;
         }
@@ -72,11 +73,13 @@
         }
 
         .image-logo {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            object-fit: contain;
-            border: 3px solid #e0e8ff;
+            width: 54px;
+            height: 54px;
+            border-radius: 18px;
+            object-fit: cover;
+            border: 2px solid #e0e8ff;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            transform: translateY(-6px);
         }
 
         .titre-entete {
@@ -312,12 +315,13 @@
         /* ===== TABLEAU ===== */
         .carte-table {
             background: var(--white);
-            border-radius: 0;
+            border-radius: var(--radius-lg);
             box-shadow: var(--shadow);
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            margin: 0 16px 22px;
+            margin: 0 0 22px;
+            border: 1px solid rgba(15, 23, 42, 0.08);
         }
 
         .barre-outils {
@@ -327,6 +331,71 @@
             justify-content: space-between;
             align-items: center;
             gap: 10px;
+        }
+
+        .barre-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .barre-actions .bouton {
+            padding: 10px 14px;
+            font-size: 0.82rem;
+        }
+
+        .main-content {
+            position: relative;
+        }
+
+        .carte-table {
+            position: relative;
+        }
+
+        .carte-table.masked > :not(.mask-overlay):not(.barre-outils) {
+            filter: blur(6px);
+            opacity: 0.35;
+            pointer-events: none;
+        }
+
+        .carte-table.masked .barre-actions button {
+            position: relative;
+            z-index: 3100;
+        }
+
+        .mask-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 3000;
+            background: rgba(255, 255, 255, 0.95);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            text-align: center;
+            gap: 16px;
+            padding: 24px;
+        }
+
+        .mask-overlay.visible {
+            display: flex;
+        }
+
+        .mask-overlay .mask-icon {
+            font-size: 3rem;
+            color: var(--navy);
+        }
+
+        .mask-overlay .mask-label {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--navy);
+        }
+
+        .mask-overlay .mask-subtext {
+            color: var(--muted);
+            max-width: 420px;
+            line-height: 1.5;
         }
 
         .badge-compteur {
@@ -405,6 +474,26 @@
             justify-content: center;
             font-weight: 700;
             font-size: 0.75rem;
+        }
+
+        .student-name {
+            display: block;
+        }
+
+        .anonymized.hidden {
+            visibility: hidden;
+            height: 0;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .student-name.hidden {
+            visibility: hidden;
+            height: 0;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
         }
 
         .tag-matricule {
@@ -537,7 +626,6 @@
         <div class="Conteneur">
         <header>
             <div class="entete-gauche">
-                <img src="{{ url_for('static', filename='logo_upl.png') }}" class="image-logo" alt="Logo UPL">
                 <div>
                     <div class="titre-entete">Protestant University of Lubumbashi</div>
                     <div class="sous-titre-entete">Student Management System — Cloud Supabase</div>
@@ -820,9 +908,18 @@
 
         <!-- ===== TABLEAU ===== -->
         <div class="carte-table">
+            <div id="maskOverlay" class="mask-overlay">
+                <div class="mask-label">Liste masquée</div>
+                <div class="mask-subtext">La liste des étudiants est masquée pour protéger les données. Cliquez sur le bouton pour rétablir l’affichage.</div>
+            </div>
             <div class="barre-outils">
                 <div class="titre-barre-outils">
                     Liste des Étudiants <span id="compteurBadge" class="badge-compteur">0</span>
+                </div>
+                <div class="barre-actions">
+                    <button type="button" class="bouton bouton-contour" id="toggleNamesBtn" onclick="toggleNameVisibility()" title="Masquer / afficher la liste">
+                        <i class="fas fa-mask"></i>
+                    </button>
                 </div>
                 <div class="enveloppe-recherche">
                     <i class="fas fa-search"></i>
@@ -851,6 +948,7 @@
 
     <script>
         let currentFilter = { promo: "", faculte: "", parcours: "", promotion_label: "" };
+        let interfaceVisible = true;
 
         // Radio UI function
         function selectFaculte(facId) {
@@ -908,23 +1006,23 @@
                     <tr>
                         <td>
                             <div class="info-etudiant">
-                                <div class="avatar">${s.nom[0]}${s.prenom[0]}</div>
+                                <div class="avatar anonymized">${s.nom[0]}${s.prenom[0]}</div>
                                 <div>
-                                    <div style="font-weight: 700;">${s.nom} ${s.postnom}</div>
-                                    <div style="font-size: 0.75rem; color: var(--muted);">${s.prenom}</div>
+                                    <div class="student-name anonymized${interfaceVisible ? '' : ' hidden'}" style="font-weight: 700;">${s.nom} ${s.postnom}</div>
+                                    <div class="student-name anonymized${interfaceVisible ? '' : ' hidden'}" style="font-size: 0.75rem; color: var(--muted);">${s.prenom}</div>
                                 </div>
                             </div>
                         </td>
-                        <td><span class="tag-matricule">${s.matricule}</span></td>
-                        <td><span class="badge-genre genre-${s.sexe}">${s.sexe}</span></td>
-                        <td><span class="tag-promo">${s.promotion}</span></td>
+                        <td><span class="tag-matricule anonymized${interfaceVisible ? '' : ' hidden'}">${s.matricule}</span></td>
+                        <td><span class="badge-genre anonymized${interfaceVisible ? '' : ' hidden'} genre-${s.sexe}">${s.sexe}</span></td>
+                        <td><span class="tag-promo anonymized${interfaceVisible ? '' : ' hidden'}">${s.promotion}</span></td>
                         <td>
-                            <div style="font-weight: 600;">${s.parcours}</div>
-                            <div style="font-size: 0.7rem; color: var(--muted);">${s.filiere || '-'}</div>
+                            <div class="anonymized${interfaceVisible ? '' : ' hidden'}" style="font-weight: 600;">${s.parcours}</div>
+                            <div class="anonymized${interfaceVisible ? '' : ' hidden'}" style="font-size: 0.7rem; color: var(--muted);">${s.filiere || '-'}</div>
                         </td>
                         <td>
-                            <div style="font-weight: 600;">${s.formatted_date.split(' ')[0]}</div>
-                            <div style="font-size: 0.7rem; color: var(--muted);">${s.formatted_date.split(' ')[1] || ''}</div>
+                            <div class="anonymized${interfaceVisible ? '' : ' hidden'}" style="font-weight: 600;">${s.formatted_date.split(' ')[0]}</div>
+                            <div class="anonymized${interfaceVisible ? '' : ' hidden'}" style="font-size: 0.7rem; color: var(--muted);">${s.formatted_date.split(' ')[1] || ''}</div>
                         </td>
                     </tr>
                 `).join('');
@@ -1030,6 +1128,21 @@
             const wb = XLSX.utils.table_to_book(table, { sheet: "Étudiants" });
             const fileName = currentFilter.promo ? `etudiants_${currentFilter.promo}.xlsx` : (currentFilter.faculte ? `etudiants_${currentFilter.faculte}.xlsx` : "etudiants_global.xlsx");
             XLSX.writeFile(wb, fileName);
+        }
+
+        function toggleNameVisibility() {
+            interfaceVisible = !interfaceVisible;
+            document.querySelectorAll('.carte-table .student-name, .carte-table .anonymized').forEach(el => {
+                el.classList.toggle('hidden', !interfaceVisible);
+            });
+            const cardTable = document.querySelector('.carte-table');
+            const overlay = document.getElementById('maskOverlay');
+            cardTable.classList.toggle('masked', !interfaceVisible);
+            overlay.classList.toggle('visible', !interfaceVisible);
+            const toggleBtn = document.getElementById('toggleNamesBtn');
+            toggleBtn.innerHTML = interfaceVisible
+                ? '<i class="fas fa-mask"></i>'
+                : '<i class="fas fa-eye"></i>';
         }
 
         // Load data on page load

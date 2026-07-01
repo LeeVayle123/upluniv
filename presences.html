@@ -46,7 +46,8 @@
         }
 
         .Conteneur {
-            max-width: 1900px;
+            width: min(100%, 1920px);
+            max-width: 100%;
             margin: 0 auto;
             padding: 18px 24px;
         }
@@ -73,11 +74,13 @@
 
         /* Logo de l'université situé dans le dossier static/  */
         .image-logo {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
+            width: 54px;
+            height: 54px;
+            border-radius: 18px;
             object-fit: cover;
-            border: 3px solid #e0e8ff;
+            border: 2px solid #e0e8ff;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            transform: translateY(-6px);
         }
 
         .titre-entete {
@@ -377,12 +380,14 @@
         /* ===== TABLEAU DES PRÉSENCES ===== */
         .carte-table {
             background: var(--white);
-            border-radius: 0;
+            border-radius: var(--radius-lg);
             box-shadow: var(--shadow);
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            margin: 0 16px 22px;
+            margin: 0 0 22px;
+            width: 100%;
+            border: 1px solid rgba(15, 23, 42, 0.08);
         }
 
         /* Barre d'outils au-dessus du tableau */
@@ -395,6 +400,71 @@
             flex-wrap: wrap;
             gap: 10px;
             background: linear-gradient(to right, var(--white), #f8fafc);
+        }
+
+        .barre-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .barre-actions .bouton {
+            padding: 10px 16px;
+            font-size: 0.82rem;
+        }
+
+        .main-content {
+            position: relative;
+        }
+
+        .carte-table {
+            position: relative;
+        }
+
+        .carte-table.masked > :not(.mask-overlay):not(.barre-outils) {
+            filter: blur(6px);
+            opacity: 0.35;
+            pointer-events: none;
+        }
+
+        .carte-table.masked .barre-actions button {
+            position: relative;
+            z-index: 3100;
+        }
+
+        .mask-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 3000;
+            background: rgba(255, 255, 255, 0.95);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            text-align: center;
+            gap: 16px;
+            padding: 24px;
+        }
+
+        .mask-overlay.visible {
+            display: flex;
+        }
+
+        .mask-overlay .mask-icon {
+            font-size: 3rem;
+            color: var(--navy);
+        }
+
+        .mask-overlay .mask-label {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--navy);
+        }
+
+        .mask-overlay .mask-subtext {
+            color: var(--muted);
+            max-width: 420px;
+            line-height: 1.5;
         }
 
         .titre-barre-outils {
@@ -543,6 +613,19 @@
             font-weight: 700;
             font-size: 0.75rem;
             flex-shrink: 0;
+        }
+
+        .student-name {
+            display: block;
+        }
+
+        .student-name.hidden,
+        .anonymized.hidden {
+            visibility: hidden;
+            height: 0;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
         }
 
         /* Tag matricule en police monospace pour une lecture facile */
@@ -813,7 +896,6 @@
             <!-- ===== EN-TÊTE DE LA PAGE ===== -->
             <header>
                 <div class="entete-gauche">
-                    <img src="{{ url_for('static', filename='logo_upl.png') }}" class="image-logo" alt="Logo UPL">
                     <div>
                         <div class="titre-entete">Protestant University of Lubumbashi</div>
                         <div class="sous-titre-entete" id="pageSubtitle">Attendance Management System</div>
@@ -1246,11 +1328,21 @@
 
             <!-- ===== TABLEAU DES PRÉSENCES ===== -->
             <div class="carte-table">
+                <div id="maskOverlay" class="mask-overlay">
+                    <div class="mask-icon"><i class="fas fa-mask"></i></div>
+                    <div class="mask-label">Liste masquée</div>
+                    <div class="mask-subtext">La liste de présences est masquée pour protéger les données. Cliquez sur le bouton pour rétablir l’affichage.</div>
+                </div>
                 <div class="barre-outils">
                     <div class="titre-barre-outils">
                         <i class="fas fa-table-list"></i>
                         <span id="tableTitle">Global Presence</span>
                         <span class="badge-compteur" id="countBadge">—</span>
+                    </div>
+                    <div class="barre-actions">
+                        <button type="button" class="bouton bouton-contour" id="toggleNamesBtn" onclick="toggleNameVisibility()" title="Masquer / afficher la liste">
+                            <i class="fas fa-mask"></i>
+                        </button>
                     </div>
                     <div class="enveloppe-recherche">
                         <i class="fas fa-search"></i>
@@ -1306,6 +1398,7 @@
             }
 
             let currentData = [];
+            let interfaceVisible = true;
 
             async function loadData(promo = '') {
                 document.getElementById('presencesBody').innerHTML = `
@@ -1420,21 +1513,21 @@
                 <tr>
                     <td>
                         <div class="info-etudiant">
-                            <div class="avatar">${initials}</div>
+                            <div class="avatar anonymized">${initials}</div>
                             <div>
-                                <div style="font-weight:600;">${p.nom || ''} ${p.postnom || ''}</div>
-                                <div style="font-size:0.76rem;color:var(--muted);">${p.prenom || ''}</div>
+                                <div class="student-name anonymized" style="font-weight:600;">${p.nom || ''} ${p.postnom || ''}</div>
+                                <div class="student-name anonymized" style="font-size:0.76rem;color:var(--muted);">${p.prenom || ''}</div>
                             </div>
                         </div>
                     </td>
-                    <td><span class="tag-matricule">${p.matricule || ''}</span></td>
+                    <td><span class="tag-matricule anonymized">${p.matricule || ''}</span></td>
                     <td>
-                        <span class="tag-promo">${p.promotion || ''}</span>
-                        <div style="font-size:0.72rem;margin-top:4px;color:var(--muted);">${filiere}</div>
+                        <span class="tag-promo anonymized">${p.promotion || ''}</span>
+                        <div class="anonymized" style="font-size:0.72rem;margin-top:4px;color:var(--muted);">${filiere}</div>
                     </td>
                     <td class="cellule-date">
-                        <div class="heure">${p.formatted_time || ''}</div>
-                        <div class="date">${p.formatted_date || ''}</div>
+                        <div class="heure anonymized">${p.formatted_time || ''}</div>
+                        <div class="date anonymized">${p.formatted_date || ''}</div>
                     </td>
                     <td>${geoBadge}</td>
                     <td>
@@ -1444,6 +1537,15 @@
                     </td>
                 </tr>`;
                 }).join('');
+
+                if (!interfaceVisible) {
+                    tbody.querySelectorAll('.student-name, .anonymized').forEach(el => el.classList.add('hidden'));
+                    document.querySelector('.main-content').classList.add('masked');
+                    document.getElementById('maskOverlay').classList.add('visible');
+                } else {
+                    document.querySelector('.main-content').classList.remove('masked');
+                    document.getElementById('maskOverlay').classList.remove('visible');
+                }
             }
 
             function switchTab(btn) {
@@ -1515,6 +1617,24 @@
                 // Mise à jour du badge avec le nombre de lignes visibles
                 document.getElementById('countBadge').textContent =
                     `${visibleCount} enregistrement${visibleCount > 1 ? 's' : ''}`;
+            }
+
+            function toggleNameVisibility() {
+                interfaceVisible = !interfaceVisible;
+
+                document.querySelectorAll('.student-name, .anonymized').forEach(el => {
+                    el.classList.toggle('hidden', !interfaceVisible);
+                });
+
+                const cardTable = document.querySelector('.carte-table');
+                const overlay = document.getElementById('maskOverlay');
+                cardTable.classList.toggle('masked', !interfaceVisible);
+                overlay.classList.toggle('visible', !interfaceVisible);
+
+                const toggleBtn = document.getElementById('toggleNamesBtn');
+                toggleBtn.innerHTML = interfaceVisible
+                    ? '<i class="fas fa-mask"></i>'
+                    : '<i class="fas fa-eye"></i>';
             }
 
             /**
